@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.nuxt
+.output
+dist
+.nitro
+.cache
+
+# Generated files
+tsconfig.tsbuildinfo
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Other
+.DS_Store

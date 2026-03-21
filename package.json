@@ -1,0 +1,35 @@
+{
+  "name": "rachida-el-hady-portfolio",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "format": "prettier --write .",
+    "format:files": "prettier --write"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.11.2",
+    "@vuestic/nuxt": "^1.0.21",
+    "axios": "^1.12.2",
+    "nuxt": "4.1.2",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.21",
+    "vue-router": "^4.5.1",
+    "vuestic-ui": "^1.10.3"
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "prettier": "^3.8.1",
+    "sass-embedded": "^1.98.0",
+    "typescript": "^5.9.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.8"
+  }
+}
