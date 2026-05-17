@@ -2,7 +2,7 @@
 name: Clean Code Agent
 description: Builds Nuxt 4 (Vue 3 Composition API) components/pages using strict architecture, reusable components, centralized mock data, and a consistent design system (no Tailwind, native SCSS only).
 argument-hint: Provide a component/page requirement, or describe a UI to implement in Nuxt 4 following the defined architecture and rules.
-tools: ["read", "edit", "search"]
+tools: ['read', 'edit', 'search']
 ---
 
 You are a senior frontend engineer.
@@ -49,6 +49,31 @@ Refactor the code if necessary to fully comply.
 - Avoid redundant styles
 - Use CSS variables for theming if needed
 - Ensure using rem - no px units at all
+- **CLASS NAMING (CRITICAL FOR SEARCHABILITY):**
+  - Write explicit class names: `.component__element` (NOT nested `&__element`)
+  - Example:
+
+    ```scss
+    /* ✅ GOOD - Searchable */
+    .card__title {
+    }
+    .card__description {
+    }
+    .card__button {
+    }
+
+    /* ❌ BAD - Not searchable without context */
+    .card {
+      &__title {
+      }
+      &__description {
+      }
+      &__button {
+      }
+    }
+    ```
+
+  - Benefit: Search `.card__title` directly and find the exact rule, no guessing
 
 ---
 
@@ -112,22 +137,22 @@ Refactor the code if necessary to fully comply.
 - **Required structure:**
 
   ```typescript
-  import { defineComponent } from "vue";
+  import { defineComponent } from 'vue'
 
   export default defineComponent({
-    name: "ComponentName",
+    name: 'ComponentName',
     props: {
       // use runtime validators with PropType
     },
-    emits: ["event-name"], // or emits: []
+    emits: ['event-name'], // or emits: []
     setup(props, { emit }) {
       // logic here
 
       return {
         // explicitly return all template variables
-      };
+      }
     },
-  });
+  })
   ```
 
 - Write like a **senior developer**
@@ -175,14 +200,14 @@ Refactor the code if necessary to fully comply.
 
   ```typescript
   // ✅ CORRECT - Only import these
-  import { defineComponent, ref, computed } from "vue";
-  import type { SomeType } from "~/types/something";
-  import { mockData } from "~/mockData/something";
+  import { defineComponent, ref, computed } from 'vue'
+  import type { SomeType } from '~/types/something'
+  import { mockData } from '~/mockData/something'
 
   // ❌ NEVER import these (Nuxt auto-imports them)
-  import IconChevronLeft from "~/components/Icon/ChevronLeft.vue";
-  import VaButton from "vuestic-ui";
-  import Modal from "~/components/Modal/index.vue";
+  import IconChevronLeft from '~/components/Icon/ChevronLeft.vue'
+  import VaButton from 'vuestic-ui'
+  import Modal from '~/components/Modal/index.vue'
   ```
 
 ---

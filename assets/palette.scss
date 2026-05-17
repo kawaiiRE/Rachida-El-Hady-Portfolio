@@ -1,0 +1,114 @@
+:root {
+  color-scheme: light;
+
+  /*
+    Raw palette tokens
+  */
+
+  /* Grayscale */
+  --gray-scale-50: #1e293b;
+  --gray-scale-100: #26364b;
+  --gray-scale-200: #334155;
+  --gray-scale-300: #475569;
+  --gray-scale-400: #64748b;
+  --gray-scale-500: #94a3b8;
+  --gray-scale-600: #b8c5d2;
+  --gray-scale-700: #cbd5e1;
+  --gray-scale-800: #e2e8f0;
+  --gray-scale-900: #f0fdf4;
+  --gray-scale-950: #e9f5f8;
+
+  /* Primary scale */
+  --primary-scale-50: #eff6ff;
+  --primary-scale-100: #dbeafe;
+  --primary-scale-200: #bfdbfe;
+  --primary-scale-300: #93c5fd;
+  --primary-scale-400: #2563eb;
+  --primary-scale-500: #1d4ed8;
+  --primary-scale-600: #1e40af;
+  --primary-scale-700: #1d3a8a;
+  --primary-scale-800: #1e316e;
+  --primary-scale-900: #172554;
+  --primary-scale-950: #0f172a;
+
+  /* Secondary scale */
+  --secondary-scale-50: #fff1f4;
+  --secondary-scale-100: #ffe4ea;
+  --secondary-scale-200: #fecdd6;
+  --secondary-scale-300: #fda4b4;
+  --secondary-scale-400: #ff8fa3;
+  --secondary-scale-500: #ff758d;
+  --secondary-scale-600: #e55e78;
+  --secondary-scale-700: #c44560;
+  --secondary-scale-800: #9d324d;
+  --secondary-scale-900: #6c2035;
+  --secondary-scale-950: #45111f;
+
+  /*
+    RGB helpers for alpha-based usage
+  */
+  --gray-scale-50-rgb: 30, 41, 59;
+  --gray-scale-700-rgb: 203, 213, 225;
+  --gray-scale-800-rgb: 226, 232, 240;
+  --gray-scale-900-rgb: 240, 253, 244;
+  --gray-scale-950-rgb: 233, 245, 248;
+  --primary-scale-400-rgb: 37, 99, 235;
+  --secondary-scale-400-rgb: 255, 143, 163;
+
+  --animated-text-shadow: #8a2be2;
+}
+
+html.dark,
+.default-layout.dark {
+  color-scheme: dark;
+
+  /* Grayscale - The Deep Abyss */
+  --gray-scale-50: #f1f5f9;
+  --gray-scale-100: #e2e8f0;
+  --gray-scale-200: #cbd5e1;
+  --gray-scale-300: #c7d2fe;
+  --gray-scale-400: #94a3b8;
+  --gray-scale-500: #64748b;
+  --gray-scale-600: #312e81;
+  --gray-scale-700: #1e1b4b;
+  --gray-scale-800: #0d0b1f;
+  --gray-scale-900: #05020a;
+  --gray-scale-950: #000000;
+
+  /* Primary scale - OMEN Ocean */
+  --primary-scale-50: #ecfeff;
+  --primary-scale-100: #cffafe;
+  --primary-scale-200: #a5f3fc;
+  --primary-scale-300: #67e8f9;
+  --primary-scale-400: #00f2ff;
+  --primary-scale-500: #007bff;
+  --primary-scale-600: #8a2be2;
+  --primary-scale-700: #7c3aed;
+  --primary-scale-800: #5b21b6;
+  --primary-scale-900: #312e81;
+  --primary-scale-950: #1e1b4b;
+
+  /* Secondary scale - OMEN Magenta Pulse */
+  --secondary-scale-50: #fff0ff;
+  --secondary-scale-100: #ffd6ff;
+  --secondary-scale-200: #ffadff;
+  --secondary-scale-300: #ff6fff;
+  --secondary-scale-400: #ff00ff;
+  --secondary-scale-500: #db00db;
+  --secondary-scale-600: #b800b8;
+  --secondary-scale-700: #940094;
+  --secondary-scale-800: #6f006f;
+  --secondary-scale-900: #490049;
+  --secondary-scale-950: #260026;
+
+  /* RGB helpers for OMEN colors */
+  --gray-scale-50-rgb: 241, 245, 249;
+  --gray-scale-700-rgb: 30, 27, 75;
+  --gray-scale-800-rgb: 13, 11, 31;
+  --gray-scale-900-rgb: 5, 2, 10;
+  --gray-scale-950-rgb: 0, 0, 0;
+  --primary-scale-400-rgb: 0, 242, 255;
+  --secondary-scale-400-rgb: 255, 0, 255;
+
+  --animated-text-shadow: #fff;
+}

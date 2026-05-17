@@ -1,0 +1,134 @@
+.hero {
+  position: relative;
+  padding-top: 4rem;
+  height: 24rem;
+  // overflow: hidden;
+}
+
+.sitting-image {
+  position: absolute;
+  inset: auto 0 -37% auto;
+  max-width: 250px;
+}
+
+.hero__background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(var(--primary-scale-400-rgb), 0.3),
+    rgba(var(--gray-scale-900-rgb), 0.5)
+  );
+}
+
+.hero .app-container {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__grid {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hero__badge {
+  width: fit-content;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.24);
+  border-radius: 999rem;
+  color: rgba(var(--gray-scale-50-rgb), 0.84);
+  background-color: rgba(var(--gray-scale-50-rgb), 0.06);
+}
+
+.hero__title {
+  font-size: clamp(2rem, 8.5vw, 4.4rem);
+  line-height: 0.98;
+  margin-bottom: 1rem;
+  color: var(--gray-scale-50);
+}
+
+.hero__subtitle {
+  max-width: 38ch;
+  color: rgba(var(--gray-scale-50-rgb), 0.85);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.4rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 2rem;
+  margin-right: 5rem;
+  max-width: 22rem;
+}
+
+.hero__cta {
+  border-radius: 999rem;
+  padding: 0.7rem 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.hero__cta:hover {
+  transform: translateY(-0.08rem);
+}
+
+.hero__cta--primary {
+  color: var(--gray-scale-950);
+  background: linear-gradient(135deg, var(--primary-scale-400), var(--secondary-scale-400));
+}
+
+.hero__cta--ghost {
+  color: var(--gray-scale-50);
+  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.3);
+  background-color: rgba(var(--gray-scale-50-rgb), 0.06);
+}
+
+.hero__visual {
+  border-radius: 1.2rem;
+  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.15);
+  background: radial-gradient(
+    circle at top,
+    rgba(var(--primary-scale-400-rgb), 0.08),
+    rgba(var(--gray-scale-900-rgb), 0.6)
+  );
+  min-height: 16rem;
+  padding: 0.8rem;
+}
+
+.hero__particles {
+  width: 100%;
+  aspect-ratio: 5 / 1;
+}
+
+@media (min-width: breakpoint('desktop')) {
+  .hero__grid {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3rem;
+  }
+
+  .hero__visual {
+    min-height: 24rem;
+    padding: 1rem;
+  }
+
+  .hero__particles {
+    aspect-ratio: 5 / 1;
+  }
+
+  .sitting-image {
+    inset: auto 0 -45% auto;
+    max-width: 300px;
+  }
+}

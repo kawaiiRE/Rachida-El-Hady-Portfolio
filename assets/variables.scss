@@ -1,0 +1,9 @@
+@use './palette.scss';
+
+:root {
+  --font-display: var(--font-primary);
+  --font-body: var(--font-primary);
+
+  --space-section-sm: 3.5rem;
+  --space-section-lg: 5.5rem;
+}

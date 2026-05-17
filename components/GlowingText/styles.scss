@@ -1,0 +1,50 @@
+.text-svg {
+  // background-image: radial-gradient(closest-side, #00bfff1a, #fff0);
+  width: 100%;
+  height: auto;
+  display: block;
+  font-weight: 400;
+  font-size: 120px;
+  font-family: inherit;
+  height: var(--navbar-height);
+}
+
+.text-symbol {
+  font-family: inherit;
+}
+
+/* Base text styling */
+.main-text {
+  stroke-width: 1px;
+  font-family: inherit;
+}
+
+/* The Border Animation */
+.text-border,
+.text-glow {
+  fill: none;
+  stroke: var(--primary-scale-400);
+  stroke-width: 1px;
+  // stroke-dasharray: 300 200; /* Length of the light segment vs gap, basically each pair is the stroke length and how much it wait before it (itself) gets started */
+  stroke-dasharray: 50 150 100 150 50 150 450 200; /* Length of the light segment vs gap, basically each pair is the stroke length and how much it wait before it (itself) gets started */
+  stroke-dashoffset: 0;
+  animation: stroke-move 10s cubic-bezier(0.38, 0.64, 0.62, 0.37) infinite;
+  &.white {
+    stroke: var(--animated-text-shadow);
+    opacity: 0.9;
+  }
+}
+
+/* The Glow Effect */
+.text-glow {
+  stroke-width: 8px;
+  font-weight: 900;
+  filter: blur(8px); /* Creates the neon bloom */
+  opacity: 0.3;
+}
+
+@keyframes stroke-move {
+  100% {
+    stroke-dashoffset: -1300; /* Moves the light along the path */
+  }
+}

@@ -18,14 +18,42 @@ export default defineNuxtConfig({
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap',
+          href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap',
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Oleo+Script+Swash+Caps:wght@400;700&family=Rochester&family=Ruthie&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap',
+        },
+      ],
+      script: [
+        {
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-YC1MR1Z5Q5',
+          async: true,
+        },
+        {
+          innerHTML: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-YC1MR1Z5Q5');
+          `,
+          type: 'text/javascript',
         },
       ],
     },
   },
 
   modules: ['@vuestic/nuxt', '@pinia/nuxt'],
-  css: ['./assets/variables.scss', './assets/global.scss'],
+  css: ['./assets/fonts.scss', './assets/variables.scss', './assets/global.scss'],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "~/assets/breakpoints.scss" as *;',
+        },
+      },
+    },
+  },
   build: {
     transpile: ['vuestic-ui'],
   },

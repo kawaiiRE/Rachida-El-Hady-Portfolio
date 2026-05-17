@@ -1,0 +1,19 @@
+@use 'sass:map';
+
+$breakpoints: (
+  'project-carousel-min': 26rem,
+  'project-carousel-xs': 32rem,
+  'nav-compact': 35rem,
+  'project-carousel-sm': 37rem,
+  'phone-wide': 38rem,
+  'project-metrics-stack': 42rem,
+  'nav-desktop': 48rem,
+  'tablet': 56rem,
+  'project-showcase-tablet': 60rem,
+  'desktop': 64rem,
+  'skills-two-column': 68rem,
+);
+
+@function breakpoint($name) {
+  @return map.get($breakpoints, $name);
+}
