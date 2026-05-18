@@ -140,6 +140,14 @@
 }
 
 @media (max-width: breakpoint('phone-wide')) {
+  .about {
+    margin-top: 5rem;
+  }
+
+  .about__list {
+    padding: 0;
+  }
+
   .skills__highlights {
     grid-template-columns: 1fr;
   }

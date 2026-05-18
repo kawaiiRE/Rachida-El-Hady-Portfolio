@@ -29,11 +29,16 @@
         <button
           class="navbar__toggle"
           type="button"
+          :aria-label="menuButtonLabel"
           :aria-expanded="isMobileMenuOpen"
           aria-controls="mobile-nav"
           @click="toggleMobileMenu"
         >
-          {{ menuButtonLabel }}
+          <span class="navbar__toggle-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
         </button>
       </div>
     </div>

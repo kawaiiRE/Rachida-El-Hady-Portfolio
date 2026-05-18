@@ -37,7 +37,6 @@
             type="button"
             class="projects__carousel-card"
             :class="carouselProject.state"
-            :style="{ '--project-background': carouselProject.project.background }"
             :aria-label="`Focus ${carouselProject.project.title}`"
             @click="selectProject(index)"
           >

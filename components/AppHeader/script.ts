@@ -28,7 +28,7 @@ export default defineComponent({
     const isMobileMenuOpen = ref(false)
 
     // -------------------- Computed --------------------
-    const menuButtonLabel = computed(() => (isMobileMenuOpen.value ? 'Close' : 'Menu'))
+    const menuButtonLabel = computed(() => (isMobileMenuOpen.value ? 'Close menu' : 'Open menu'))
     const isDarkTheme = computed(() => themeMode.value === 'dark')
     const themeToggleLabel = computed(() =>
       isDarkTheme.value ? 'Switch to light theme' : 'Switch to dark theme',
