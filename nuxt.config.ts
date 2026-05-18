@@ -3,6 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    public: {
+      emailjsPublicKey: process.env.VITE_EMAILJS_PUBLIC_KEY,
+      emailjsServiceId: process.env.VITE_EMAILJS_SERVICE_ID,
+      emailjsTemplateId: process.env.VITE_EMAILJS_TEMPLATE_ID,
+    },
+  },
+
   // Application configuration
   app: {
     head: {
