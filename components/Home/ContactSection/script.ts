@@ -102,7 +102,7 @@ export default defineComponent({
             to_name: 'Rachida',
             email: formData.value.email,
             from_email: formData.value.email,
-            to_email: 'elhadyrachida711@gmail.com',
+            to_email: 'elhadyrachida71@gmail.com',
             message: formData.value.message,
           },
         )
