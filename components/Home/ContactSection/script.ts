@@ -77,10 +77,22 @@ export default defineComponent({
     // -------------------- Computed --------------------
 
     // -------------------- Methods --------------------
+    const getEmailJSConfig = () => ({
+      publicKey: config.public.emailjsPublicKey as string,
+      serviceId: config.public.emailjsServiceId as string,
+      templateId: config.public.emailjsTemplateId as string,
+    })
+
     // Initialize EmailJS
     const initializeEmailJS = () => {
-      const publicKey = config.public.emailjsPublicKey
-      emailjs.init(publicKey as string)
+      const { publicKey } = getEmailJSConfig()
+
+      if (!publicKey) {
+        console.error('EmailJS public key is missing. Check NUXT_PUBLIC_EMAILJS_PUBLIC_KEY in the deployment environment.')
+        return
+      }
+
+      emailjs.init({ publicKey })
     }
 
     // Send form
@@ -95,9 +107,15 @@ export default defineComponent({
       successMessage.value = ''
 
       try {
+        const { publicKey, serviceId, templateId } = getEmailJSConfig()
+
+        if (!publicKey || !serviceId || !templateId) {
+          throw new Error('EmailJS configuration is missing')
+        }
+
         await emailjs.send(
-          config.public.emailjsServiceId as string,
-          config.public.emailjsTemplateId as string,
+          serviceId,
+          templateId,
           {
             from_name: formData.value.name,
             to_name: 'Rachida',
@@ -106,6 +124,7 @@ export default defineComponent({
             to_email: 'elhadyrachida71@gmail.com',
             message: formData.value.message,
           },
+          { publicKey },
         )
 
         successMessage.value = 'Message sent successfully!'
