@@ -88,7 +88,9 @@ export default defineComponent({
       const { publicKey } = getEmailJSConfig()
 
       if (!publicKey) {
-        console.error('EmailJS public key is missing. Check NUXT_PUBLIC_EMAILJS_PUBLIC_KEY in the deployment environment.')
+        console.error(
+          'EmailJS public key is missing. Check NUXT_PUBLIC_EMAILJS_PUBLIC_KEY in the deployment environment.',
+        )
         return
       }
 

@@ -1,20 +1,84 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL
+const siteName = 'Rachida El Hady'
+const siteDescription =
+  'Frontend engineer portfolio for Rachida El Hady, featuring Nuxt, Vue, React Native, Expo, and production-focused interface work.'
+const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
   runtimeConfig: {
     public: {
-      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY || '',
-      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID || '',
-      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID || '',
+      siteUrl,
+      emailjsPublicKey:
+        process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY || '',
+      emailjsServiceId:
+        process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID || '',
+      emailjsTemplateId:
+        process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID || '',
     },
   },
 
   // Application configuration
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'en',
+      },
+      title: siteName,
+      meta: [
+        {
+          name: 'description',
+          content: siteDescription,
+        },
+        {
+          name: 'theme-color',
+          content: '#121212',
+        },
+        {
+          property: 'og:type',
+          content: 'website',
+        },
+        {
+          property: 'og:url',
+          content: siteUrl,
+        },
+        {
+          property: 'og:title',
+          content: siteName,
+        },
+        {
+          property: 'og:description',
+          content: siteDescription,
+        },
+        {
+          property: 'og:image',
+          content: socialImage,
+        },
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+        {
+          name: 'twitter:title',
+          content: siteName,
+        },
+        {
+          name: 'twitter:description',
+          content: siteDescription,
+        },
+        {
+          name: 'twitter:image',
+          content: socialImage,
+        },
+      ],
       link: [
+        {
+          rel: 'canonical',
+          href: siteUrl,
+        },
         {
           rel: 'preconnect',
           href: 'https://fonts.googleapis.com',

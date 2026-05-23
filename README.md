@@ -1,75 +1,71 @@
-# Nuxt Minimal Starter
+# Rachida El Hady Portfolio
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Nuxt 4 portfolio for Rachida El Hady, focused on frontend engineering, mobile app work, selected projects, and contact conversion.
+
+## Tech Stack
+
+- Nuxt 4
+- Vue 3 Composition API
+- TypeScript
+- SCSS
+- EmailJS for the contact form
+- Vanta/Three.js for the hero background
 
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies:
 
 ```bash
-# npm
 npm install
+```
 
-# pnpm
-pnpm install
+The repository includes a Yarn lockfile, so Yarn can also be used when it is available:
 
-# yarn
+```bash
 yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+Create a local `.env` file from `.env.example` and fill in the deployment URL plus EmailJS values:
 
-Start the development server on `http://localhost:3000`:
+```env
+NUXT_PUBLIC_SITE_URL=https://your-domain.com
+NUXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key_here
+NUXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id_here
+NUXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id_here
+```
+
+## Development
+
+Start the local dev server:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+Build for production:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview the production build:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Deployment Notes
+
+For Cloudflare, set the same `NUXT_PUBLIC_*` variables in the Cloudflare environment before triggering a deployment. Client-visible Nuxt public variables are read during build for static output, so redeploy after changing them.
+
+If the live domain changes, update:
+
+- `NUXT_PUBLIC_SITE_URL`
+- `public/sitemap.xml`
+- the `Sitemap:` entry in `public/robots.txt`
+
+## Content To Maintain
+
+- Project data lives in `constants/projects.ts`.
+- Contact and CV request actions are wired through EmailJS and `mailto:` links.
+- Global SEO metadata is configured in `nuxt.config.ts`.
