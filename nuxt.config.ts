@@ -1,9 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const siteUrl = process.env.NUXT_PUBLIC_SITE_URL
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://rachida.dev'
 const siteName = 'Rachida El Hady'
 const siteDescription =
   'Frontend engineer portfolio for Rachida El Hady, featuring Nuxt, Vue, React Native, Expo, and production-focused interface work.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
+const websiteStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: siteName,
+  alternateName: 'Rachida El Hady',
+  url: siteUrl,
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -42,6 +49,10 @@ export default defineNuxtConfig({
           content: 'website',
         },
         {
+          property: 'og:site_name',
+          content: siteName,
+        },
+        {
           property: 'og:url',
           content: siteUrl,
         },
@@ -73,6 +84,10 @@ export default defineNuxtConfig({
           name: 'twitter:image',
           content: socialImage,
         },
+        {
+          name: 'application-name',
+          content: siteName,
+        },
       ],
       link: [
         {
@@ -99,15 +114,19 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-YC1MR1Z5Q5',
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-SYP80JYZQ9',
           async: true,
+        },
+        {
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify(websiteStructuredData),
         },
         {
           innerHTML: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-YC1MR1Z5Q5');
+            gtag('config', 'G-SYP80JYZQ9');
           `,
           type: 'text/javascript',
         },
