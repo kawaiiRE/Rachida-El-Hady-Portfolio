@@ -1,7 +1,6 @@
 import { computed, defineComponent, ref } from 'vue'
-import type { PropType } from 'vue'
+import { PROJECTS } from '~/constants/projects'
 import type { PortfolioProject } from '~/constants/projects'
-import { APP_ROUTES } from '~/constants/routes'
 
 type ProjectCardState =
   | 'is-active'
@@ -30,19 +29,15 @@ const CARD_STATE_BY_DIFF: Record<string, ProjectCardState> = {
 
 export default defineComponent({
   name: 'ProjectsSection',
-  props: {
-    projects: {
-      type: Array as PropType<PortfolioProject[]>,
-      default: () => [],
-    },
-  },
+  props: {},
   emits: [],
-  setup(props) {
+  setup() {
+    const projects = PROJECTS
     const currentIndex = ref(0)
-    const totalProjects = computed(() => props.projects.length)
+    const totalProjects = computed(() => projects.length)
 
     const currentProject = computed<PortfolioProject | null>(() => {
-      return props.projects[currentIndex.value] ?? null
+      return projects[currentIndex.value] ?? null
     })
 
     const normalizeIndex = (index: number): number => {
@@ -70,7 +65,7 @@ export default defineComponent({
     }
 
     const carouselProjects = computed<ProjectCarouselItem[]>(() => {
-      return props.projects.map((project, index) => ({
+      return projects.map((project, index) => ({
         project,
         state: getCardState(index),
       }))
@@ -93,7 +88,6 @@ export default defineComponent({
       currentProject,
       selectProject,
       shiftProject,
-      APP_ROUTES,
     }
   },
 })

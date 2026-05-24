@@ -1,14 +1,6 @@
 <template>
   <section id="vibe" class="vibe">
     <div class="app-container">
-      <div class="vibe__intro">
-        <p class="section-label">Vibe</p>
-        <h2 class="section-title">Soft energy, strong structure, and motion with rhythm.</h2>
-        <p class="vibe__copy">
-          The kind of work I love sits right between design sensitivity and engineering clarity.
-        </p>
-      </div>
-
       <div class="vibe__banner">
         <div class="vibe__marquee" aria-label="Animated list of design and frontend vibes">
           <div class="vibe__row" :class="{ 'vibe__row--reverse': false }">

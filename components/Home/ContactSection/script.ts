@@ -1,5 +1,6 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import emailjs from '@emailjs/browser'
+import { APP_LINKS } from '~/constants/routes'
 
 interface HomeContactItem {
   id: string
@@ -155,6 +156,7 @@ export default defineComponent({
       isLoading,
       successMessage,
       errorMessage,
+      APP_LINKS,
       sendMessage,
     }
   },

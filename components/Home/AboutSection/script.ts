@@ -6,7 +6,7 @@ type SkillGroup = {
   skills: string[]
 }
 
-type Highlight = {
+type LeadershipHighlight = {
   id: string
   title: string
   description: string
@@ -19,10 +19,25 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     // -------------------- State --------------------
-    const items: string[] = [
-      'I build functional web and mobile applications using modern frameworks like Nuxt and Expo.',
-      'I focus on creating practical, data-driven tools and systems that serve a clear purpose.',
-      'I enjoy turning complex product ideas into polished interfaces.',
+    const leadershipHighlights: LeadershipHighlight[] = [
+      {
+        id: 'project-leadership',
+        title: 'Leadership',
+        description:
+          'Take the lead on major frontend projects by directing development, organizing engineering tasks, and keeping the team aligned to deliver high-quality work.',
+      },
+      {
+        id: 'team-growth',
+        title: 'Team Growth & Mentorship',
+        description:
+          'Guide new developers from their first day until they are fully independent, helping them learn the codebase and write cleaner, stronger code.',
+      },
+      {
+        id: 'code-quality',
+        title: 'Code Quality & Standards',
+        description:
+          'Review daily pull requests to maintain clear patterns, consistent implementation, and reliable frontend quality across the team.',
+      },
     ]
 
     const skillGroups: SkillGroup[] = [
@@ -60,34 +75,12 @@ export default defineComponent({
       },
     ]
 
-    const highlights: Highlight[] = [
-      {
-        id: 'project-leadership',
-        title: 'Leadership',
-        description:
-          'Take the lead on major frontend projects by directing development, organizing engineering tasks, and keeping the team aligned to deliver high-quality work.',
-      },
-      {
-        id: 'team-growth',
-        title: 'Team Growth & Mentorship',
-        description:
-          'Directly guide all new developers from their first day until they are fully independent. I help them learn new technologies, master our codebase, and consistently write cleaner, better code.',
-      },
-      {
-        id: 'code-quality',
-        title: 'Code Quality & Standards',
-        description:
-          'Review daily pull requests to maintain high code quality and consistency across the team.',
-      },
-    ]
-
     // -------------------- Computed --------------------
     // -------------------- Methods --------------------
     // -------------------- Lifecycle --------------------
 
     return {
-      highlights,
-      items,
+      leadershipHighlights,
       skillGroups,
     }
   },

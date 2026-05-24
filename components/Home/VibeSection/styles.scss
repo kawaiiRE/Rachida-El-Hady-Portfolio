@@ -2,17 +2,6 @@
   position: relative;
 }
 
-.vibe__intro {
-  max-width: 42rem;
-  margin-bottom: 1.75rem;
-}
-
-.vibe__copy {
-  max-width: 34rem;
-  color: rgba(var(--gray-scale-50-rgb), 0.76);
-  line-height: 1.6;
-}
-
 .vibe__banner {
   background-color: var(--primary-scale-300);
   margin: 0 -4.5rem;
@@ -299,10 +288,6 @@
 }
 
 @media (max-width: breakpoint('tablet')) {
-  .vibe__intro {
-    margin-bottom: 1.35rem;
-  }
-
   .vibe__marquee {
     gap: 0.75rem;
     -webkit-mask-image: none;

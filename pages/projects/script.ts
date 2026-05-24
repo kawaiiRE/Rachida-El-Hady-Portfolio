@@ -1,5 +1,6 @@
 import { defineComponent, ref, onMounted, nextTick } from 'vue'
 import { PROJECTS } from '~/constants/projects'
+import type { PortfolioProject } from '~/constants/projects'
 
 export default defineComponent({
   name: 'ProjectsPage',
@@ -49,6 +50,10 @@ export default defineComponent({
       return scrollState.value[id] ? !scrollState.value[id].end : true
     }
 
+    const getProjectLinks = (project: PortfolioProject) => {
+      return project.links.filter((link) => link.url)
+    }
+
     onMounted(async () => {
       await nextTick()
       // Initialize scroll states
@@ -70,6 +75,7 @@ export default defineComponent({
       scrollGallery,
       canScrollLeft,
       canScrollRight,
+      getProjectLinks,
     }
   },
 })

@@ -5,8 +5,8 @@
       <div class="hero__content">
         <h1 class="hero__title">Rachida El Hady</h1>
         <p class="hero__subtitle">
-          Focused on writing structured code and architecting reliable systems that scale seamlessly
-          in production.
+          Frontend engineering with style and substance, focused on structured code and reliable
+          systems that scale smoothly in production.
         </p>
 
         <div class="hero__actions">
@@ -16,6 +16,14 @@
           <NuxtLink :to="APP_ROUTES.CONTACT" class="hero__cta hero__cta--ghost"
             >Get In Touch</NuxtLink
           >
+          <a
+            v-if="APP_LINKS.CV_DOWNLOAD"
+            :href="APP_LINKS.CV_DOWNLOAD"
+            class="hero__cta hero__cta--ghost"
+            download
+          >
+            Download CV
+          </a>
         </div>
       </div>
     </div>

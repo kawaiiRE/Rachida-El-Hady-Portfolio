@@ -40,6 +40,15 @@
         <div class="contact__divider">
           <span>or</span>
         </div>
+
+        <a
+          v-if="APP_LINKS.CV_DOWNLOAD"
+          :href="APP_LINKS.CV_DOWNLOAD"
+          class="contact__cv-link"
+          download
+        >
+          Download CV
+        </a>
       </div>
 
       <!-- Contact form -->

@@ -1,16 +1,43 @@
-.about__list {
+.leadership__highlights {
   display: grid;
-  gap: 0.85rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.about__item {
-  list-style: none;
-  border-left: 0.18rem solid var(--primary-scale-400);
-  background-color: rgba(var(--gray-scale-900-rgb), 0.5);
-  border-radius: 0.7rem;
-  padding: 0.95rem 1rem;
-  color: rgba(var(--gray-scale-50-rgb), 0.9);
-  line-height: 1.5;
+.leadership__card {
+  position: relative;
+  overflow: hidden;
+  min-height: 12rem;
+  padding: 1.25rem 1rem;
+  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.14);
+  border-radius: 0.85rem;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--gray-scale-950-rgb), 0.72),
+    rgba(var(--gray-scale-900-rgb), 0.66)
+  );
+  box-shadow: 0 0.85rem 1.8rem rgba(var(--gray-scale-800-rgb), 0.12);
+}
+
+.leadership__card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.25rem;
+  background: linear-gradient(90deg, var(--primary-scale-400), var(--secondary-scale-400));
+}
+
+.leadership__card-title {
+  margin-bottom: 0.75rem;
+  color: var(--gray-scale-50);
+  font-size: 1.08rem;
+  line-height: 1.25;
+}
+
+.leadership__card-description {
+  color: rgba(var(--gray-scale-50-rgb), 0.76);
+  line-height: 1.65;
 }
 
 .about__skills {
@@ -22,8 +49,7 @@
   gap: 2rem;
 }
 
-.skills__header,
-.skills__beyond-header {
+.skills__header {
   display: grid;
   gap: 0.95rem;
   max-width: 42rem;
@@ -70,55 +96,8 @@
   line-height: 1.65;
 }
 
-.skills__beyond {
-  display: grid;
-  gap: 1.35rem;
-  padding-top: 1.25rem;
-}
-
-.skills__highlights {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.skills__highlight-card {
-  position: relative;
-  overflow: hidden;
-  min-height: 12rem;
-  padding: 1.25rem 1rem;
-  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.14);
-  border-radius: 0.85rem;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--gray-scale-950-rgb), 0.72),
-    rgba(var(--gray-scale-900-rgb), 0.66)
-  );
-  box-shadow: 0 0.85rem 1.8rem rgba(var(--gray-scale-800-rgb), 0.12);
-}
-
-.skills__highlight-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 0.25rem;
-  background: linear-gradient(90deg, var(--primary-scale-400), var(--secondary-scale-400));
-}
-
-.skills__highlight-title {
-  margin-bottom: 0.75rem;
-  color: var(--gray-scale-50);
-  font-size: 1.08rem;
-  line-height: 1.25;
-}
-
-.skills__highlight-description {
-  color: rgba(var(--gray-scale-50-rgb), 0.76);
-  line-height: 1.65;
-}
-
 @media (max-width: breakpoint('skills-two-column')) {
-  .skills__highlights {
+  .leadership__highlights {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -144,15 +123,11 @@
     margin-top: 5rem;
   }
 
-  .about__list {
-    padding: 0;
-  }
-
-  .skills__highlights {
+  .leadership__highlights {
     grid-template-columns: 1fr;
   }
 
-  .skills__highlight-card {
+  .leadership__card {
     min-height: auto;
   }
 }

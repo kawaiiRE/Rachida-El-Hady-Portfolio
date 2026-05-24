@@ -10,9 +10,9 @@ interface AppHeaderLink {
 
 export const links: AppHeaderLink[] = [
   // { id: 'hero', label: 'Home', path: APP_ROUTES.HOME },
-  { id: 'about', label: 'About', path: APP_ROUTES.ABOUT },
-  { id: 'vibe', label: 'Vibe', path: APP_ROUTES.VIBE },
+  // { id: 'leadership', label: 'Leadership', path: APP_ROUTES.LEADERSHIP },
   { id: 'projects', label: 'Projects', path: APP_ROUTES.PROJECTS },
+  { id: 'vibe', label: 'Vibe', path: APP_ROUTES.VIBE },
   { id: 'contact', label: 'Contact', path: APP_ROUTES.CONTACT },
 ]
 

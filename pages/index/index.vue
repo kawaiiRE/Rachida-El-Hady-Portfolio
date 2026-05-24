@@ -2,11 +2,10 @@
   <div class="home-page">
     <HomeHeroSection />
     <HomeAboutSection />
+    <HomeProjectsSection />
     <HomeVibeSection />
-    <HomeProjectsSection :projects="projects" />
     <HomeContactSection />
   </div>
 </template>
 
-<script lang="ts" src="./script.ts" />
 <style lang="scss" scoped src="./styles.scss" />

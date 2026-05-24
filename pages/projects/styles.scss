@@ -43,32 +43,19 @@
   background: transparent;
   border-radius: 1.5rem;
   padding: 2.5rem 0;
+  scroll-margin-top: 6rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
 .project-card__title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 800;
   margin: 0;
-
-  /* Animated gradient */
-  background: linear-gradient(
-      90deg,
-      rgb(97, 197, 255),
-      rgb(97, 197, 255),
-      rgb(255, 120, 165),
-      rgb(255, 120, 165),
-      rgb(97, 197, 255)
-    )
-    0% 0% / 200% 100% text;
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: gradientLoop 3s linear infinite;
-  text-align: center;
+  color: var(--gray-scale-50);
+  line-height: 1.1;
+  text-align: left;
 }
 
 @keyframes gradientLoop {
@@ -131,6 +118,12 @@
   gap: 1rem;
 }
 
+.project-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .project-card__btn-primary {
   display: inline-flex;
   justify-content: center;
@@ -140,13 +133,9 @@
   font-weight: bold;
   color: #fff;
   text-decoration: none;
-  background: linear-gradient(
-      90deg,
-      rgb(97, 197, 255),
-      rgb(97, 197, 255),
-      rgb(255, 120, 165),
-      rgb(255, 120, 165),
-      rgb(97, 197, 255)
+  background: var(
+      --project-background,
+      linear-gradient(135deg, var(--primary-scale-400), var(--primary-scale-500))
     )
     0% 0% / 200% 100%;
   background-size: 200% auto;
@@ -192,6 +181,7 @@
 
 .project-card__gallery {
   display: flex;
+  align-items: center;
   gap: 1.5rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -206,12 +196,25 @@
 }
 
 .project-card__gallery-image {
-  flex: 0 0 200px;
-  width: 200px;
-  height: auto;
-  border-radius: 1rem;
-  object-fit: cover;
+  flex: 0 0 auto;
+  width: auto;
+  height: clamp(22rem, 42vw, 38rem);
+  max-width: min(72rem, 86vw);
+  border-radius: 0.75rem;
+  object-fit: contain;
   scroll-snap-align: start;
+}
+
+@media (max-width: 768px) {
+  .project-card__title {
+    text-align: center;
+  }
+
+  .project-card__gallery-image {
+    height: auto;
+    width: min(100%, 22rem);
+    max-width: 86vw;
+  }
 }
 
 /* Navigation arrows */

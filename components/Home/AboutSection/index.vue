@@ -1,16 +1,26 @@
 <template>
-  <section id="about" class="about">
+  <section id="leadership" class="about">
     <div class="app-container">
       <!-- <div ref="textCanvasRef" class="about__visual" aria-hidden="true"></div> -->
 
-      <p class="section-label">About</p>
-      <h2 class="section-title">Frontend engineering with style and substance.</h2>
+      <p class="section-label">Leadership</p>
+      <h2 class="section-title">How I help teams move with clarity.</h2>
 
-      <ul class="about__list">
-        <li v-for="item in items" :key="item" class="about__item">
-          {{ item }}
-        </li>
-      </ul>
+      <div class="leadership__highlights">
+        <article
+          v-for="highlight in leadershipHighlights"
+          :key="highlight.id"
+          class="leadership__card"
+        >
+          <h3 class="leadership__card-title">
+            {{ highlight.title }}
+          </h3>
+
+          <p class="leadership__card-description">
+            {{ highlight.description }}
+          </p>
+        </article>
+      </div>
 
       <div id="skills" class="about__skills skills">
         <div class="skills__header">
@@ -31,36 +41,6 @@
             <p class="skills__detail-text">
               {{ group.skills.join(', ') }}
             </p>
-          </div>
-        </div>
-
-        <div class="skills__beyond">
-          <div class="skills__beyond-header">
-            <div>
-              <p class="section-label">Beyond Coding</p>
-              <h2 class="section-title">How I Work With Teams</h2>
-            </div>
-
-            <p class="skills__description">
-              I don't only focus on writing code. I also support teammates, review work, and help
-              projects move forward with clearer structure and better quality.
-            </p>
-          </div>
-
-          <div class="skills__highlights">
-            <article
-              v-for="highlight in highlights"
-              :key="highlight.id"
-              class="skills__highlight-card"
-            >
-              <h3 class="skills__highlight-title">
-                {{ highlight.title }}
-              </h3>
-
-              <p class="skills__highlight-description">
-                {{ highlight.description }}
-              </p>
-            </article>
           </div>
         </div>
       </div>

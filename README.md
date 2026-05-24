@@ -67,5 +67,6 @@ If the live domain changes, update:
 ## Content To Maintain
 
 - Project data lives in `constants/projects.ts`.
-- Contact and CV request actions are wired through EmailJS and `mailto:` links.
+- Contact form delivery is wired through EmailJS.
+- To show the Download CV button, add the CV file under `public/` and set `APP_LINKS.CV_DOWNLOAD` in `constants/routes.ts`.
 - Global SEO metadata is configured in `nuxt.config.ts`.

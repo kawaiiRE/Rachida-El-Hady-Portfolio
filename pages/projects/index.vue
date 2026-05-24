@@ -4,8 +4,8 @@
       <div class="projects-page__header">
         <h1 class="projects-page__title">My Projects</h1>
         <p class="projects-page__subtitle">
-          A closer look at the mobile app I've built, featuring beautiful layouts and smooth
-          interactions.
+          A closer look at selected web and mobile builds, with the product thinking, visuals, and
+          technical details behind each one.
         </p>
       </div>
 
@@ -15,6 +15,7 @@
           :id="project.id"
           :key="project.id"
           class="project-card"
+          :style="{ '--project-background': project.background }"
         >
           <h2 class="project-card__title">{{ project.title }}</h2>
 
@@ -29,23 +30,22 @@
               </div>
 
               <div class="project-card__info">
-                <a
-                  :href="project.link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="project-card__btn-primary"
-                >
-                  View Project
-                </a>
+                <div class="project-card__actions">
+                  <a
+                    v-for="(projectLink, linkIndex) in getProjectLinks(project)"
+                    :key="projectLink.id"
+                    :href="projectLink.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :class="
+                      linkIndex === 0 ? 'project-card__btn-primary' : 'project-card__btn-secondary'
+                    "
+                  >
+                    {{ projectLink.label }}
+                  </a>
+                </div>
+
                 <p class="project-card__description">{{ project.description }}</p>
-                <a
-                  :href="project.link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="project-card__btn-secondary"
-                >
-                  {{ project.linkLabel }}
-                </a>
               </div>
             </div>
 

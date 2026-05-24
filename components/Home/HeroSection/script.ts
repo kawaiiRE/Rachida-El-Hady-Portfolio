@@ -1,7 +1,7 @@
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { PropType } from 'vue'
 import { hexColorToNumber, resolveCssVarColor, themeColorVariables } from '~/lib/utils'
-import { APP_ROUTES } from '~/constants/routes'
+import { APP_LINKS, APP_ROUTES } from '~/constants/routes'
 
 type VantaEffect = {
   destroy: () => void
@@ -77,6 +77,7 @@ export default defineComponent({
 
     return {
       heroBackgroundRef,
+      APP_LINKS,
       APP_ROUTES,
     }
   },
