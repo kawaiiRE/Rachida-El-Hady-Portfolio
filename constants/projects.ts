@@ -29,14 +29,115 @@ export interface PortfolioProject {
 
 export const PROJECTS: PortfolioProject[] = [
   {
+    id: 'notify',
+    title: 'Notify',
+    category: 'Mobile App + Marketing Website',
+    summary:
+      'A calm reminder app for everyday tasks, routines, follow-ups, and important alerts, paired with a focused Nuxt marketing site.',
+    description:
+      'Notify is an Expo and React Native reminder app built around reliable device-first alerts, quick repeat setup, snooze options, pinned and sticky reminders, categories, priorities, history, backup import/export, and Android notification setup checks. Its Nuxt marketing site presents the reminder workflow, privacy policy, SEO metadata, robots, sitemap, and a clean download path for the app listing.',
+    stack: [
+      'Expo',
+      'React Native',
+      'TypeScript',
+      'Expo Notifications',
+      'React Native Paper',
+      'Day.js',
+      'Nuxt',
+      'Vue',
+      'Vuestic UI',
+    ],
+    imageAlt: 'Notify smart reminders app store feature graphic.',
+    logo: '/images/projects/notify/notify-logo.png',
+    logoAlt: 'Notify bell logo.',
+    images: [
+      '/images/projects/notify/notify-prev-1-upcoming-reminders.png',
+      '/images/projects/notify/notify-prev-2-new-reminder.png',
+      '/images/projects/notify/notify-prev-3-history-export.png',
+    ],
+    bgImg: '/images/projects/notify/notify-bg.png',
+    background: 'linear-gradient(90deg, #2f7d56, #5d8d6a, #ffba45, #f3efe4, #2f7d56)',
+    metrics: [
+      {
+        value: 'Expo',
+        label: 'Device-first reminder alerts',
+      },
+      {
+        value: 'Nuxt',
+        label: 'Marketing and privacy site',
+      },
+    ],
+    links: [
+      {
+        id: 'website',
+        label: 'Visit Website',
+        url: 'https://notify.rachida.dev/',
+      },
+    ],
+    path: '/projects#notify',
+  },
+  {
+    id: 'auraflow',
+    title: 'Auraflow',
+    category: 'Creative Web App',
+    summary:
+      'An interactive WebGL wallpaper studio for creating fluid art, marbled ink, silk trails, auroras, nebulae, and organic blooms in the browser.',
+    description:
+      'Auraflow is a Nuxt and Vue creative tool for making interactive WebGL wallpapers. It ships with fluid ink, ink marbling, reaction bloom, neon silk, aurora field, and nebula forge modes, with mode-specific controls, local preset storage, responsive wallpaper sizing, and direct PNG exports for the screen you use.',
+    stack: ['Nuxt', 'Vue', 'TypeScript', 'Pinia', 'WebGL', 'Canvas', 'SCSS', 'Vitest'],
+    imageAlt: 'Auraflow interactive fluid wallpaper preview.',
+    logo: '/images/projects/auraflow/auraflow-logo.png',
+    logoAlt: 'Auraflow swirl logo.',
+    images: [
+      '/images/projects/auraflow/auraflow-prev-1-fluid-ink.png',
+      '/images/projects/auraflow/auraflow-prev-2-ink-marbling.png',
+      '/images/projects/auraflow/auraflow-prev-3-reaction-bloom.png',
+      '/images/projects/auraflow/auraflow-prev-4-neon-silk.png',
+      '/images/projects/auraflow/auraflow-prev-5-aurora-field.png',
+      '/images/projects/auraflow/auraflow-prev-6-nebula-forge.png',
+    ],
+    bgImg: '/images/projects/auraflow/auraflow-bg.png',
+    background: 'linear-gradient(90deg, #ff8fbd, #83e6ff, #b69cff, #ffd59e, #ff8fbd)',
+    metrics: [
+      {
+        value: '6',
+        label: 'Interactive wallpaper modes',
+      },
+      {
+        value: 'PNG',
+        label: 'Custom wallpaper exports',
+      },
+    ],
+    links: [
+      {
+        id: 'website',
+        label: 'Visit Website',
+        url: 'https://auraflow.rachida.dev/',
+      },
+    ],
+    path: '/projects#auraflow',
+  },
+  {
     id: 'crazy-sudoku',
     title: 'Crazy Sudoku',
-    category: 'Mobile App',
-    summary: 'A fun and challenging Sudoku experience built for mobile puzzle sessions.',
+    category: 'Mobile App + Marketing Website',
+    summary:
+      'A colorful Sudoku app and playful demo site for puzzle modes, rules, mini games, and a clear Google Play path.',
     description:
-      'A mobile app developed using React Native, Expo, and Git. Integrated ads and in-app payments for a colorful logic puzzle experience with classic Sudoku, greater-than clues, division twists, circles mode, achievements, coins, and mini games.',
-    stack: ['React Native', 'Expo', 'Git', 'Ads', 'In-app Payments'],
-    imageAlt: 'Crazy Sudoku app preview.',
+      'Crazy Sudoku combines a React Native and Expo mobile puzzle app with a responsive Nuxt marketing and demo site. The app includes classic Sudoku, greater-than clues, division twists, circles mode, achievements, coins, mini games, ads, and in-app payments, while the website supports discovery with animated bubbles, mini game previews, rule explanations, SEO metadata, and a direct Google Play path.',
+    stack: [
+      'React Native',
+      'Expo',
+      'Nuxt',
+      'Vue',
+      'TypeScript',
+      'Vuestic UI',
+      'Ads',
+      'In-app Payments',
+      'SEO',
+      'Cloudflare',
+    ],
+    imageAlt: 'Crazy Sudoku app and demo site preview.',
     logo: '/images/projects/crazy-sudoku/crazy-sudoku-logo.png',
     logoAlt: 'Crazy Sudoku logo.',
     images: [
@@ -45,6 +146,11 @@ export const PROJECTS: PortfolioProject[] = [
       '/images/projects/crazy-sudoku/crazy-sudoku-prev-3.png',
       '/images/projects/crazy-sudoku/crazy-sudoku-prev-4.jpg',
       '/images/projects/crazy-sudoku/crazy-sudoku-prev-5.png',
+      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-1.png',
+      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-2.png',
+      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-3.png',
+      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-4.png',
+      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-5.png',
     ],
     bgImg: '/images/projects/crazy-sudoku/crazy-sudoku-bg.png',
     background: 'linear-gradient(90deg, #61c5ff, #61c5ff, #ff78a5, #ff78a5, #61c5ff)',
@@ -54,48 +160,8 @@ export const PROJECTS: PortfolioProject[] = [
         label: 'Downloads',
       },
       {
-        value: '5',
-        label: 'App Rating',
-      },
-    ],
-    links: [
-      {
-        id: 'google-play',
-        label: 'View on Google Play',
-        url: 'https://play.google.com/store/apps/details?id=com.kawaiire.crazysudoku',
-      },
-    ],
-    path: '/projects#crazy-sudoku',
-  },
-  {
-    id: 'crazy-sudoku-web',
-    title: 'Crazy Sudoku Demo Site',
-    category: 'Marketing Website',
-    summary:
-      'A playful marketing and demo site for Crazy Sudoku, with animated bubbles, mini game previews, rules, and a clear Google Play path.',
-    description:
-      'A responsive marketing website for Crazy Sudoku built around motion, bright game visuals, and quick product understanding. The site supports the main app with SEO metadata, a demo-style puzzle board, mini game previews, rule explanations, and a direct path to the Google Play listing.',
-    stack: ['Nuxt', 'Vue', 'TypeScript', 'Vuestic UI', 'SEO', 'Cloudflare'],
-    imageAlt: 'Crazy Sudoku demo site themed background.',
-    logo: '/images/projects/crazy-sudoku-web/crazy-sudoku-web-logo.png',
-    logoAlt: 'Crazy Sudoku demo site logo.',
-    images: [
-      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-1.png',
-      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-2.png',
-      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-3.png',
-      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-4.png',
-      '/images/projects/crazy-sudoku-web/crazy-sudoku-web-prev-5.png',
-    ],
-    bgImg: '/images/projects/crazy-sudoku-web/crazy-sudoku-web-bg.png',
-    background: 'linear-gradient(90deg, #61c5ff, #61c5ff, #ff78a5, #ff78a5, #61c5ff)',
-    metrics: [
-      {
         value: 'Live',
-        label: 'Marketing site',
-      },
-      {
-        value: '3',
-        label: 'Puzzle modes previewed',
+        label: 'Demo and marketing site',
       },
     ],
     links: [
@@ -104,55 +170,14 @@ export const PROJECTS: PortfolioProject[] = [
         label: 'Visit Website',
         url: 'https://crazysudoku.rachida.dev',
       },
+      {
+        id: 'google-play',
+        label: 'View on Google Play',
+        url: 'https://play.google.com/store/apps/details?id=com.kawaiire.crazysudoku',
+      },
     ],
-    path: '/projects#crazy-sudoku-web',
+    path: '/projects#crazy-sudoku',
   },
-  // Keeping this combined Crazy Sudoku entry commented out while the website and app are
-  // temporarily presented as separate projects. Uncomment it later if they should merge again.
-  // {
-  //   id: 'crazy-sudoku',
-  //   title: 'Crazy Sudoku',
-  //   category: 'Mobile App',
-  //   summary: 'A fun and challenging Sudoku experience built for mobile puzzle sessions.',
-  //   description:
-  //     'A mobile app developed using React Native, Expo, and Git. Integrated ads and in-app payments for a fun and challenging Sudoku experience.',
-  //   stack: ['React Native', 'Expo', 'Git', 'Ads', 'In-app Payments'],
-  //   imageAlt: 'Crazy Sudoku app preview.',
-  //   logo: '/images/projects/crazy-sudoku/crazy-sudoku-logo.png',
-  //   logoAlt: 'Crazy Sudoku logo.',
-  //   images: [
-  //     '/images/projects/crazy-sudoku/crazy-sudoku-prev-1.jpg',
-  //     '/images/projects/crazy-sudoku/crazy-sudoku-prev-2.png',
-  //     '/images/projects/crazy-sudoku/crazy-sudoku-prev-3.png',
-  //     '/images/projects/crazy-sudoku/crazy-sudoku-prev-4.jpg',
-  //     '/images/projects/crazy-sudoku/crazy-sudoku-prev-5.png',
-  //   ],
-  //   bgImg: '/images/projects/crazy-sudoku/crazy-sudoku-bg.png',
-  //   background: 'linear-gradient(90deg, #61c5ff, #61c5ff, #ff78a5, #ff78a5, #61c5ff)',
-  //   metrics: [
-  //     {
-  //       value: '900+',
-  //       label: 'Downloads',
-  //     },
-  //     {
-  //       value: '5',
-  //       label: 'App Rating',
-  //     },
-  //   ],
-  //   links: [
-  //     {
-  //       id: 'website',
-  //       label: 'Visit Website',
-  //       url: 'https://crazysudoku.rachida.dev',
-  //     },
-  //     {
-  //       id: 'google-play',
-  //       label: 'View on Google Play',
-  //       url: 'https://play.google.com/store/apps/details?id=com.kawaiire.crazysudoku',
-  //     },
-  //   ],
-  //   path: '/projects#crazy-sudoku',
-  // },
   {
     id: 'trackpal-web',
     title: 'TrackPal Web',
@@ -245,7 +270,13 @@ export const PROJECTS: PortfolioProject[] = [
         label: 'Offline capture and receipts',
       },
     ],
-    links: [],
+    links: [
+      {
+        id: 'google-play',
+        label: 'View on Google Play',
+        url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
+      },
+    ],
     path: '/projects#trackpal-mobile',
   },
 ]
