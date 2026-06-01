@@ -347,6 +347,9 @@
           <section v-if="summary.storage === 'unconfigured'" class="analytics-page__notice">
             D1 is not bound yet. Add a Cloudflare D1 binding named ANALYTICS_DB and redeploy.
           </section>
+          <section v-if="geoMissingNotice" class="analytics-page__notice">
+            {{ geoMissingNotice }}
+          </section>
 
           <nav class="analytics-page__tabs" aria-label="Analytics views">
             <button
@@ -386,22 +389,53 @@
                 <h2>Hourly Pattern</h2>
                 <span>UTC</span>
               </header>
-              <div class="analytics-page__heatmap">
-                <div
-                  v-for="row in hourRows"
-                  :key="row.hour"
-                  class="analytics-page__heat-cell"
-                  :style="{
-                    backgroundColor: `rgba(85, 183, 255, ${0.1 + getHourIntensity(row) / 120})`,
-                  }"
-                  :title="`${row.hour}:00 - ${formatNumber(row.stats.events)} events`"
-                >
-                  <span>{{ row.hour }}</span>
-                  <strong>{{ row.stats.events }}</strong>
+              <div class="analytics-page__hour-chart">
+                <div class="analytics-page__hour-axis" aria-hidden="true">
+                  <span v-for="(label, index) in hourAxisLabels" :key="`${label}-${index}`">
+                    {{ formatNumber(label) }}
+                  </span>
+                </div>
+
+                <div class="analytics-page__hour-plot">
+                  <svg
+                    class="analytics-page__hour-svg"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <polygon class="analytics-page__hour-area" :points="hourAreaPoints" />
+                    <polyline class="analytics-page__hour-line" :points="hourPolylinePoints" />
+                  </svg>
+
+                  <span
+                    v-for="point in hourChartPoints"
+                    :key="point.hour"
+                    class="analytics-page__hour-dot"
+                    :style="{ left: `${point.x}%`, top: `${point.y}%` }"
+                    :title="`${point.hour}:00 - ${formatNumber(point.stats.events)} events`"
+                  >
+                    <strong>{{ formatNumber(point.stats.events) }}</strong>
+                  </span>
+
+                  <div class="analytics-page__hour-labels" aria-hidden="true">
+                    <span
+                      v-for="point in hourChartPoints"
+                      v-show="isHourTick(point.hour)"
+                      :key="`label-${point.hour}`"
+                      :style="{ left: `${point.x}%` }"
+                    >
+                      {{ point.hour }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </article>
 
+            <AnalyticsList
+              title="Top Countries"
+              :items="countryRows"
+              empty-label="No country data yet"
+            />
             <AnalyticsList
               title="Lebanon Cities"
               :items="lebanonCityRows"
@@ -415,13 +449,45 @@
             <AnalyticsList title="Top Pages" :items="pageRows" empty-label="No page data yet" />
             <AnalyticsList title="Top Clicks" :items="clickRows" empty-label="No clicks yet" />
             <AnalyticsList
-              title="Geo Precision"
+              title="Geo Detail Level"
               :items="precisionRows"
               empty-label="No geo data yet"
             />
           </section>
 
           <section v-if="activeTab === 'geo'" class="analytics-page__tables-grid">
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
+                <h2>Countries</h2>
+                <span>{{ countryTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table analytics-page__table--compact">
+                  <thead>
+                    <tr>
+                      <th>Country</th>
+                      <th>Visitors</th>
+                      <th>Sessions</th>
+                      <th>Views</th>
+                      <th>Clicks</th>
+                      <th>Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in countryTableRows" :key="row.countryCode">
+                      <td>{{ getCountryLabel(row) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
+                      <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                      <td>{{ formatNumber(row.stats.clicks) }}</td>
+                      <td>{{ formatNumber(row.stats.events) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-if="!countryTableRows.length" class="analytics-page__empty">No country rows</p>
+              </div>
+            </article>
+
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
                 <h2>Lebanon Cities</h2>
@@ -470,6 +536,7 @@
                       <th>Level</th>
                       <th>Provider</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                     </tr>
@@ -478,9 +545,10 @@
                     <tr v-for="row in lebanonPreciseTableRows" :key="getRowKey(row)">
                       <td>{{ getLocationLabel(row) }}</td>
                       <td>{{ getPreciseLocationMeta(row) }}</td>
-                      <td>{{ row.precision || 'unknown' }}</td>
-                      <td>{{ row.provider || 'unknown' }}</td>
+                      <td>{{ formatPrecisionLabel(row.precision || '') }}</td>
+                      <td>{{ formatProviderLabel(row.provider || '') }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                     </tr>
@@ -540,6 +608,7 @@
                       <th>Level</th>
                       <th>Provider</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Events</th>
                     </tr>
@@ -548,9 +617,10 @@
                     <tr v-for="row in preciseLocationTableRows" :key="getRowKey(row)">
                       <td>{{ getLocationLabel(row) }}</td>
                       <td>{{ getPreciseLocationMeta(row) }}</td>
-                      <td>{{ row.precision || 'unknown' }}</td>
-                      <td>{{ row.provider || 'unknown' }}</td>
+                      <td>{{ formatPrecisionLabel(row.precision || '') }}</td>
+                      <td>{{ formatProviderLabel(row.provider || '') }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                     </tr>
@@ -574,16 +644,21 @@
                       <th>Provider</th>
                       <th>Events</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="row in providerTableRows" :key="row.name">
-                      <td>{{ row.name }}</td>
+                      <td>{{ formatProviderLabel(row.name) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                     </tr>
                   </tbody>
                 </table>
+                <p v-if="!providerTableRows.length" class="analytics-page__empty">
+                  No geo provider rows
+                </p>
               </div>
             </article>
 
@@ -603,6 +678,7 @@
                       <th>Coords</th>
                       <th>Events</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -610,16 +686,20 @@
                       v-for="row in geoQualityTableRows"
                       :key="`${row.provider}-${row.precision}-${row.colo}-${row.hasPostalCode}-${row.hasCoordinates}`"
                     >
-                      <td>{{ row.provider || 'unknown' }}</td>
-                      <td>{{ row.precision || 'unknown' }}</td>
-                      <td>{{ row.colo || 'unknown' }}</td>
+                      <td>{{ formatProviderLabel(row.provider) }}</td>
+                      <td>{{ formatPrecisionLabel(row.precision) }}</td>
+                      <td>{{ formatEdgeLabel(row.colo) }}</td>
                       <td>{{ row.hasPostalCode ? 'yes' : 'no' }}</td>
                       <td>{{ row.hasCoordinates ? 'yes' : 'no' }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                     </tr>
                   </tbody>
                 </table>
+                <p v-if="!geoQualityTableRows.length" class="analytics-page__empty">
+                  No geo quality rows
+                </p>
               </div>
             </article>
           </section>
@@ -637,6 +717,7 @@
                       <th>Campaign</th>
                       <th>Meta</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                       <th>Rate</th>
@@ -647,6 +728,7 @@
                       <td>{{ getCampaignLabel(row) }}</td>
                       <td>{{ getCampaignMeta(row) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                       <td>{{ formatPercent(row.stats.clickRate) }}</td>
@@ -669,6 +751,7 @@
                       <th>Campaign</th>
                       <th>Location</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                       <th>Events</th>
@@ -682,6 +765,7 @@
                       <td>{{ getCampaignLabel(row) }}</td>
                       <td>{{ getLocationLabel(row) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
@@ -702,14 +786,16 @@
                     <tr>
                       <th>Host</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="row in referrerTableRows" :key="row.host">
-                      <td>{{ row.host }}</td>
+                      <td>{{ row.host || 'direct' }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                     </tr>
@@ -731,6 +817,7 @@
                     <tr>
                       <th>Page</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                       <th>Avg Time</th>
@@ -739,8 +826,9 @@
                   </thead>
                   <tbody>
                     <tr v-for="row in pageTableRows" :key="row.path">
-                      <td>{{ row.path }}</td>
+                      <td>{{ optionValue(row.path) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                       <td>{{ row.stats.avgEngagementSeconds }}s</td>
@@ -763,14 +851,16 @@
                       <th>Element</th>
                       <th>Page</th>
                       <th>Href</th>
+                      <th>Sessions</th>
                       <th>Clicks</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="row in clickTableRows" :key="`${row.label}-${row.href}-${row.path}`">
                       <td>{{ getClickLabel(row) }}</td>
-                      <td>{{ row.path }}</td>
-                      <td>{{ row.href }}</td>
+                      <td>{{ optionValue(row.path) }}</td>
+                      <td>{{ row.href || 'none' }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                     </tr>
                   </tbody>
@@ -790,6 +880,7 @@
                       <th>Event</th>
                       <th>Events</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -797,6 +888,7 @@
                       <td>{{ formatEventName(row.name) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -814,14 +906,16 @@
                     <tr>
                       <th>Device</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Views</th>
                       <th>Clicks</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="row in deviceTableRows" :key="row.name">
-                      <td>{{ row.name }}</td>
+                      <td>{{ optionValue(row.name) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.pageViews) }}</td>
                       <td>{{ formatNumber(row.stats.clicks) }}</td>
                     </tr>
@@ -841,19 +935,79 @@
                     <tr>
                       <th>Language</th>
                       <th>Visitors</th>
+                      <th>Sessions</th>
                       <th>Events</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="row in languageTableRows" :key="row.name">
-                      <td>{{ row.name }}</td>
+                      <td>{{ optionValue(row.name) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </article>
+          </section>
+
+          <section v-if="activeTab === 'sessions'" class="analytics-page__panel">
+            <header class="analytics-page__panel-header">
+              <h2>Sessions</h2>
+              <span>{{ sessionTableRows.length }} rows</span>
+            </header>
+            <div class="analytics-page__table-wrap">
+              <table class="analytics-page__table analytics-page__table--sessions">
+                <thead>
+                  <tr>
+                    <th>Started</th>
+                    <th>Last Seen</th>
+                    <th>Duration</th>
+                    <th>Session</th>
+                    <th>Location</th>
+                    <th>Device</th>
+                    <th>Campaign</th>
+                    <th>Referrer</th>
+                    <th>Entry</th>
+                    <th>Exit</th>
+                    <th>Pages</th>
+                    <th>Views</th>
+                    <th>Clicks</th>
+                    <th>Events</th>
+                    <th>Scroll</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in sessionTableRows" :key="row.sessionId">
+                    <td>{{ formatDate(row.firstSeen) }}</td>
+                    <td>{{ formatDate(row.lastSeen) }}</td>
+                    <td>{{ formatSeconds(row.durationSeconds) }}</td>
+                    <td :title="row.sessionId">{{ shortId(row.sessionId) }}</td>
+                    <td>
+                      {{ getSessionLocation(row) }}
+                      <span v-if="getSessionGeoNote(row)" class="analytics-page__cell-note">
+                        {{ getSessionGeoNote(row) }}
+                      </span>
+                    </td>
+                    <td>{{ optionValue(row.device) }}</td>
+                    <td>{{ getSessionCampaign(row) }}</td>
+                    <td>{{ row.referrerHost || 'direct' }}</td>
+                    <td>{{ optionValue(row.entryPage) }}</td>
+                    <td>{{ optionValue(row.exitPage) }}</td>
+                    <td>{{ getSessionPages(row) }}</td>
+                    <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                    <td>{{ formatNumber(row.stats.clicks) }}</td>
+                    <td>{{ formatNumber(row.stats.events) }}</td>
+                    <td>{{ formatPercent(row.stats.avgScrollDepth) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p v-if="!sessionTableRows.length" class="analytics-page__empty">
+                No sessions match these filters
+              </p>
+            </div>
           </section>
 
           <section v-if="activeTab === 'events'" class="analytics-page__panel">

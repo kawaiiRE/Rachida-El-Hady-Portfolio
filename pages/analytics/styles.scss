@@ -404,32 +404,118 @@
   white-space: nowrap;
 }
 
-.analytics-page__heatmap {
+.analytics-page__hour-chart {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.45rem;
-  padding: 1rem;
+  grid-template-columns: 2.6rem minmax(32rem, 1fr);
+  gap: 0.7rem;
+  padding: 1rem 1rem 1.2rem;
+  overflow-x: auto;
 }
 
-.analytics-page__heat-cell {
-  min-height: 3.4rem;
-  display: grid;
-  gap: 0.25rem;
-  align-content: center;
-  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.09);
-  border-radius: 0.42rem;
-  padding: 0.45rem;
-}
-
-.analytics-page__heat-cell span {
-  color: rgba(var(--gray-scale-50-rgb), 0.58);
+.analytics-page__hour-axis {
+  height: 12.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.1rem 0 1.65rem;
+  color: rgba(var(--gray-scale-50-rgb), 0.45);
   font-size: 0.68rem;
   font-weight: 800;
 }
 
-.analytics-page__heat-cell strong {
+.analytics-page__hour-plot {
+  position: relative;
+  height: 12.5rem;
+  min-width: 32rem;
+  border-left: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.1);
+  border-bottom: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.1);
+  background:
+    linear-gradient(
+        to bottom,
+        rgba(var(--gray-scale-50-rgb), 0.08) 0.0625rem,
+        transparent 0.0625rem
+      )
+      0 0 / 100% 33.333%,
+    linear-gradient(to right, rgba(var(--gray-scale-50-rgb), 0.04) 0.0625rem, transparent 0.0625rem)
+      0 0 / 12.5% 100%;
+}
+
+.analytics-page__hour-svg {
+  position: absolute;
+  inset: 0 0 1.55rem;
+  width: 100%;
+  height: calc(100% - 1.55rem);
+  overflow: visible;
+}
+
+.analytics-page__hour-area {
+  fill: rgba(85, 183, 255, 0.14);
+}
+
+.analytics-page__hour-line {
+  fill: none;
+  stroke: #7ff5d1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.analytics-page__hour-dot {
+  position: absolute;
+  z-index: 1;
+  width: 0.56rem;
+  height: 0.56rem;
+  border: 0.12rem solid rgba(var(--gray-scale-950-rgb), 0.92);
+  border-radius: 999px;
+  background: #7ff5d1;
+  box-shadow: 0 0 0 0.2rem rgba(127, 245, 209, 0.12);
+  transform: translate(-50%, -50%);
+}
+
+.analytics-page__hour-dot strong {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.35rem);
+  min-width: 1.8rem;
+  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.14);
+  border-radius: 0.35rem;
+  padding: 0.2rem 0.35rem;
   color: var(--gray-scale-50);
-  font-size: 0.92rem;
+  background: rgba(var(--gray-scale-950-rgb), 0.92);
+  font-size: 0.68rem;
+  line-height: 1;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(0.2rem);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.analytics-page__hour-dot:hover strong,
+.analytics-page__hour-dot:focus-visible strong {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.analytics-page__hour-labels {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.25rem;
+}
+
+.analytics-page__hour-labels span {
+  position: absolute;
+  top: 0.35rem;
+  color: rgba(var(--gray-scale-50-rgb), 0.5);
+  font-size: 0.68rem;
+  font-weight: 800;
+  transform: translateX(-50%);
 }
 
 .analytics-page__table-wrap {
@@ -449,6 +535,10 @@
 
 .analytics-page__table--events {
   min-width: 70rem;
+}
+
+.analytics-page__table--sessions {
+  min-width: 96rem;
 }
 
 .analytics-page__table th,
@@ -479,6 +569,13 @@
 .analytics-page__table td:first-child {
   color: rgba(var(--gray-scale-50-rgb), 0.92);
   font-weight: 700;
+}
+
+.analytics-page__cell-note {
+  display: block;
+  margin-top: 0.2rem;
+  color: rgba(var(--gray-scale-50-rgb), 0.5);
+  font-size: 0.72rem;
 }
 
 .analytics-page__empty {
@@ -547,7 +644,11 @@
     flex: 1;
   }
 
-  .analytics-page__heatmap {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .analytics-page__hour-chart {
+    grid-template-columns: 2.4rem minmax(28rem, 1fr);
+  }
+
+  .analytics-page__hour-plot {
+    min-width: 28rem;
   }
 }

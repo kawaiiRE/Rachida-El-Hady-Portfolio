@@ -117,21 +117,33 @@ const getNumberHeader = (
 const asObject = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
 
+const hasKeys = (value: Record<string, unknown>): boolean => Object.keys(value).length > 0
+
 const getCloudflareRequestCf = (event: H3Event): Record<string, unknown> => {
   const context = asObject(event.context)
   const cloudflare = asObject(context.cloudflare)
   const platform = asObject(context._platform)
   const platformCloudflare = asObject(platform.cloudflare)
   const cloudflareRequest = asObject(cloudflare.request)
+  const cloudflareEvent = asObject(cloudflare.event)
+  const cloudflareEventRequest = asObject(cloudflareEvent.request)
   const platformRequest = asObject(platformCloudflare.request)
+  const platformEvent = asObject(platformCloudflare.event)
+  const platformEventRequest = asObject(platformEvent.request)
+  const nodeRequest = asObject(event.node.req)
   const candidates = [
+    asObject(context.cf),
+    asObject(platform.cf),
     asObject(cloudflareRequest.cf),
     asObject(cloudflare.cf),
     asObject(platformRequest.cf),
     asObject(platformCloudflare.cf),
+    asObject(cloudflareEventRequest.cf),
+    asObject(platformEventRequest.cf),
+    asObject(nodeRequest.cf),
   ]
 
-  return candidates.find((candidate) => Object.keys(candidate).length > 0) || {}
+  return candidates.find(hasKeys) || {}
 }
 
 const getCloudflareString = (cf: Record<string, unknown>, keys: string[]): string => {

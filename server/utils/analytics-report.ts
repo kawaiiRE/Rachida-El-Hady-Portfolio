@@ -139,10 +139,16 @@ const normalizeLower = (value: unknown): string => normalize(value).toLowerCase(
 const normalizeKeyPart = (value: unknown, fallback = 'unknown'): string => {
   const normalized = normalize(value)
 
-  return normalized || fallback
+  return normalized && !['undefined', 'null'].includes(normalized.toLowerCase())
+    ? normalized
+    : fallback
 }
 
-const isKnownValue = (value: string): boolean => Boolean(value && value !== 'unknown')
+const isKnownValue = (value: string): boolean => {
+  const normalized = normalizeLower(value)
+
+  return Boolean(normalized && !['unknown', 'undefined', 'null'].includes(normalized))
+}
 
 const parseDateBound = (value: string, endOfDay: boolean): number => {
   if (!value) {

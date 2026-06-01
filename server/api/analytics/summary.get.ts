@@ -28,6 +28,31 @@ type Counter = {
   scrollSamples: number
 }
 
+type SessionAccumulator = {
+  sessionId: string
+  visitorId: string
+  firstSeen: string
+  lastSeen: string
+  firstTimestamp: number
+  lastTimestamp: number
+  city: string
+  region: string
+  countryCode: string
+  postalCode: string
+  colo: string
+  precision: string
+  provider: string
+  device: string
+  referrerHost: string
+  source: string
+  medium: string
+  campaign: string
+  entryPage: string
+  exitPage: string
+  pages: Set<string>
+  counter: Counter
+}
+
 const createCounter = (): Counter => ({
   events: 0,
   pageViews: 0,
@@ -70,10 +95,25 @@ const assertAuthorized = (event: Parameters<typeof getHeader>[0]) => {
 }
 
 const normalizeKeyPart = (value: unknown, fallback = 'unknown'): string => {
-  const normalized = String(value || '').trim()
+  const normalized = String(value ?? '').trim()
 
-  return normalized || fallback
+  return normalized && !['undefined', 'null'].includes(normalized.toLowerCase())
+    ? normalized
+    : fallback
 }
+
+const isKnownPart = (value: unknown): boolean => {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+
+  return Boolean(normalized && !['unknown', 'undefined', 'null'].includes(normalized))
+}
+
+const hasKnownGeoValue = (...values: unknown[]): boolean => values.some(isKnownPart)
+
+const splitKeyParts = (key: string, length: number): string[] =>
+  Array.from({ length }, (_, index) => normalizeKeyPart(key.split('|')[index]))
 
 const addRecordToCounter = (counter: Counter, record: AnalyticsRecord) => {
   const facts = getAnalyticsFacts(record)
@@ -145,10 +185,111 @@ const addToMap = (map: Map<string, Counter>, key: string, record: AnalyticsRecor
 const serializeNamedCounters = (map: Map<string, Counter>) =>
   sortCounters(
     [...map.entries()].map(([name, stats]) => ({
-      name,
+      name: normalizeKeyPart(name),
       stats: serializeCounter(stats),
     })),
   )
+
+const getSessionKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+
+  return facts.sessionId || facts.visitorId || record.id
+}
+
+const createSessionAccumulator = (
+  record: AnalyticsRecord,
+  facts: ReturnType<typeof getAnalyticsFacts>,
+): SessionAccumulator => ({
+  sessionId: facts.sessionId || record.id,
+  visitorId: facts.visitorId,
+  firstSeen: facts.receivedAt,
+  lastSeen: facts.receivedAt,
+  firstTimestamp: facts.timestamp,
+  lastTimestamp: facts.timestamp,
+  city: facts.city,
+  region: facts.region || facts.regionCode,
+  countryCode: facts.countryCode || facts.country,
+  postalCode: facts.postalCode,
+  colo: facts.colo,
+  precision: facts.precision,
+  provider: facts.provider,
+  device: facts.device,
+  referrerHost: facts.referrerHost,
+  source: facts.utmSource,
+  medium: facts.utmMedium,
+  campaign: facts.utmCampaign,
+  entryPage: facts.pagePath,
+  exitPage: facts.pagePath,
+  pages: new Set<string>(),
+  counter: createCounter(),
+})
+
+const addToSessions = (sessions: Map<string, SessionAccumulator>, record: AnalyticsRecord) => {
+  const facts = getAnalyticsFacts(record)
+  const key = getSessionKey(record)
+  const session = sessions.get(key) || createSessionAccumulator(record, facts)
+
+  addRecordToCounter(session.counter, record)
+
+  if (facts.pagePath) {
+    session.pages.add(facts.pagePath)
+  }
+
+  if (facts.timestamp && (!session.firstTimestamp || facts.timestamp < session.firstTimestamp)) {
+    session.firstTimestamp = facts.timestamp
+    session.firstSeen = facts.receivedAt
+    session.entryPage = facts.pagePath || session.entryPage
+  }
+
+  if (facts.timestamp && facts.timestamp >= session.lastTimestamp) {
+    session.lastTimestamp = facts.timestamp
+    session.lastSeen = facts.receivedAt
+    session.exitPage = facts.pagePath || session.exitPage
+  }
+
+  session.visitorId = session.visitorId || facts.visitorId
+  session.city = session.city || facts.city
+  session.region = session.region || facts.region || facts.regionCode
+  session.countryCode = session.countryCode || facts.countryCode || facts.country
+  session.postalCode = session.postalCode || facts.postalCode
+  session.colo = session.colo || facts.colo
+  session.precision = session.precision || facts.precision
+  session.provider = session.provider || facts.provider
+  session.device = session.device || facts.device
+  session.referrerHost = session.referrerHost || facts.referrerHost
+  session.source = session.source || facts.utmSource
+  session.medium = session.medium || facts.utmMedium
+  session.campaign = session.campaign || facts.utmCampaign
+
+  sessions.set(key, session)
+}
+
+const serializeSession = (session: SessionAccumulator) => ({
+  sessionId: normalizeKeyPart(session.sessionId),
+  visitorId: normalizeKeyPart(session.visitorId),
+  firstSeen: normalizeKeyPart(session.firstSeen),
+  lastSeen: normalizeKeyPart(session.lastSeen),
+  durationSeconds:
+    session.firstTimestamp && session.lastTimestamp
+      ? Math.max(0, Math.round((session.lastTimestamp - session.firstTimestamp) / 1000))
+      : 0,
+  city: normalizeKeyPart(session.city),
+  region: normalizeKeyPart(session.region),
+  countryCode: normalizeKeyPart(session.countryCode),
+  postalCode: normalizeKeyPart(session.postalCode),
+  colo: normalizeKeyPart(session.colo),
+  precision: normalizeKeyPart(session.precision),
+  provider: normalizeKeyPart(session.provider),
+  device: normalizeKeyPart(session.device),
+  referrerHost: normalizeKeyPart(session.referrerHost, 'direct'),
+  source: normalizeKeyPart(session.source),
+  medium: normalizeKeyPart(session.medium),
+  campaign: normalizeKeyPart(session.campaign),
+  entryPage: normalizeKeyPart(session.entryPage),
+  exitPage: normalizeKeyPart(session.exitPage),
+  pages: [...session.pages],
+  stats: serializeCounter(session.counter),
+})
 
 const parseNullableNumber = (value: string): number | null => {
   if (!value || value === 'unknown') {
@@ -194,6 +335,7 @@ export default defineEventHandler(async (event) => {
   })
   const filteredRecords = filterAnalyticsRecords(records, filters)
   const total = createCounter()
+  const countries = new Map<string, Counter>()
   const locations = new Map<string, Counter>()
   const preciseLocations = new Map<string, Counter>()
   const campaigns = new Map<string, Counter>()
@@ -209,21 +351,42 @@ export default defineEventHandler(async (event) => {
   const languages = new Map<string, Counter>()
   const timeline = new Map<string, Counter>()
   const hours = new Map<string, Counter>()
+  const sessions = new Map<string, SessionAccumulator>()
 
   for (const record of filteredRecords) {
     const facts = getAnalyticsFacts(record)
+    const countryKey = normalizeKeyPart(facts.countryCode || facts.country)
     const locationKey = getAnalyticsLocationKey(record)
     const preciseLocationKey = getAnalyticsPreciseLocationKey(record)
     const campaignKey = getAnalyticsCampaignKey(record)
     const campaignLocationKey = `${campaignKey}|${locationKey}`
+    const hasCountry = isKnownPart(facts.countryCode || facts.country)
+    const hasLocation = hasKnownGeoValue(
+      facts.city,
+      facts.region,
+      facts.regionCode,
+      facts.countryCode,
+      facts.country,
+    )
+    const hasPreciseLocation = hasKnownGeoValue(
+      facts.city,
+      facts.region,
+      facts.regionCode,
+      facts.postalCode,
+      facts.timezone,
+      facts.colo,
+      facts.latitude,
+      facts.longitude,
+    )
 
     addRecordToCounter(total, record)
-    addToMap(locations, locationKey, record)
-    addToMap(preciseLocations, preciseLocationKey, record)
+    if (hasCountry) addToMap(countries, countryKey, record)
+    if (hasLocation) addToMap(locations, locationKey, record)
+    if (hasPreciseLocation) addToMap(preciseLocations, preciseLocationKey, record)
     addToMap(campaigns, campaignKey, record)
-    addToMap(campaignLocations, campaignLocationKey, record)
+    if (hasLocation) addToMap(campaignLocations, campaignLocationKey, record)
     addToMap(precision, normalizeKeyPart(facts.precision), record)
-    addToMap(providers, normalizeKeyPart(facts.provider), record)
+    if (isKnownPart(facts.provider)) addToMap(providers, normalizeKeyPart(facts.provider), record)
     addToMap(geoQuality, getAnalyticsGeoQualityKey(record), record)
     addToMap(pages, normalizeKeyPart(facts.pagePath), record)
     addToMap(referrers, normalizeKeyPart(facts.referrerHost, 'direct'), record)
@@ -232,6 +395,7 @@ export default defineEventHandler(async (event) => {
     addToMap(languages, normalizeKeyPart(facts.language), record)
     addToMap(timeline, getDayKey(record), record)
     addToMap(hours, getHourKey(record), record)
+    addToSessions(sessions, record)
 
     if (facts.eventName === 'site_click') {
       addToMap(clicks, getAnalyticsClickKey(record), record)
@@ -240,7 +404,7 @@ export default defineEventHandler(async (event) => {
 
   const byLocation = sortCounters(
     [...locations.entries()].map(([key, stats]) => {
-      const [city, region, countryCode] = key.split('|')
+      const [city, region, countryCode] = splitKeyParts(key, 3)
 
       return {
         city,
@@ -249,6 +413,12 @@ export default defineEventHandler(async (event) => {
         stats: serializeCounter(stats),
       }
     }),
+  )
+  const byCountry = sortCounters(
+    [...countries.entries()].map(([countryCode, stats]) => ({
+      countryCode,
+      stats: serializeCounter(stats),
+    })),
   )
   const byPreciseLocation = sortCounters(
     [...preciseLocations.entries()].map(([key, stats]) => {
@@ -263,7 +433,7 @@ export default defineEventHandler(async (event) => {
         longitude,
         provider,
         precisionLevel,
-      ] = key.split('|')
+      ] = splitKeyParts(key, 10)
 
       return {
         city,
@@ -282,7 +452,7 @@ export default defineEventHandler(async (event) => {
   )
   const byCampaign = sortCounters(
     [...campaigns.entries()].map(([key, stats]) => {
-      const [source, medium, campaign, content] = key.split('|')
+      const [source, medium, campaign, content] = splitKeyParts(key, 4)
 
       return {
         source,
@@ -295,7 +465,7 @@ export default defineEventHandler(async (event) => {
   )
   const byCampaignLocation = sortCounters(
     [...campaignLocations.entries()].map(([key, stats]) => {
-      const [source, medium, campaign, content, city, region, countryCode] = key.split('|')
+      const [source, medium, campaign, content, city, region, countryCode] = splitKeyParts(key, 7)
 
       return {
         source,
@@ -311,7 +481,7 @@ export default defineEventHandler(async (event) => {
   )
   const topClicks = sortCounters(
     [...clicks.entries()].map(([key, stats]) => {
-      const [label, href, path] = key.split('|')
+      const [label, href, path] = splitKeyParts(key, 3)
 
       return {
         label,
@@ -341,7 +511,7 @@ export default defineEventHandler(async (event) => {
     .sort((first, second) => first.hour.localeCompare(second.hour))
   const byGeoQuality = sortCounters(
     [...geoQuality.entries()].map(([key, stats]) => {
-      const [provider, precisionLevel, colo, postalStatus, coordinateStatus] = key.split('|')
+      const [provider, precisionLevel, colo, postalStatus, coordinateStatus] = splitKeyParts(key, 5)
 
       return {
         provider,
@@ -353,6 +523,23 @@ export default defineEventHandler(async (event) => {
       }
     }),
   )
+  const bySession = [...sessions.values()]
+    .map(serializeSession)
+    .sort((first, second) => second.lastSeen.localeCompare(first.lastSeen))
+  const lebanonCities = byLocation.filter(
+    (item) => item.countryCode === 'LB' && isKnownPart(item.city),
+  )
+  const lebanonPreciseLocations = byPreciseLocation.filter(
+    (item) =>
+      item.countryCode === 'LB' &&
+      (isKnownPart(item.city) ||
+        isKnownPart(item.region) ||
+        isKnownPart(item.postalCode) ||
+        isKnownPart(item.timezone) ||
+        isKnownPart(item.colo) ||
+        item.latitude !== null ||
+        item.longitude !== null),
+  )
 
   return {
     generatedAt: new Date().toISOString(),
@@ -362,8 +549,9 @@ export default defineEventHandler(async (event) => {
     filters,
     filterOptions: buildAnalyticsFilterOptions(records),
     stats: serializeCounter(total),
-    lebanonCities: byLocation.filter((item) => item.countryCode === 'LB'),
-    lebanonPreciseLocations: byPreciseLocation.filter((item) => item.countryCode === 'LB'),
+    byCountry,
+    lebanonCities,
+    lebanonPreciseLocations,
     byLocation,
     byPreciseLocation,
     byCampaign,
@@ -379,5 +567,6 @@ export default defineEventHandler(async (event) => {
     precision: serializeNamedCounters(precision),
     providers: serializeNamedCounters(providers),
     geoQuality: byGeoQuality,
+    sessions: bySession,
   }
 })
