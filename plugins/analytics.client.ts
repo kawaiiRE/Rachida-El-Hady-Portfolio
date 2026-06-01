@@ -28,6 +28,8 @@ const VISITOR_STORAGE_KEY = 'portfolio:analytics:visitor-id'
 const SESSION_STORAGE_KEY = 'portfolio:analytics:session-id'
 const SESSION_STARTED_AT_KEY = 'portfolio:analytics:session-started-at'
 const OPT_OUT_STORAGE_KEY = 'portfolio:analytics:opt-out'
+const OPT_OUT_QUERY_PARAM = 'analytics_opt_out'
+const OPT_IN_QUERY_PARAM = 'analytics_opt_in'
 const MAX_TEXT_LENGTH = 180
 const SCROLL_THROTTLE_MS = 250
 
@@ -114,12 +116,45 @@ const getScrollDepth = (): number => {
   return Math.min(100, Math.round(((scrollTop + viewportHeight) / documentHeight) * 100))
 }
 
+const removeAnalyticsPreferenceParams = (url: URL) => {
+  url.searchParams.delete(OPT_OUT_QUERY_PARAM)
+  url.searchParams.delete(OPT_IN_QUERY_PARAM)
+  window.history.replaceState(
+    window.history.state,
+    document.title,
+    `${url.pathname}${url.search}${url.hash}`,
+  )
+}
+
+const applyAnalyticsPreferenceFromUrl = () => {
+  const url = new URL(window.location.href)
+  const shouldOptOut = isTruthy(url.searchParams.get(OPT_OUT_QUERY_PARAM))
+  const shouldOptIn = isTruthy(url.searchParams.get(OPT_IN_QUERY_PARAM))
+
+  if (!shouldOptOut && !shouldOptIn) {
+    return
+  }
+
+  if (shouldOptOut) {
+    localStorage.setItem(OPT_OUT_STORAGE_KEY, 'true')
+    localStorage.removeItem(VISITOR_STORAGE_KEY)
+    sessionStorage.removeItem(SESSION_STORAGE_KEY)
+    sessionStorage.removeItem(SESSION_STARTED_AT_KEY)
+  } else if (shouldOptIn) {
+    localStorage.removeItem(OPT_OUT_STORAGE_KEY)
+  }
+
+  removeAnalyticsPreferenceParams(url)
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const router = useRouter()
   const analyticsEnabled = isTruthy(config.public.analyticsEnabled)
   const analyticsEndpoint = String(config.public.analyticsEndpoint || '/api/analytics/event')
   const googleAnalyticsId = String(config.public.googleAnalyticsId || '')
+
+  applyAnalyticsPreferenceFromUrl()
 
   const globalPrivacyControl = Boolean(
     (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl,

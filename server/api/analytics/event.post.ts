@@ -1,7 +1,6 @@
-import { appendFile, mkdir } from 'node:fs/promises'
-import { dirname, isAbsolute, resolve } from 'node:path'
 import { createHmac } from 'node:crypto'
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
+import { writeAnalyticsRecord } from '../../utils/analytics-storage'
 
 const MAX_BODY_SIZE = 32_000
 const MAX_STRING_LENGTH = 1_000
@@ -41,14 +40,6 @@ const cleanValue = (value: unknown, depth = 0): unknown => {
   }
 
   return null
-}
-
-const getLogPath = (configuredPath: string): string => {
-  if (!configuredPath) {
-    return resolve(process.cwd(), '.data/analytics-events.jsonl')
-  }
-
-  return isAbsolute(configuredPath) ? configuredPath : resolve(process.cwd(), configuredPath)
 }
 
 const getClientIp = (event: Parameters<typeof getHeader>[0]): string => {
@@ -248,7 +239,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const clientIp = getClientIp(event)
-  const analyticsLogPath = getLogPath(String(runtimeConfig.analyticsLogPath || ''))
   const record = {
     id: crypto.randomUUID(),
     receivedAt: new Date().toISOString(),
@@ -262,17 +252,22 @@ export default defineEventHandler(async (event) => {
       geo: getGeoPayload(event),
       ipHash: createIpHash(clientIp, String(runtimeConfig.analyticsIpSalt || '')),
     },
-    payload: cleanValue(body),
+    payload: cleanValue(body) as Record<string, unknown>,
   }
 
+  let storage: 'd1' | 'file' | 'unconfigured' = 'unconfigured'
+
   try {
-    await mkdir(dirname(analyticsLogPath), { recursive: true })
-    await appendFile(analyticsLogPath, `${JSON.stringify(record)}\n`, 'utf8')
+    storage = await writeAnalyticsRecord(event, record, {
+      d1BindingName: String(runtimeConfig.analyticsD1Binding || ''),
+      logPath: String(runtimeConfig.analyticsLogPath || ''),
+    })
   } catch (error) {
     console.warn('[analytics] Failed to persist analytics event:', error)
   }
 
   return {
     ok: true,
+    storage,
   }
 })

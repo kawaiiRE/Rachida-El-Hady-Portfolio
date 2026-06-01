@@ -19,6 +19,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     analyticsAdminToken: process.env.ANALYTICS_ADMIN_TOKEN || '',
+    analyticsD1Binding: process.env.ANALYTICS_D1_BINDING || 'ANALYTICS_DB',
     analyticsIpSalt: process.env.ANALYTICS_IP_SALT || '',
     analyticsLogPath: process.env.ANALYTICS_LOG_PATH || '.data/analytics-events.jsonl',
     public: {

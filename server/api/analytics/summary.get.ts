@@ -1,6 +1,5 @@
-import { readFile } from 'node:fs/promises'
-import { isAbsolute, resolve } from 'node:path'
 import { createError, defineEventHandler, getHeader, getQuery } from 'h3'
+import { readAnalyticsRecords } from '../../utils/analytics-storage'
 
 type AnalyticsRecord = {
   eventName?: string
@@ -15,7 +14,10 @@ type AnalyticsRecord = {
     }
   }
   payload?: {
-    visitorId?: string
+    visitor?: {
+      visitorId?: string
+      sessionId?: string
+    }
     page?: {
       path?: string
       utm?: {
@@ -50,14 +52,6 @@ const createCounter = (): Counter => ({
   formSubmits: 0,
   visitors: new Set<string>(),
 })
-
-const getLogPath = (configuredPath: string): string => {
-  if (!configuredPath) {
-    return resolve(process.cwd(), '.data/analytics-events.jsonl')
-  }
-
-  return isAbsolute(configuredPath) ? configuredPath : resolve(process.cwd(), configuredPath)
-}
 
 const parseLimit = (value: unknown): number => {
   const limit = Number(value)
@@ -140,7 +134,7 @@ const addRecordToCounter = (counter: Counter, record: AnalyticsRecord) => {
   if (record.eventName === 'site_click') counter.clicks += 1
   if (record.eventName === 'form_submit') counter.formSubmits += 1
 
-  const visitorId = record.payload?.visitorId
+  const visitorId = record.payload?.visitor?.visitorId
 
   if (visitorId) {
     counter.visitors.add(visitorId)
@@ -164,151 +158,121 @@ const sortCounters = <T extends { stats: ReturnType<typeof serializeCounter> }>(
     return second.stats.events - first.stats.events
   })
 
-const parseRecords = (file: string, limit: number): AnalyticsRecord[] =>
-  file
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .slice(-limit)
-    .flatMap((line) => {
-      try {
-        return [JSON.parse(line) as AnalyticsRecord]
-      } catch {
-        return []
-      }
-    })
-
 export default defineEventHandler(async (event) => {
   const runtimeConfig = assertAuthorized(event)
   const query = getQuery(event)
   const limit = parseLimit(query.limit)
-  const logPath = getLogPath(String(runtimeConfig.analyticsLogPath || ''))
+  const { records, storage } = await readAnalyticsRecords(event, {
+    d1BindingName: String(runtimeConfig.analyticsD1Binding || ''),
+    logPath: String(runtimeConfig.analyticsLogPath || ''),
+    limit,
+  })
+  const total = createCounter()
+  const locations = new Map<string, Counter>()
+  const campaigns = new Map<string, Counter>()
+  const campaignLocations = new Map<string, Counter>()
+  const clicks = new Map<string, Counter>()
+  const precision = new Map<string, Counter>()
+  const providers = new Map<string, Counter>()
 
-  try {
-    const records = parseRecords(await readFile(logPath, 'utf8'), limit)
-    const total = createCounter()
-    const locations = new Map<string, Counter>()
-    const campaigns = new Map<string, Counter>()
-    const campaignLocations = new Map<string, Counter>()
-    const clicks = new Map<string, Counter>()
-    const precision = new Map<string, Counter>()
-    const providers = new Map<string, Counter>()
+  for (const record of records as AnalyticsRecord[]) {
+    const locationKey = getLocationKey(record)
+    const campaignKey = getCampaignKey(record)
+    const campaignLocationKey = `${campaignKey}|${locationKey}`
+    const precisionKey = normalizeKeyPart(record.request?.geo?.precision)
+    const providerKey = normalizeKeyPart(record.request?.geo?.provider)
 
-    for (const record of records) {
-      const locationKey = getLocationKey(record)
-      const campaignKey = getCampaignKey(record)
-      const campaignLocationKey = `${campaignKey}|${locationKey}`
-      const precisionKey = normalizeKeyPart(record.request?.geo?.precision)
-      const providerKey = normalizeKeyPart(record.request?.geo?.provider)
+    addRecordToCounter(total, record)
 
-      addRecordToCounter(total, record)
-
-      for (const [key, map] of [
-        [locationKey, locations],
-        [campaignKey, campaigns],
-        [campaignLocationKey, campaignLocations],
-        [precisionKey, precision],
-        [providerKey, providers],
-      ] as const) {
-        const counter = map.get(key) || createCounter()
-        addRecordToCounter(counter, record)
-        map.set(key, counter)
-      }
-
-      if (record.eventName === 'site_click') {
-        const clickKey = getClickKey(record)
-        const counter = clicks.get(clickKey) || createCounter()
-        addRecordToCounter(counter, record)
-        clicks.set(clickKey, counter)
-      }
+    for (const [key, map] of [
+      [locationKey, locations],
+      [campaignKey, campaigns],
+      [campaignLocationKey, campaignLocations],
+      [precisionKey, precision],
+      [providerKey, providers],
+    ] as const) {
+      const counter = map.get(key) || createCounter()
+      addRecordToCounter(counter, record)
+      map.set(key, counter)
     }
 
-    const byLocation = sortCounters(
-      [...locations.entries()].map(([key, stats]) => {
-        const [city, region, countryCode] = key.split('|')
-
-        return {
-          city,
-          region,
-          countryCode,
-          stats: serializeCounter(stats),
-        }
-      }),
-    )
-    const byCampaign = sortCounters(
-      [...campaigns.entries()].map(([key, stats]) => {
-        const [source, medium, campaign, content] = key.split('|')
-
-        return {
-          source,
-          medium,
-          campaign,
-          content,
-          stats: serializeCounter(stats),
-        }
-      }),
-    )
-    const byCampaignLocation = sortCounters(
-      [...campaignLocations.entries()].map(([key, stats]) => {
-        const [source, medium, campaign, content, city, region, countryCode] = key.split('|')
-
-        return {
-          source,
-          medium,
-          campaign,
-          content,
-          city,
-          region,
-          countryCode,
-          stats: serializeCounter(stats),
-        }
-      }),
-    )
-    const topClicks = sortCounters(
-      [...clicks.entries()].map(([key, stats]) => {
-        const [label, href, path] = key.split('|')
-
-        return {
-          label,
-          href,
-          path,
-          stats: serializeCounter(stats),
-        }
-      }),
-    )
-
-    return {
-      generatedAt: new Date().toISOString(),
-      scannedEvents: records.length,
-      stats: serializeCounter(total),
-      lebanonCities: byLocation.filter((item) => item.countryCode === 'LB'),
-      byLocation,
-      byCampaign,
-      byCampaignLocation,
-      topClicks,
-      precision: sortCounters(
-        [...precision.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
-      ),
-      providers: sortCounters(
-        [...providers.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
-      ),
+    if (record.eventName === 'site_click') {
+      const clickKey = getClickKey(record)
+      const counter = clicks.get(clickKey) || createCounter()
+      addRecordToCounter(counter, record)
+      clicks.set(clickKey, counter)
     }
-  } catch (error: unknown) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+  }
+
+  const byLocation = sortCounters(
+    [...locations.entries()].map(([key, stats]) => {
+      const [city, region, countryCode] = key.split('|')
+
       return {
-        generatedAt: new Date().toISOString(),
-        scannedEvents: 0,
-        stats: serializeCounter(createCounter()),
-        lebanonCities: [],
-        byLocation: [],
-        byCampaign: [],
-        byCampaignLocation: [],
-        topClicks: [],
-        precision: [],
-        providers: [],
+        city,
+        region,
+        countryCode,
+        stats: serializeCounter(stats),
       }
-    }
+    }),
+  )
+  const byCampaign = sortCounters(
+    [...campaigns.entries()].map(([key, stats]) => {
+      const [source, medium, campaign, content] = key.split('|')
 
-    throw error
+      return {
+        source,
+        medium,
+        campaign,
+        content,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+  const byCampaignLocation = sortCounters(
+    [...campaignLocations.entries()].map(([key, stats]) => {
+      const [source, medium, campaign, content, city, region, countryCode] = key.split('|')
+
+      return {
+        source,
+        medium,
+        campaign,
+        content,
+        city,
+        region,
+        countryCode,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+  const topClicks = sortCounters(
+    [...clicks.entries()].map(([key, stats]) => {
+      const [label, href, path] = key.split('|')
+
+      return {
+        label,
+        href,
+        path,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+
+  return {
+    generatedAt: new Date().toISOString(),
+    storage,
+    scannedEvents: records.length,
+    stats: serializeCounter(total),
+    lebanonCities: byLocation.filter((item) => item.countryCode === 'LB'),
+    byLocation,
+    byCampaign,
+    byCampaignLocation,
+    topClicks,
+    precision: sortCounters(
+      [...precision.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
+    ),
+    providers: sortCounters(
+      [...providers.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
+    ),
   }
 })
