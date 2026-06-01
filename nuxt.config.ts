@@ -4,6 +4,7 @@ const siteName = 'Rachida El Hady'
 const siteDescription =
   'Frontend engineer portfolio for Rachida El Hady, featuring Nuxt, Vue, React Native, Expo, and production-focused interface work.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
+const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || ''
 const websiteStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -17,8 +18,16 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   runtimeConfig: {
+    analyticsAdminToken: process.env.ANALYTICS_ADMIN_TOKEN || '',
+    analyticsIpSalt: process.env.ANALYTICS_IP_SALT || '',
+    analyticsLogPath: process.env.ANALYTICS_LOG_PATH || '.data/analytics-events.jsonl',
     public: {
       siteUrl,
+      analyticsEnabled:
+        process.env.NUXT_PUBLIC_ANALYTICS_ENABLED ||
+        (process.env.NODE_ENV === 'production' ? 'true' : 'false'),
+      analyticsEndpoint: process.env.NUXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics/event',
+      googleAnalyticsId,
       emailjsPublicKey:
         process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY || '',
       emailjsServiceId:
@@ -114,21 +123,8 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-SYP80JYZQ9',
-          async: true,
-        },
-        {
           type: 'application/ld+json',
           innerHTML: JSON.stringify(websiteStructuredData),
-        },
-        {
-          innerHTML: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-SYP80JYZQ9');
-          `,
-          type: 'text/javascript',
         },
       ],
     },
