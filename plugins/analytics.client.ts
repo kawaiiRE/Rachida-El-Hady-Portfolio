@@ -1,6 +1,11 @@
 import { defineNuxtPlugin, useRouter, useRuntimeConfig } from '#imports'
 
-type AnalyticsEventName = 'page_view' | 'site_click' | 'form_submit' | 'page_engagement'
+type AnalyticsEventName =
+  | 'page_view'
+  | 'site_click'
+  | 'form_submit'
+  | 'page_engagement'
+  | 'location_update'
 
 interface AnalyticsElementPayload {
   tag: string
@@ -32,6 +37,18 @@ const OPT_OUT_QUERY_PARAM = 'analytics_opt_out'
 const OPT_IN_QUERY_PARAM = 'analytics_opt_in'
 const MAX_TEXT_LENGTH = 180
 const SCROLL_THROTTLE_MS = 250
+const PRECISE_LOCATION_CAMPAIGN_PARAMS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'ad_city',
+  'target_city',
+  'utm_city',
+  'ad_area',
+  'target_area',
+  'ad_location',
+  'utm_location',
+]
 
 const isTruthy = (value: unknown): boolean =>
   value === true || value === 'true' || value === '1' || value === 'yes'
@@ -41,6 +58,26 @@ const safeText = (value: unknown, maxLength = MAX_TEXT_LENGTH): string => {
 
   return value.replace(/\s+/g, ' ').trim().slice(0, maxLength)
 }
+
+const roundCoordinate = (value: number): number => Math.round(value * 10_000) / 10_000
+
+const roundNumber = (value: number): number => Math.round(value * 10) / 10
+
+const getNullableNumber = (value: number | null): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? roundNumber(value) : null
+
+const getPreciseLocationPayload = (position: GeolocationPosition) => ({
+  source: 'browser-geolocation',
+  permission: 'granted',
+  capturedAt: new Date(position.timestamp || Date.now()).toISOString(),
+  latitude: roundCoordinate(position.coords.latitude),
+  longitude: roundCoordinate(position.coords.longitude),
+  accuracyMeters: Math.max(0, Math.round(position.coords.accuracy || 0)),
+  altitude: getNullableNumber(position.coords.altitude),
+  altitudeAccuracyMeters: getNullableNumber(position.coords.altitudeAccuracy),
+  headingDegrees: getNullableNumber(position.coords.heading),
+  speedMetersPerSecond: getNullableNumber(position.coords.speed),
+})
 
 const createId = (prefix: string): string => {
   const randomId =
@@ -100,6 +137,29 @@ const getUtmPayload = () => {
   }
 }
 
+const getAdTargetPayload = () => {
+  const params = new URLSearchParams(window.location.search)
+
+  return {
+    countryCode: safeText(params.get('ad_country_code') || params.get('target_country_code') || '')
+      .toUpperCase()
+      .slice(0, 2),
+    country: safeText(params.get('ad_country') || params.get('target_country') || ''),
+    region: safeText(params.get('ad_region') || params.get('target_region') || ''),
+    city: safeText(
+      params.get('ad_city') || params.get('target_city') || params.get('utm_city') || '',
+    ),
+    area: safeText(
+      params.get('ad_area') ||
+        params.get('target_area') ||
+        params.get('ad_location') ||
+        params.get('utm_location') ||
+        '',
+    ),
+    adSet: safeText(params.get('ad_set') || params.get('adset') || params.get('utm_adset') || ''),
+  }
+}
+
 const getScrollDepth = (): number => {
   const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
   const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
@@ -154,6 +214,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
   const analyticsEnabled = isTruthy(config.public.analyticsEnabled)
   const analyticsEndpoint = String(config.public.analyticsEndpoint || '/api/analytics/event')
+  const preciseLocationEnabled = isTruthy(config.public.analyticsPreciseLocationEnabled)
+  const preciseLocationMode = String(config.public.analyticsPreciseLocationMode || 'campaign')
+    .trim()
+    .toLowerCase()
   const googleAnalyticsId = String(config.public.googleAnalyticsId || '')
 
   applyAnalyticsPreferenceFromUrl()
@@ -186,9 +250,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const pageStartedAt = { value: Date.now() }
   const maxScrollDepth = { value: getScrollDepth() }
+  const preciseLocation = { value: null as ReturnType<typeof getPreciseLocationPayload> | null }
   let lastTrackedPath = ''
   let lastScrollCheck = 0
   let googleAnalyticsLoaded = false
+  let preciseLocationRequested = false
 
   const installGoogleAnalytics = () => {
     if (!googleAnalyticsId || googleAnalyticsLoaded) {
@@ -235,6 +301,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       referrer: document.referrer,
       hash: window.location.hash,
       utm: getUtmPayload(),
+      adTarget: getAdTargetPayload(),
+    },
+    geo: {
+      precise: preciseLocation.value,
     },
     environment: {
       language: navigator.language,
@@ -282,6 +352,67 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       keepalive: true,
     }).catch(() => {})
+  }
+
+  const hasCampaignLocationIntent = (): boolean => {
+    const params = new URLSearchParams(window.location.search)
+
+    return PRECISE_LOCATION_CAMPAIGN_PARAMS.some((param) => params.has(param))
+  }
+
+  const shouldRequestPreciseLocation = (): boolean => {
+    if (
+      !preciseLocationEnabled ||
+      preciseLocationRequested ||
+      !window.isSecureContext ||
+      !('geolocation' in navigator)
+    ) {
+      return false
+    }
+
+    if (preciseLocationMode === 'all') {
+      return true
+    }
+
+    if (preciseLocationMode === 'campaign') {
+      return hasCampaignLocationIntent()
+    }
+
+    return false
+  }
+
+  const requestPreciseLocation = async () => {
+    if (!shouldRequestPreciseLocation()) {
+      return
+    }
+
+    preciseLocationRequested = true
+
+    try {
+      const permissionStatus =
+        'permissions' in navigator
+          ? await navigator.permissions.query({ name: 'geolocation' as PermissionName })
+          : null
+
+      if (permissionStatus?.state === 'denied') {
+        return
+      }
+    } catch {
+      // Some browsers do not expose the Permissions API consistently.
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        preciseLocation.value = getPreciseLocationPayload(position)
+        postAnalyticsEvent(getBasePayload('location_update'))
+      },
+      () => {},
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5 * 60 * 1000,
+        timeout: 12_000,
+      },
+    )
   }
 
   const trackGoogleEvent = (eventName: AnalyticsEventName, params: Record<string, unknown>) => {
@@ -468,11 +599,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:mounted', () => {
     installGoogleAnalytics()
     trackPageView()
+    window.setTimeout(requestPreciseLocation, 1_000)
   })
 
   router.afterEach((to, from) => {
     window.setTimeout(() => {
       trackPageView(from.fullPath || '')
+      requestPreciseLocation()
     }, 0)
   })
 

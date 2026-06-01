@@ -28,6 +28,10 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_ANALYTICS_ENABLED ||
         (process.env.NODE_ENV === 'production' ? 'true' : 'false'),
       analyticsEndpoint: process.env.NUXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics/event',
+      analyticsPreciseLocationEnabled:
+        process.env.NUXT_PUBLIC_ANALYTICS_PRECISE_LOCATION_ENABLED || 'false',
+      analyticsPreciseLocationMode:
+        process.env.NUXT_PUBLIC_ANALYTICS_PRECISE_LOCATION_MODE || 'campaign',
       googleAnalyticsId,
       emailjsPublicKey:
         process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY || '',

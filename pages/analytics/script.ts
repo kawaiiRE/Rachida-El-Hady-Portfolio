@@ -31,6 +31,9 @@ interface AnalyticsFilters {
   utmSource: string
   utmMedium: string
   utmCampaign: string
+  adCity: string
+  adRegion: string
+  adCountry: string
   pagePath: string
   device: string
   precision: string
@@ -56,6 +59,9 @@ interface AnalyticsFilterOptions {
   utmSources: AnalyticsFilterOption[]
   utmMediums: AnalyticsFilterOption[]
   utmCampaigns: AnalyticsFilterOption[]
+  adCities: AnalyticsFilterOption[]
+  adRegions: AnalyticsFilterOption[]
+  adCountries: AnalyticsFilterOption[]
   pagePaths: AnalyticsFilterOption[]
   devices: AnalyticsFilterOption[]
   precision: AnalyticsFilterOption[]
@@ -72,6 +78,8 @@ interface AnalyticsLocationRow {
   colo?: string
   latitude?: number | null
   longitude?: number | null
+  accuracyMeters?: number | null
+  nearestLocalityDistanceKm?: number | null
   provider?: string
   precision?: string
   stats: AnalyticsStats
@@ -103,6 +111,23 @@ interface AnalyticsCampaignLocationRow extends AnalyticsCampaignRow {
   city: string
   region: string
   countryCode: string
+}
+
+interface AnalyticsAdTargetRow {
+  city: string
+  region: string
+  countryCode: string
+  area: string
+  adSet: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsCampaignAdTargetRow extends AnalyticsCampaignRow {
+  city: string
+  region: string
+  countryCode: string
+  area: string
+  adSet: string
 }
 
 interface AnalyticsClickRow {
@@ -153,6 +178,8 @@ interface AnalyticsSessionRow {
   countryCode: string
   postalCode: string
   colo: string
+  accuracyMeters: number | null
+  nearestLocalityDistanceKm: number | null
   precision: string
   provider: string
   device: string
@@ -160,6 +187,11 @@ interface AnalyticsSessionRow {
   source: string
   medium: string
   campaign: string
+  adTargetCity: string
+  adTargetRegion: string
+  adTargetCountryCode: string
+  adTargetArea: string
+  adTargetAdSet: string
   entryPage: string
   exitPage: string
   pages: string[]
@@ -181,6 +213,8 @@ interface AnalyticsSummary {
   byPreciseLocation: AnalyticsLocationRow[]
   byCampaign: AnalyticsCampaignRow[]
   byCampaignLocation: AnalyticsCampaignLocationRow[]
+  byAdTarget: AnalyticsAdTargetRow[]
+  byCampaignAdTarget: AnalyticsCampaignAdTargetRow[]
   topClicks: AnalyticsClickRow[]
   byPage: AnalyticsPageRow[]
   byReferrer: AnalyticsReferrerRow[]
@@ -210,9 +244,12 @@ interface AnalyticsEvent {
       timezone?: string
       latitude?: number | null
       longitude?: number | null
+      accuracyMeters?: number | null
+      nearestLocalityDistanceKm?: number | null
       colo?: string
       precision?: string
       provider?: string
+      source?: string
     }
   }
   payload?: {
@@ -226,6 +263,14 @@ interface AnalyticsEvent {
         medium?: string
         campaign?: string
         content?: string
+      }
+      adTarget?: {
+        countryCode?: string
+        country?: string
+        region?: string
+        city?: string
+        area?: string
+        adSet?: string
       }
     }
     click?: {
@@ -280,6 +325,9 @@ const defaultFilters = (): AnalyticsFilters => ({
   utmSource: '',
   utmMedium: '',
   utmCampaign: '',
+  adCity: '',
+  adRegion: '',
+  adCountry: '',
   pagePath: '',
   device: '',
   precision: '',
@@ -299,6 +347,9 @@ const emptyFilterOptions = (): AnalyticsFilterOptions => ({
   utmSources: [],
   utmMediums: [],
   utmCampaigns: [],
+  adCities: [],
+  adRegions: [],
+  adCountries: [],
   pagePaths: [],
   devices: [],
   precision: [],
@@ -335,6 +386,9 @@ const filterLabels: Record<FilterKey, string> = {
   utmSource: 'Source',
   utmMedium: 'Medium',
   utmCampaign: 'Campaign',
+  adCity: 'Ad City',
+  adRegion: 'Ad Region',
+  adCountry: 'Ad Country',
   pagePath: 'Page',
   device: 'Device',
   precision: 'Precision',
@@ -452,6 +506,9 @@ const getKnownCountryRows = (rows: AnalyticsCountryRow[]): AnalyticsCountryRow[]
 const formatPrecisionLabel = (value: unknown): string => {
   const precision = cleanPart(value)
 
+  if (precision === 'browser-locality') return 'Browser locality'
+  if (precision === 'browser-coordinate') return 'Browser coordinates'
+  if (precision === 'browser-coordinate-low') return 'Browser coordinates, low confidence'
   if (precision === 'postal') return 'Postal-level'
   if (precision === 'city') return 'City-level'
   if (precision === 'region') return 'Region-level'
@@ -461,7 +518,13 @@ const formatPrecisionLabel = (value: unknown): string => {
   return optionValue(value)
 }
 
-const formatProviderLabel = (value: unknown): string => cleanPart(value) || 'No provider'
+const formatProviderLabel = (value: unknown): string => {
+  const provider = cleanPart(value)
+
+  if (provider === 'browser-geolocation') return 'Browser location'
+
+  return provider || 'No provider'
+}
 
 const formatEdgeLabel = (value: unknown): string => cleanPart(value) || 'No edge'
 
@@ -475,12 +538,22 @@ const getCoordinateLabel = (row: AnalyticsLocationRow): string => {
   return latitude && longitude ? `${latitude}, ${longitude}` : ''
 }
 
+const formatAccuracy = (value: number | null | undefined): string =>
+  typeof value === 'number' && Number.isFinite(value) ? `+/- ${formatNumber(value)}m` : ''
+
+const formatDistance = (value: number | null | undefined): string =>
+  typeof value === 'number' && Number.isFinite(value)
+    ? `nearest ${value < 1 ? `${Math.round(value * 1000)}m` : `${value.toFixed(1)}km`}`
+    : ''
+
 const getPreciseLocationMeta = (row: AnalyticsLocationRow): string =>
   [
     cleanPart(row.postalCode || '') ? `postal ${cleanPart(row.postalCode || '')}` : '',
     cleanPart(row.timezone || ''),
     cleanPart(row.colo || '') ? `edge ${cleanPart(row.colo || '')}` : '',
     getCoordinateLabel(row),
+    formatAccuracy(row.accuracyMeters),
+    formatDistance(row.nearestLocalityDistanceKm),
   ]
     .filter(Boolean)
     .join(' - ') || 'No finer fields'
@@ -496,12 +569,24 @@ const getSessionLocation = (row: AnalyticsSessionRow): string =>
 const getSessionCampaign = (row: AnalyticsSessionRow): string =>
   joinParts([row.source, row.medium, row.campaign], 'Direct or untagged')
 
+const getSessionAdTarget = (row: AnalyticsSessionRow): string =>
+  getAdTargetLabel({
+    city: row.adTargetCity,
+    region: row.adTargetRegion,
+    countryCode: row.adTargetCountryCode,
+    area: row.adTargetArea,
+    adSet: row.adTargetAdSet,
+    stats: row.stats,
+  })
+
 const getSessionGeoNote = (row: AnalyticsSessionRow): string =>
   [
     cleanPart(row.precision) ? formatPrecisionLabel(row.precision) : '',
     cleanPart(row.provider) ? formatProviderLabel(row.provider) : '',
     cleanPart(row.postalCode) ? `postal ${cleanPart(row.postalCode)}` : '',
     cleanPart(row.colo) ? `edge ${cleanPart(row.colo)}` : '',
+    formatAccuracy(row.accuracyMeters),
+    formatDistance(row.nearestLocalityDistanceKm),
   ]
     .filter(Boolean)
     .join(' / ')
@@ -528,6 +613,22 @@ const getCampaignMeta = (row: AnalyticsCampaignRow): string =>
     .filter(Boolean)
     .join(' - ')
 
+const getAdTargetLabel = (row: AnalyticsAdTargetRow | AnalyticsCampaignAdTargetRow): string => {
+  const country = getCountryLabelFromCode(row.countryCode, '')
+
+  return joinParts([row.area, row.city, row.region, country], 'No ad target')
+}
+
+const getAdTargetMeta = (row: AnalyticsAdTargetRow | AnalyticsCampaignAdTargetRow): string =>
+  [
+    cleanPart(row.adSet) ? `ad set: ${cleanPart(row.adSet)}` : '',
+    `${formatNumber(row.stats.uniqueSessions)} sessions`,
+    `${formatNumber(row.stats.pageViews)} views`,
+    `${formatNumber(row.stats.clicks)} clicks`,
+  ]
+    .filter(Boolean)
+    .join(' - ')
+
 const getClickLabel = (row: AnalyticsClickRow): string =>
   cleanPart(row.label) || cleanPart(row.href) || 'Unlabeled click'
 
@@ -546,6 +647,8 @@ const getRowKey = (row: AnalyticsLocationRow): string =>
     row.colo,
     row.latitude,
     row.longitude,
+    row.accuracyMeters,
+    row.nearestLocalityDistanceKm,
     row.provider,
     row.precision,
   ]
@@ -739,6 +842,17 @@ export default defineComponent({
       ),
     )
 
+    const adTargetRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.byAdTarget || [], sortMetric.value),
+        totalSessions.value || totalVisitors.value,
+        getAdTargetLabel,
+        getAdTargetMeta,
+        (stats) => stats.uniqueSessions || stats.uniqueVisitors,
+        (value) => formatCountLabel(value, 'session'),
+      ),
+    )
+
     const clickRows = computed(() =>
       makeListItems(
         sortByMetric(summary.value?.topClicks || [], 'events'),
@@ -807,6 +921,15 @@ export default defineComponent({
         tableLimit.value,
       ),
     )
+    const adTargetTableRows = computed(() =>
+      sortByMetric(summary.value?.byAdTarget || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const campaignAdTargetTableRows = computed(() =>
+      sortByMetric(summary.value?.byCampaignAdTarget || [], sortMetric.value).slice(
+        0,
+        tableLimit.value,
+      ),
+    )
     const pageTableRows = computed(() =>
       sortByMetric(summary.value?.byPage || [], sortMetric.value).slice(0, tableLimit.value),
     )
@@ -847,6 +970,11 @@ export default defineComponent({
         ? 'These are local analytics records, so Cloudflare city and country fields are not present yet.'
         : 'Matched events do not include country or city fields yet. Cloudflare geo will appear here once requests include those fields.'
     })
+    const geoAccuracyNotice = computed(() =>
+      summary.value?.byLocation?.length
+        ? 'Location uses browser permission when available, then falls back to Cloudflare IP geo. Browser rows show as Browser location with accuracy meters.'
+        : '',
+    )
     const recentEvents = computed(() => eventsResponse.value?.events || [])
     const dayRows = computed(() => summary.value?.byDay || [])
     const hourRows = computed(() => {
@@ -1058,10 +1186,40 @@ export default defineComponent({
           cleanPart(geo?.postalCode) ? `postal ${cleanPart(geo?.postalCode)}` : '',
           cleanPart(geo?.colo) ? `edge ${cleanPart(geo?.colo)}` : '',
           latitude && longitude ? `${latitude}, ${longitude}` : '',
+          formatAccuracy(geo?.accuracyMeters),
+          formatDistance(geo?.nearestLocalityDistanceKm),
         ]
           .filter(Boolean)
           .join(' - ') || 'none'
       )
+    }
+
+    const formatAdTarget = (event: AnalyticsEvent): string => {
+      const adTarget = event.payload?.page?.adTarget
+
+      if (!adTarget) {
+        return 'none'
+      }
+
+      return getAdTargetLabel({
+        city: adTarget.city || '',
+        region: adTarget.region || '',
+        countryCode: adTarget.countryCode || adTarget.country || '',
+        area: adTarget.area || '',
+        adSet: adTarget.adSet || '',
+        stats: {
+          events: 0,
+          uniqueVisitors: 0,
+          uniqueSessions: 0,
+          pageViews: 0,
+          clicks: 0,
+          formSubmits: 0,
+          engagements: 0,
+          avgEngagementSeconds: 0,
+          avgScrollDepth: 0,
+          clickRate: 0,
+        },
+      })
     }
 
     const formatEventDetail = (event: AnalyticsEvent): string => {
@@ -1103,10 +1261,17 @@ export default defineComponent({
         event.request?.geo?.colo || '',
         event.request?.geo?.precision || '',
         event.request?.geo?.provider || '',
+        event.request?.geo?.latitude || '',
+        event.request?.geo?.longitude || '',
+        event.request?.geo?.accuracyMeters || '',
         event.payload?.page?.path || '',
         event.payload?.page?.utm?.source || '',
         event.payload?.page?.utm?.medium || '',
         event.payload?.page?.utm?.campaign || '',
+        event.payload?.page?.adTarget?.city || '',
+        event.payload?.page?.adTarget?.region || '',
+        event.payload?.page?.adTarget?.countryCode || event.payload?.page?.adTarget?.country || '',
+        event.payload?.page?.adTarget?.area || '',
         formatEventDetail(event),
       ])
       const csv = [
@@ -1118,10 +1283,17 @@ export default defineComponent({
           'edgeColo',
           'geoLevel',
           'geoProvider',
+          'latitude',
+          'longitude',
+          'accuracyMeters',
           'pagePath',
           'utmSource',
           'utmMedium',
           'utmCampaign',
+          'adCity',
+          'adRegion',
+          'adCountry',
+          'adArea',
           'detail',
         ],
         ...rows,
@@ -1159,7 +1331,10 @@ export default defineComponent({
     return {
       activeFilterChips,
       activeTab,
+      adTargetRows,
+      adTargetTableRows,
       applyFilters,
+      campaignAdTargetTableRows,
       campaignLocationTableRows,
       campaignRows,
       campaignTableRows,
@@ -1177,6 +1352,7 @@ export default defineComponent({
       eventTypeTableRows,
       exportEventsCsv,
       filterOptions,
+      formatAdTarget,
       formatDate,
       formatDay,
       formatEventDetail,
@@ -1192,6 +1368,8 @@ export default defineComponent({
       formatSeconds,
       getCampaignLabel,
       getCampaignMeta,
+      getAdTargetLabel,
+      getAdTargetMeta,
       getClickLabel,
       getClickMeta,
       getCountryLabel,
@@ -1199,11 +1377,13 @@ export default defineComponent({
       getPreciseLocationMeta,
       getLocationLabel,
       getRowKey,
+      getSessionAdTarget,
       getSessionCampaign,
       getSessionGeoNote,
       getSessionLocation,
       getSessionPages,
       geoQualityTableRows,
+      geoAccuracyNotice,
       geoMissingNotice,
       hasToken,
       hourAreaPoints,

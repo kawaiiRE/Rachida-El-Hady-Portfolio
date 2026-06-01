@@ -3,6 +3,7 @@ import type { AnalyticsRecord } from '../../utils/analytics-storage'
 import { readAnalyticsRecords } from '../../utils/analytics-storage'
 import {
   buildAnalyticsFilterOptions,
+  getAnalyticsAdTargetKey,
   filterAnalyticsRecords,
   getAnalyticsCampaignKey,
   getAnalyticsClickKey,
@@ -40,6 +41,8 @@ type SessionAccumulator = {
   countryCode: string
   postalCode: string
   colo: string
+  accuracyMeters: number | null
+  nearestLocalityDistanceKm: number | null
   precision: string
   provider: string
   device: string
@@ -47,6 +50,11 @@ type SessionAccumulator = {
   source: string
   medium: string
   campaign: string
+  adTargetCity: string
+  adTargetRegion: string
+  adTargetCountryCode: string
+  adTargetArea: string
+  adTargetAdSet: string
   entryPage: string
   exitPage: string
   pages: Set<string>
@@ -211,6 +219,8 @@ const createSessionAccumulator = (
   countryCode: facts.countryCode || facts.country,
   postalCode: facts.postalCode,
   colo: facts.colo,
+  accuracyMeters: facts.accuracyMeters,
+  nearestLocalityDistanceKm: facts.nearestLocalityDistanceKm,
   precision: facts.precision,
   provider: facts.provider,
   device: facts.device,
@@ -218,6 +228,11 @@ const createSessionAccumulator = (
   source: facts.utmSource,
   medium: facts.utmMedium,
   campaign: facts.utmCampaign,
+  adTargetCity: facts.adTargetCity,
+  adTargetRegion: facts.adTargetRegion,
+  adTargetCountryCode: facts.adTargetCountryCode || facts.adTargetCountry,
+  adTargetArea: facts.adTargetArea,
+  adTargetAdSet: facts.adTargetAdSet,
   entryPage: facts.pagePath,
   exitPage: facts.pagePath,
   pages: new Set<string>(),
@@ -253,6 +268,9 @@ const addToSessions = (sessions: Map<string, SessionAccumulator>, record: Analyt
   session.countryCode = session.countryCode || facts.countryCode || facts.country
   session.postalCode = session.postalCode || facts.postalCode
   session.colo = session.colo || facts.colo
+  session.accuracyMeters = session.accuracyMeters ?? facts.accuracyMeters
+  session.nearestLocalityDistanceKm =
+    session.nearestLocalityDistanceKm ?? facts.nearestLocalityDistanceKm
   session.precision = session.precision || facts.precision
   session.provider = session.provider || facts.provider
   session.device = session.device || facts.device
@@ -260,6 +278,12 @@ const addToSessions = (sessions: Map<string, SessionAccumulator>, record: Analyt
   session.source = session.source || facts.utmSource
   session.medium = session.medium || facts.utmMedium
   session.campaign = session.campaign || facts.utmCampaign
+  session.adTargetCity = session.adTargetCity || facts.adTargetCity
+  session.adTargetRegion = session.adTargetRegion || facts.adTargetRegion
+  session.adTargetCountryCode =
+    session.adTargetCountryCode || facts.adTargetCountryCode || facts.adTargetCountry
+  session.adTargetArea = session.adTargetArea || facts.adTargetArea
+  session.adTargetAdSet = session.adTargetAdSet || facts.adTargetAdSet
 
   sessions.set(key, session)
 }
@@ -278,6 +302,8 @@ const serializeSession = (session: SessionAccumulator) => ({
   countryCode: normalizeKeyPart(session.countryCode),
   postalCode: normalizeKeyPart(session.postalCode),
   colo: normalizeKeyPart(session.colo),
+  accuracyMeters: session.accuracyMeters,
+  nearestLocalityDistanceKm: session.nearestLocalityDistanceKm,
   precision: normalizeKeyPart(session.precision),
   provider: normalizeKeyPart(session.provider),
   device: normalizeKeyPart(session.device),
@@ -285,6 +311,11 @@ const serializeSession = (session: SessionAccumulator) => ({
   source: normalizeKeyPart(session.source),
   medium: normalizeKeyPart(session.medium),
   campaign: normalizeKeyPart(session.campaign),
+  adTargetCity: normalizeKeyPart(session.adTargetCity),
+  adTargetRegion: normalizeKeyPart(session.adTargetRegion),
+  adTargetCountryCode: normalizeKeyPart(session.adTargetCountryCode),
+  adTargetArea: normalizeKeyPart(session.adTargetArea),
+  adTargetAdSet: normalizeKeyPart(session.adTargetAdSet),
   entryPage: normalizeKeyPart(session.entryPage),
   exitPage: normalizeKeyPart(session.exitPage),
   pages: [...session.pages],
@@ -340,6 +371,8 @@ export default defineEventHandler(async (event) => {
   const preciseLocations = new Map<string, Counter>()
   const campaigns = new Map<string, Counter>()
   const campaignLocations = new Map<string, Counter>()
+  const adTargets = new Map<string, Counter>()
+  const campaignAdTargets = new Map<string, Counter>()
   const clicks = new Map<string, Counter>()
   const precision = new Map<string, Counter>()
   const providers = new Map<string, Counter>()
@@ -360,6 +393,8 @@ export default defineEventHandler(async (event) => {
     const preciseLocationKey = getAnalyticsPreciseLocationKey(record)
     const campaignKey = getAnalyticsCampaignKey(record)
     const campaignLocationKey = `${campaignKey}|${locationKey}`
+    const adTargetKey = getAnalyticsAdTargetKey(record)
+    const campaignAdTargetKey = `${campaignKey}|${adTargetKey}`
     const hasCountry = isKnownPart(facts.countryCode || facts.country)
     const hasLocation = hasKnownGeoValue(
       facts.city,
@@ -378,6 +413,14 @@ export default defineEventHandler(async (event) => {
       facts.latitude,
       facts.longitude,
     )
+    const hasAdTarget = hasKnownGeoValue(
+      facts.adTargetCity,
+      facts.adTargetRegion,
+      facts.adTargetCountryCode,
+      facts.adTargetCountry,
+      facts.adTargetArea,
+      facts.adTargetAdSet,
+    )
 
     addRecordToCounter(total, record)
     if (hasCountry) addToMap(countries, countryKey, record)
@@ -385,6 +428,10 @@ export default defineEventHandler(async (event) => {
     if (hasPreciseLocation) addToMap(preciseLocations, preciseLocationKey, record)
     addToMap(campaigns, campaignKey, record)
     if (hasLocation) addToMap(campaignLocations, campaignLocationKey, record)
+    if (hasAdTarget) {
+      addToMap(adTargets, adTargetKey, record)
+      addToMap(campaignAdTargets, campaignAdTargetKey, record)
+    }
     addToMap(precision, normalizeKeyPart(facts.precision), record)
     if (isKnownPart(facts.provider)) addToMap(providers, normalizeKeyPart(facts.provider), record)
     addToMap(geoQuality, getAnalyticsGeoQualityKey(record), record)
@@ -431,9 +478,11 @@ export default defineEventHandler(async (event) => {
         colo,
         latitude,
         longitude,
+        accuracyMeters,
+        nearestLocalityDistanceKm,
         provider,
         precisionLevel,
-      ] = splitKeyParts(key, 10)
+      ] = splitKeyParts(key, 12)
 
       return {
         city,
@@ -444,6 +493,8 @@ export default defineEventHandler(async (event) => {
         colo,
         latitude: parseNullableNumber(latitude),
         longitude: parseNullableNumber(longitude),
+        accuracyMeters: parseNullableNumber(accuracyMeters),
+        nearestLocalityDistanceKm: parseNullableNumber(nearestLocalityDistanceKm),
         provider,
         precision: precisionLevel,
         stats: serializeCounter(stats),
@@ -475,6 +526,39 @@ export default defineEventHandler(async (event) => {
         city,
         region,
         countryCode,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+  const byAdTarget = sortCounters(
+    [...adTargets.entries()].map(([key, stats]) => {
+      const [city, region, countryCode, area, adSet] = splitKeyParts(key, 5)
+
+      return {
+        city,
+        region,
+        countryCode,
+        area,
+        adSet,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+  const byCampaignAdTarget = sortCounters(
+    [...campaignAdTargets.entries()].map(([key, stats]) => {
+      const [source, medium, campaign, content, city, region, countryCode, area, adSet] =
+        splitKeyParts(key, 9)
+
+      return {
+        source,
+        medium,
+        campaign,
+        content,
+        city,
+        region,
+        countryCode,
+        area,
+        adSet,
         stats: serializeCounter(stats),
       }
     }),
@@ -556,6 +640,8 @@ export default defineEventHandler(async (event) => {
     byPreciseLocation,
     byCampaign,
     byCampaignLocation,
+    byAdTarget,
+    byCampaignAdTarget,
     topClicks,
     byPage,
     byReferrer,

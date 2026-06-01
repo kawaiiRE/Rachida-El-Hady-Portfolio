@@ -12,6 +12,9 @@ export interface AnalyticsFilters {
   utmSource: string
   utmMedium: string
   utmCampaign: string
+  adCity: string
+  adRegion: string
+  adCountry: string
   pagePath: string
   device: string
   precision: string
@@ -37,6 +40,9 @@ export interface AnalyticsFacts {
   continent: string
   latitude: number | null
   longitude: number | null
+  accuracyMeters: number | null
+  geoSource: string
+  nearestLocalityDistanceKm: number | null
   metroCode: string
   colo: string
   precision: string
@@ -48,6 +54,12 @@ export interface AnalyticsFacts {
   utmMedium: string
   utmCampaign: string
   utmContent: string
+  adTargetCountryCode: string
+  adTargetCountry: string
+  adTargetRegion: string
+  adTargetCity: string
+  adTargetArea: string
+  adTargetAdSet: string
   clickLabel: string
   clickHref: string
   isOutbound: boolean
@@ -78,6 +90,9 @@ const EMPTY_FILTERS: AnalyticsFilters = {
   utmSource: '',
   utmMedium: '',
   utmCampaign: '',
+  adCity: '',
+  adRegion: '',
+  adCountry: '',
   pagePath: '',
   device: '',
   precision: '',
@@ -229,6 +244,7 @@ const matchesSearch = (facts: AnalyticsFacts, query: string): boolean => {
     facts.country,
     facts.postalCode,
     facts.timezone,
+    facts.geoSource,
     facts.colo,
     facts.precision,
     facts.provider,
@@ -239,6 +255,12 @@ const matchesSearch = (facts: AnalyticsFacts, query: string): boolean => {
     facts.utmMedium,
     facts.utmCampaign,
     facts.utmContent,
+    facts.adTargetCountryCode,
+    facts.adTargetCountry,
+    facts.adTargetRegion,
+    facts.adTargetCity,
+    facts.adTargetArea,
+    facts.adTargetAdSet,
     facts.clickLabel,
     facts.clickHref,
     facts.referrer,
@@ -293,6 +315,9 @@ export const parseAnalyticsFilters = (query: Record<string, unknown>): Analytics
   utmSource: getQueryString(query, 'utmSource'),
   utmMedium: getQueryString(query, 'utmMedium'),
   utmCampaign: getQueryString(query, 'utmCampaign'),
+  adCity: getQueryString(query, 'adCity'),
+  adRegion: getQueryString(query, 'adRegion'),
+  adCountry: getQueryString(query, 'adCountry').toUpperCase(),
   pagePath: getQueryString(query, 'pagePath'),
   device: getQueryString(query, 'device'),
   precision: getQueryString(query, 'precision'),
@@ -329,6 +354,13 @@ export const getAnalyticsFacts = (record: AnalyticsRecord): AnalyticsFacts => {
     continent: getStringValue(record, ['request', 'geo', 'continent']),
     latitude: getNullableNumberValue(record, ['request', 'geo', 'latitude']),
     longitude: getNullableNumberValue(record, ['request', 'geo', 'longitude']),
+    accuracyMeters: getNullableNumberValue(record, ['request', 'geo', 'accuracyMeters']),
+    geoSource: getStringValue(record, ['request', 'geo', 'source']),
+    nearestLocalityDistanceKm: getNullableNumberValue(record, [
+      'request',
+      'geo',
+      'nearestLocalityDistanceKm',
+    ]),
     metroCode: getStringValue(record, ['request', 'geo', 'metroCode']),
     colo: getStringValue(record, ['request', 'geo', 'colo']),
     precision: getStringValue(record, ['request', 'geo', 'precision']),
@@ -340,6 +372,17 @@ export const getAnalyticsFacts = (record: AnalyticsRecord): AnalyticsFacts => {
     utmMedium: getStringValue(record, ['payload', 'page', 'utm', 'medium']),
     utmCampaign: getStringValue(record, ['payload', 'page', 'utm', 'campaign']),
     utmContent: getStringValue(record, ['payload', 'page', 'utm', 'content']),
+    adTargetCountryCode: getStringValue(record, [
+      'payload',
+      'page',
+      'adTarget',
+      'countryCode',
+    ]).toUpperCase(),
+    adTargetCountry: getStringValue(record, ['payload', 'page', 'adTarget', 'country']),
+    adTargetRegion: getStringValue(record, ['payload', 'page', 'adTarget', 'region']),
+    adTargetCity: getStringValue(record, ['payload', 'page', 'adTarget', 'city']),
+    adTargetArea: getStringValue(record, ['payload', 'page', 'adTarget', 'area']),
+    adTargetAdSet: getStringValue(record, ['payload', 'page', 'adTarget', 'adSet']),
     clickLabel: getStringValue(record, ['payload', 'click', 'label']),
     clickHref: getStringValue(record, ['payload', 'click', 'href']),
     isOutbound:
@@ -377,6 +420,8 @@ export const getAnalyticsPreciseLocationKey = (record: AnalyticsRecord): string 
     normalizeKeyPart(facts.colo),
     normalizeKeyPart(facts.latitude ?? ''),
     normalizeKeyPart(facts.longitude ?? ''),
+    normalizeKeyPart(facts.accuracyMeters ?? ''),
+    normalizeKeyPart(facts.nearestLocalityDistanceKm ?? ''),
     normalizeKeyPart(facts.provider),
     normalizeKeyPart(facts.precision),
   ].join('|')
@@ -402,6 +447,18 @@ export const getAnalyticsCampaignKey = (record: AnalyticsRecord): string => {
     normalizeKeyPart(facts.utmMedium),
     normalizeKeyPart(facts.utmCampaign),
     normalizeKeyPart(facts.utmContent),
+  ].join('|')
+}
+
+export const getAnalyticsAdTargetKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+
+  return [
+    normalizeKeyPart(facts.adTargetCity),
+    normalizeKeyPart(facts.adTargetRegion),
+    normalizeKeyPart(facts.adTargetCountryCode || facts.adTargetCountry),
+    normalizeKeyPart(facts.adTargetArea),
+    normalizeKeyPart(facts.adTargetAdSet),
   ].join('|')
 }
 
@@ -436,6 +493,11 @@ export const filterAnalyticsRecords = (
     if (!matchesExact(facts.utmSource, filters.utmSource)) return false
     if (!matchesExact(facts.utmMedium, filters.utmMedium)) return false
     if (!matchesExact(facts.utmCampaign, filters.utmCampaign)) return false
+    if (!matchesExact(facts.adTargetCity, filters.adCity)) return false
+    if (!matchesExact(facts.adTargetRegion, filters.adRegion)) return false
+    if (!matchesExact(facts.adTargetCountryCode || facts.adTargetCountry, filters.adCountry)) {
+      return false
+    }
     if (!matchesExact(facts.pagePath, filters.pagePath)) return false
     if (!matchesExact(facts.device, filters.device)) return false
     if (!matchesExact(facts.precision, filters.precision)) return false
@@ -459,6 +521,13 @@ export const buildAnalyticsFilterOptions = (records: AnalyticsRecord[]) => ({
   utmSources: makeOptions(records, (record) => getAnalyticsFacts(record).utmSource),
   utmMediums: makeOptions(records, (record) => getAnalyticsFacts(record).utmMedium),
   utmCampaigns: makeOptions(records, (record) => getAnalyticsFacts(record).utmCampaign),
+  adCities: makeOptions(records, (record) => getAnalyticsFacts(record).adTargetCity),
+  adRegions: makeOptions(records, (record) => getAnalyticsFacts(record).adTargetRegion),
+  adCountries: makeOptions(
+    records,
+    (record) =>
+      getAnalyticsFacts(record).adTargetCountryCode || getAnalyticsFacts(record).adTargetCountry,
+  ),
   pagePaths: makeOptions(records, (record) => getAnalyticsFacts(record).pagePath),
   devices: makeOptions(records, (record) => getAnalyticsFacts(record).device),
   precision: makeOptions(records, (record) => getAnalyticsFacts(record).precision),

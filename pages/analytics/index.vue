@@ -203,6 +203,48 @@
               </select>
             </label>
 
+            <label class="analytics-page__control">
+              <span>Ad City</span>
+              <select v-model="draftFilters.adCity" class="analytics-page__select">
+                <option value="">All ad cities</option>
+                <option
+                  v-for="option in filterOptions.adCities"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ formatOptionLabel(option) }}
+                </option>
+              </select>
+            </label>
+
+            <label class="analytics-page__control">
+              <span>Ad Region</span>
+              <select v-model="draftFilters.adRegion" class="analytics-page__select">
+                <option value="">All ad regions</option>
+                <option
+                  v-for="option in filterOptions.adRegions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ formatOptionLabel(option) }}
+                </option>
+              </select>
+            </label>
+
+            <label class="analytics-page__control">
+              <span>Ad Country</span>
+              <select v-model="draftFilters.adCountry" class="analytics-page__select">
+                <option value="">All ad countries</option>
+                <option
+                  v-for="option in filterOptions.adCountries"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ formatOptionLabel(option) }}
+                </option>
+              </select>
+            </label>
+
             <label class="analytics-page__control analytics-page__control--wide">
               <span>Page</span>
               <select v-model="draftFilters.pagePath" class="analytics-page__select">
@@ -350,6 +392,9 @@
           <section v-if="geoMissingNotice" class="analytics-page__notice">
             {{ geoMissingNotice }}
           </section>
+          <section v-if="geoAccuracyNotice" class="analytics-page__notice">
+            {{ geoAccuracyNotice }}
+          </section>
 
           <nav class="analytics-page__tabs" aria-label="Analytics views">
             <button
@@ -437,9 +482,14 @@
               empty-label="No country data yet"
             />
             <AnalyticsList
-              title="Lebanon Cities"
+              title="Lebanon Locations"
               :items="lebanonCityRows"
               empty-label="No LB city data yet"
+            />
+            <AnalyticsList
+              title="Ad Target Locations"
+              :items="adTargetRows"
+              empty-label="No ad target data yet"
             />
             <AnalyticsList
               title="Top Campaigns"
@@ -490,7 +540,7 @@
 
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
-                <h2>Lebanon Cities</h2>
+                <h2>Lebanon Locations</h2>
                 <span>{{ lebanonTableRows.length }} rows</span>
               </header>
               <div class="analytics-page__table-wrap">
@@ -562,7 +612,7 @@
 
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
-                <h2>All Locations</h2>
+                <h2>Visitor Locations</h2>
                 <span>{{ locationTableRows.length }} rows</span>
               </header>
               <div class="analytics-page__table-wrap">
@@ -741,7 +791,82 @@
 
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
-                <h2>Campaign By City</h2>
+                <h2>Ad Target Locations</h2>
+                <span>{{ adTargetTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table">
+                  <thead>
+                    <tr>
+                      <th>Target</th>
+                      <th>Ad Set</th>
+                      <th>Visitors</th>
+                      <th>Sessions</th>
+                      <th>Views</th>
+                      <th>Clicks</th>
+                      <th>Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in adTargetTableRows" :key="getAdTargetLabel(row)">
+                      <td>{{ getAdTargetLabel(row) }}</td>
+                      <td>{{ optionValue(row.adSet) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
+                      <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                      <td>{{ formatNumber(row.stats.clicks) }}</td>
+                      <td>{{ formatNumber(row.stats.events) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-if="!adTargetTableRows.length" class="analytics-page__empty">
+                  No ad target rows
+                </p>
+              </div>
+            </article>
+
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
+                <h2>Campaign By Ad Target</h2>
+                <span>{{ campaignAdTargetTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table">
+                  <thead>
+                    <tr>
+                      <th>Campaign</th>
+                      <th>Target</th>
+                      <th>Visitors</th>
+                      <th>Sessions</th>
+                      <th>Views</th>
+                      <th>Clicks</th>
+                      <th>Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="row in campaignAdTargetTableRows"
+                      :key="`${getCampaignLabel(row)}-${getAdTargetLabel(row)}`"
+                    >
+                      <td>{{ getCampaignLabel(row) }}</td>
+                      <td>{{ getAdTargetLabel(row) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueSessions) }}</td>
+                      <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                      <td>{{ formatNumber(row.stats.clicks) }}</td>
+                      <td>{{ formatNumber(row.stats.events) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-if="!campaignAdTargetTableRows.length" class="analytics-page__empty">
+                  No campaign ad target rows
+                </p>
+              </div>
+            </article>
+
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
+                <h2>Campaign By Visitor Location</h2>
                 <span>{{ campaignLocationTableRows.length }} rows</span>
               </header>
               <div class="analytics-page__table-wrap">
@@ -968,6 +1093,7 @@
                     <th>Location</th>
                     <th>Device</th>
                     <th>Campaign</th>
+                    <th>Ad Target</th>
                     <th>Referrer</th>
                     <th>Entry</th>
                     <th>Exit</th>
@@ -992,6 +1118,7 @@
                     </td>
                     <td>{{ optionValue(row.device) }}</td>
                     <td>{{ getSessionCampaign(row) }}</td>
+                    <td>{{ getSessionAdTarget(row) }}</td>
                     <td>{{ row.referrerHost || 'direct' }}</td>
                     <td>{{ optionValue(row.entryPage) }}</td>
                     <td>{{ optionValue(row.exitPage) }}</td>
@@ -1033,6 +1160,7 @@
                     <th>Geo</th>
                     <th>Page</th>
                     <th>Campaign</th>
+                    <th>Ad Target</th>
                     <th>Detail</th>
                   </tr>
                 </thead>
@@ -1050,6 +1178,7 @@
                           .join(' / ') || 'none'
                       }}
                     </td>
+                    <td>{{ formatAdTarget(event) }}</td>
                     <td>{{ formatEventDetail(event) }}</td>
                   </tr>
                 </tbody>
