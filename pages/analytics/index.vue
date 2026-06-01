@@ -134,6 +134,34 @@
             </label>
 
             <label class="analytics-page__control">
+              <span>Postal</span>
+              <select v-model="draftFilters.postalCode" class="analytics-page__select">
+                <option value="">All postal codes</option>
+                <option
+                  v-for="option in filterOptions.postalCodes"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ formatOptionLabel(option) }}
+                </option>
+              </select>
+            </label>
+
+            <label class="analytics-page__control">
+              <span>Edge</span>
+              <select v-model="draftFilters.colo" class="analytics-page__select">
+                <option value="">All edges</option>
+                <option
+                  v-for="option in filterOptions.colos"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ formatOptionLabel(option) }}
+                </option>
+              </select>
+            </label>
+
+            <label class="analytics-page__control">
               <span>Campaign</span>
               <select v-model="draftFilters.utmCampaign" class="analytics-page__select">
                 <option value="">All campaigns</option>
@@ -430,6 +458,42 @@
 
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
+                <h2>Precise Lebanon Geo</h2>
+                <span>{{ lebanonPreciseTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table">
+                  <thead>
+                    <tr>
+                      <th>Location</th>
+                      <th>Finer Fields</th>
+                      <th>Level</th>
+                      <th>Provider</th>
+                      <th>Visitors</th>
+                      <th>Views</th>
+                      <th>Clicks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in lebanonPreciseTableRows" :key="getRowKey(row)">
+                      <td>{{ getLocationLabel(row) }}</td>
+                      <td>{{ getPreciseLocationMeta(row) }}</td>
+                      <td>{{ row.precision || 'unknown' }}</td>
+                      <td>{{ row.provider || 'unknown' }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                      <td>{{ formatNumber(row.stats.clicks) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-if="!lebanonPreciseTableRows.length" class="analytics-page__empty">
+                  No precise Lebanon rows
+                </p>
+              </div>
+            </article>
+
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
                 <h2>All Locations</h2>
                 <span>{{ locationTableRows.length }} rows</span>
               </header>
@@ -464,6 +528,42 @@
 
             <article class="analytics-page__panel">
               <header class="analytics-page__panel-header">
+                <h2>Precise Locations</h2>
+                <span>{{ preciseLocationTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table">
+                  <thead>
+                    <tr>
+                      <th>Location</th>
+                      <th>Finer Fields</th>
+                      <th>Level</th>
+                      <th>Provider</th>
+                      <th>Visitors</th>
+                      <th>Views</th>
+                      <th>Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in preciseLocationTableRows" :key="getRowKey(row)">
+                      <td>{{ getLocationLabel(row) }}</td>
+                      <td>{{ getPreciseLocationMeta(row) }}</td>
+                      <td>{{ row.precision || 'unknown' }}</td>
+                      <td>{{ row.provider || 'unknown' }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                      <td>{{ formatNumber(row.stats.pageViews) }}</td>
+                      <td>{{ formatNumber(row.stats.events) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-if="!preciseLocationTableRows.length" class="analytics-page__empty">
+                  No precise location rows
+                </p>
+              </div>
+            </article>
+
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
                 <h2>Geo Providers</h2>
                 <span>{{ providerTableRows.length }} rows</span>
               </header>
@@ -479,6 +579,42 @@
                   <tbody>
                     <tr v-for="row in providerTableRows" :key="row.name">
                       <td>{{ row.name }}</td>
+                      <td>{{ formatNumber(row.stats.events) }}</td>
+                      <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="analytics-page__panel">
+              <header class="analytics-page__panel-header">
+                <h2>Geo Quality</h2>
+                <span>{{ geoQualityTableRows.length }} rows</span>
+              </header>
+              <div class="analytics-page__table-wrap">
+                <table class="analytics-page__table analytics-page__table--compact">
+                  <thead>
+                    <tr>
+                      <th>Provider</th>
+                      <th>Level</th>
+                      <th>Edge</th>
+                      <th>Postal</th>
+                      <th>Coords</th>
+                      <th>Events</th>
+                      <th>Visitors</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="row in geoQualityTableRows"
+                      :key="`${row.provider}-${row.precision}-${row.colo}-${row.hasPostalCode}-${row.hasCoordinates}`"
+                    >
+                      <td>{{ row.provider || 'unknown' }}</td>
+                      <td>{{ row.precision || 'unknown' }}</td>
+                      <td>{{ row.colo || 'unknown' }}</td>
+                      <td>{{ row.hasPostalCode ? 'yes' : 'no' }}</td>
+                      <td>{{ row.hasCoordinates ? 'yes' : 'no' }}</td>
                       <td>{{ formatNumber(row.stats.events) }}</td>
                       <td>{{ formatNumber(row.stats.uniqueVisitors) }}</td>
                     </tr>
@@ -740,6 +876,7 @@
                     <th>Time</th>
                     <th>Event</th>
                     <th>Location</th>
+                    <th>Geo</th>
                     <th>Page</th>
                     <th>Campaign</th>
                     <th>Detail</th>
@@ -750,6 +887,7 @@
                     <td>{{ formatDate(event.receivedAt) }}</td>
                     <td>{{ formatEventName(event.eventName) }}</td>
                     <td>{{ formatLocation(event) }}</td>
+                    <td>{{ formatGeoDetail(event) }}</td>
                     <td>{{ event.payload?.page?.path || 'unknown' }}</td>
                     <td>
                       {{

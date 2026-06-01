@@ -7,6 +7,8 @@ export interface AnalyticsFilters {
   countryCode: string
   region: string
   city: string
+  postalCode: string
+  colo: string
   utmSource: string
   utmMedium: string
   utmCampaign: string
@@ -27,8 +29,16 @@ export interface AnalyticsFacts {
   sessionId: string
   city: string
   region: string
+  regionCode: string
   countryCode: string
   country: string
+  postalCode: string
+  timezone: string
+  continent: string
+  latitude: number | null
+  longitude: number | null
+  metroCode: string
+  colo: string
   precision: string
   provider: string
   pagePath: string
@@ -63,6 +73,8 @@ const EMPTY_FILTERS: AnalyticsFilters = {
   countryCode: '',
   region: '',
   city: '',
+  postalCode: '',
+  colo: '',
   utmSource: '',
   utmMedium: '',
   utmCampaign: '',
@@ -100,6 +112,18 @@ const getNumberValue = (value: unknown, path: string[]): number => {
   const numberValue = typeof nextValue === 'number' ? nextValue : Number(nextValue)
 
   return Number.isFinite(numberValue) ? numberValue : 0
+}
+
+const getNullableNumberValue = (value: unknown, path: string[]): number | null => {
+  const nextValue = getNestedValue(value, path)
+
+  if (nextValue === '' || nextValue === null || nextValue === undefined) {
+    return null
+  }
+
+  const numberValue = typeof nextValue === 'number' ? nextValue : Number(nextValue)
+
+  return Number.isFinite(numberValue) ? numberValue : null
 }
 
 const getBooleanValue = (value: unknown, path: string[]): boolean => {
@@ -194,8 +218,14 @@ const matchesSearch = (facts: AnalyticsFacts, query: string): boolean => {
     facts.eventName,
     facts.city,
     facts.region,
+    facts.regionCode,
     facts.countryCode,
     facts.country,
+    facts.postalCode,
+    facts.timezone,
+    facts.colo,
+    facts.precision,
+    facts.provider,
     facts.pagePath,
     facts.pageFullPath,
     facts.pageTitle,
@@ -252,6 +282,8 @@ export const parseAnalyticsFilters = (query: Record<string, unknown>): Analytics
   countryCode: getQueryString(query, 'countryCode').toUpperCase(),
   region: getQueryString(query, 'region'),
   city: getQueryString(query, 'city'),
+  postalCode: getQueryString(query, 'postalCode'),
+  colo: getQueryString(query, 'colo').toUpperCase(),
   utmSource: getQueryString(query, 'utmSource'),
   utmMedium: getQueryString(query, 'utmMedium'),
   utmCampaign: getQueryString(query, 'utmCampaign'),
@@ -283,8 +315,16 @@ export const getAnalyticsFacts = (record: AnalyticsRecord): AnalyticsFacts => {
     sessionId: getStringValue(record, ['payload', 'visitor', 'sessionId']),
     city: getStringValue(record, ['request', 'geo', 'city']),
     region: getStringValue(record, ['request', 'geo', 'region']),
+    regionCode: getStringValue(record, ['request', 'geo', 'regionCode']),
     countryCode: countryCode.toUpperCase(),
     country: getStringValue(record, ['request', 'geo', 'country']),
+    postalCode: getStringValue(record, ['request', 'geo', 'postalCode']),
+    timezone: getStringValue(record, ['request', 'geo', 'timezone']),
+    continent: getStringValue(record, ['request', 'geo', 'continent']),
+    latitude: getNullableNumberValue(record, ['request', 'geo', 'latitude']),
+    longitude: getNullableNumberValue(record, ['request', 'geo', 'longitude']),
+    metroCode: getStringValue(record, ['request', 'geo', 'metroCode']),
+    colo: getStringValue(record, ['request', 'geo', 'colo']),
     precision: getStringValue(record, ['request', 'geo', 'precision']),
     provider: getStringValue(record, ['request', 'geo', 'provider']),
     pagePath: getStringValue(record, ['payload', 'page', 'path']),
@@ -316,6 +356,35 @@ export const getAnalyticsLocationKey = (record: AnalyticsRecord): string => {
     normalizeKeyPart(facts.city),
     normalizeKeyPart(facts.region),
     normalizeKeyPart(facts.countryCode || facts.country),
+  ].join('|')
+}
+
+export const getAnalyticsPreciseLocationKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+
+  return [
+    normalizeKeyPart(facts.city),
+    normalizeKeyPart(facts.region || facts.regionCode),
+    normalizeKeyPart(facts.countryCode || facts.country),
+    normalizeKeyPart(facts.postalCode),
+    normalizeKeyPart(facts.timezone),
+    normalizeKeyPart(facts.colo),
+    normalizeKeyPart(facts.latitude ?? ''),
+    normalizeKeyPart(facts.longitude ?? ''),
+    normalizeKeyPart(facts.provider),
+    normalizeKeyPart(facts.precision),
+  ].join('|')
+}
+
+export const getAnalyticsGeoQualityKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+
+  return [
+    normalizeKeyPart(facts.provider),
+    normalizeKeyPart(facts.precision),
+    normalizeKeyPart(facts.colo),
+    facts.postalCode ? 'postal' : 'no-postal',
+    facts.latitude !== null && facts.longitude !== null ? 'coordinates' : 'no-coordinates',
   ].join('|')
 }
 
@@ -356,6 +425,8 @@ export const filterAnalyticsRecords = (
     if (!matchesExact(facts.countryCode, filters.countryCode)) return false
     if (!matchesExact(facts.region, filters.region)) return false
     if (!matchesExact(facts.city, filters.city)) return false
+    if (!matchesExact(facts.postalCode, filters.postalCode)) return false
+    if (!matchesExact(facts.colo, filters.colo)) return false
     if (!matchesExact(facts.utmSource, filters.utmSource)) return false
     if (!matchesExact(facts.utmMedium, filters.utmMedium)) return false
     if (!matchesExact(facts.utmCampaign, filters.utmCampaign)) return false
@@ -377,6 +448,8 @@ export const buildAnalyticsFilterOptions = (records: AnalyticsRecord[]) => ({
   countryCodes: makeOptions(records, (record) => getAnalyticsFacts(record).countryCode),
   regions: makeOptions(records, (record) => getAnalyticsFacts(record).region),
   cities: makeOptions(records, (record) => getAnalyticsFacts(record).city),
+  postalCodes: makeOptions(records, (record) => getAnalyticsFacts(record).postalCode),
+  colos: makeOptions(records, (record) => getAnalyticsFacts(record).colo),
   utmSources: makeOptions(records, (record) => getAnalyticsFacts(record).utmSource),
   utmMediums: makeOptions(records, (record) => getAnalyticsFacts(record).utmMedium),
   utmCampaigns: makeOptions(records, (record) => getAnalyticsFacts(record).utmCampaign),

@@ -26,6 +26,8 @@ interface AnalyticsFilters {
   countryCode: string
   region: string
   city: string
+  postalCode: string
+  colo: string
   utmSource: string
   utmMedium: string
   utmCampaign: string
@@ -49,6 +51,8 @@ interface AnalyticsFilterOptions {
   countryCodes: AnalyticsFilterOption[]
   regions: AnalyticsFilterOption[]
   cities: AnalyticsFilterOption[]
+  postalCodes: AnalyticsFilterOption[]
+  colos: AnalyticsFilterOption[]
   utmSources: AnalyticsFilterOption[]
   utmMediums: AnalyticsFilterOption[]
   utmCampaigns: AnalyticsFilterOption[]
@@ -63,6 +67,22 @@ interface AnalyticsLocationRow {
   city: string
   region: string
   countryCode: string
+  postalCode?: string
+  timezone?: string
+  colo?: string
+  latitude?: number | null
+  longitude?: number | null
+  provider?: string
+  precision?: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsGeoQualityRow {
+  provider: string
+  precision: string
+  colo: string
+  hasPostalCode: boolean
+  hasCoordinates: boolean
   stats: AnalyticsStats
 }
 
@@ -121,7 +141,9 @@ interface AnalyticsSummary {
   filterOptions: AnalyticsFilterOptions
   stats: AnalyticsStats
   lebanonCities: AnalyticsLocationRow[]
+  lebanonPreciseLocations: AnalyticsLocationRow[]
   byLocation: AnalyticsLocationRow[]
+  byPreciseLocation: AnalyticsLocationRow[]
   byCampaign: AnalyticsCampaignRow[]
   byCampaignLocation: AnalyticsCampaignLocationRow[]
   topClicks: AnalyticsClickRow[]
@@ -134,6 +156,7 @@ interface AnalyticsSummary {
   byHour: AnalyticsHourRow[]
   precision: AnalyticsNamedRow[]
   providers: AnalyticsNamedRow[]
+  geoQuality: AnalyticsGeoQualityRow[]
 }
 
 interface AnalyticsEvent {
@@ -147,6 +170,11 @@ interface AnalyticsEvent {
       region?: string
       countryCode?: string
       country?: string
+      postalCode?: string
+      timezone?: string
+      latitude?: number | null
+      longitude?: number | null
+      colo?: string
       precision?: string
       provider?: string
     }
@@ -211,6 +239,8 @@ const defaultFilters = (): AnalyticsFilters => ({
   countryCode: '',
   region: '',
   city: '',
+  postalCode: '',
+  colo: '',
   utmSource: '',
   utmMedium: '',
   utmCampaign: '',
@@ -228,6 +258,8 @@ const emptyFilterOptions = (): AnalyticsFilterOptions => ({
   countryCodes: [],
   regions: [],
   cities: [],
+  postalCodes: [],
+  colos: [],
   utmSources: [],
   utmMediums: [],
   utmCampaigns: [],
@@ -261,6 +293,8 @@ const filterLabels: Record<FilterKey, string> = {
   countryCode: 'Country',
   region: 'Region',
   city: 'City',
+  postalCode: 'Postal',
+  colo: 'Edge',
   utmSource: 'Source',
   utmMedium: 'Medium',
   utmCampaign: 'Campaign',
@@ -334,6 +368,26 @@ const optionValue = (value: string): string => cleanPart(value) || 'unknown'
 const getLocationLabel = (row: AnalyticsLocationRow | AnalyticsCampaignLocationRow): string =>
   joinParts([row.city, row.region, row.countryCode], 'Unknown location')
 
+const formatCoordinate = (value: number | null | undefined): string =>
+  typeof value === 'number' && Number.isFinite(value) ? value.toFixed(3) : ''
+
+const getCoordinateLabel = (row: AnalyticsLocationRow): string => {
+  const latitude = formatCoordinate(row.latitude)
+  const longitude = formatCoordinate(row.longitude)
+
+  return latitude && longitude ? `${latitude}, ${longitude}` : ''
+}
+
+const getPreciseLocationMeta = (row: AnalyticsLocationRow): string =>
+  [
+    cleanPart(row.postalCode || '') ? `postal ${cleanPart(row.postalCode || '')}` : '',
+    cleanPart(row.timezone || ''),
+    cleanPart(row.colo || '') ? `edge ${cleanPart(row.colo || '')}` : '',
+    getCoordinateLabel(row),
+  ]
+    .filter(Boolean)
+    .join(' - ') || 'No finer fields'
+
 const getCampaignLabel = (row: AnalyticsCampaignRow): string =>
   joinParts([row.source, row.medium, row.campaign], 'Direct or untagged')
 
@@ -353,6 +407,22 @@ const getClickMeta = (row: AnalyticsClickRow): string =>
   joinParts([row.path, row.href], `${formatNumber(row.stats.events)} click events`)
 
 const getSortableValue = (stats: AnalyticsStats, metric: SortMetric): number => stats[metric] || 0
+
+const getRowKey = (row: AnalyticsLocationRow): string =>
+  [
+    row.city,
+    row.region,
+    row.countryCode,
+    row.postalCode,
+    row.timezone,
+    row.colo,
+    row.latitude,
+    row.longitude,
+    row.provider,
+    row.precision,
+  ]
+    .map((value) => String(value ?? ''))
+    .join('|')
 
 const sortByMetric = <T extends { stats: AnalyticsStats }>(rows: T[], metric: SortMetric): T[] =>
   [...rows].sort((first, second) => {
@@ -550,8 +620,20 @@ export default defineComponent({
     const locationTableRows = computed(() =>
       sortByMetric(summary.value?.byLocation || [], sortMetric.value).slice(0, tableLimit.value),
     )
+    const preciseLocationTableRows = computed(() =>
+      sortByMetric(summary.value?.byPreciseLocation || [], sortMetric.value).slice(
+        0,
+        tableLimit.value,
+      ),
+    )
     const lebanonTableRows = computed(() =>
       sortByMetric(summary.value?.lebanonCities || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const lebanonPreciseTableRows = computed(() =>
+      sortByMetric(summary.value?.lebanonPreciseLocations || [], sortMetric.value).slice(
+        0,
+        tableLimit.value,
+      ),
     )
     const campaignTableRows = computed(() =>
       sortByMetric(summary.value?.byCampaign || [], sortMetric.value).slice(0, tableLimit.value),
@@ -582,6 +664,9 @@ export default defineComponent({
     )
     const providerTableRows = computed(() =>
       sortByMetric(summary.value?.providers || [], 'events').slice(0, tableLimit.value),
+    )
+    const geoQualityTableRows = computed(() =>
+      sortByMetric(summary.value?.geoQuality || [], 'events').slice(0, tableLimit.value),
     )
     const recentEvents = computed(() => eventsResponse.value?.events || [])
     const dayRows = computed(() => summary.value?.byDay || [])
@@ -763,6 +848,24 @@ export default defineComponent({
         'unknown',
       )
 
+    const formatGeoDetail = (event: AnalyticsEvent): string => {
+      const geo = event.request?.geo
+      const latitude = formatCoordinate(geo?.latitude)
+      const longitude = formatCoordinate(geo?.longitude)
+
+      return (
+        [
+          geo?.precision ? `level ${geo.precision}` : '',
+          geo?.provider || '',
+          geo?.postalCode ? `postal ${geo.postalCode}` : '',
+          geo?.colo ? `edge ${geo.colo}` : '',
+          latitude && longitude ? `${latitude}, ${longitude}` : '',
+        ]
+          .filter(Boolean)
+          .join(' - ') || 'none'
+      )
+    }
+
     const formatEventDetail = (event: AnalyticsEvent): string => {
       if (event.eventName === 'site_click') {
         return joinParts(
@@ -799,6 +902,10 @@ export default defineComponent({
         event.receivedAt,
         event.eventName,
         formatLocation(event),
+        event.request?.geo?.postalCode || '',
+        event.request?.geo?.colo || '',
+        event.request?.geo?.precision || '',
+        event.request?.geo?.provider || '',
         event.payload?.page?.path || '',
         event.payload?.page?.utm?.source || '',
         event.payload?.page?.utm?.medium || '',
@@ -810,6 +917,10 @@ export default defineComponent({
           'receivedAt',
           'eventName',
           'location',
+          'postalCode',
+          'edgeColo',
+          'geoLevel',
+          'geoProvider',
           'pagePath',
           'utmSource',
           'utmMedium',
@@ -871,6 +982,7 @@ export default defineComponent({
       formatDay,
       formatEventDetail,
       formatEventName,
+      formatGeoDetail,
       formatLocation,
       formatNumber,
       formatOptionLabel,
@@ -880,13 +992,17 @@ export default defineComponent({
       getClickLabel,
       getClickMeta,
       getDayHeight,
+      getPreciseLocationMeta,
       getHourIntensity,
       getLocationLabel,
+      getRowKey,
+      geoQualityTableRows,
       hasToken,
       hourRows,
       isLoading,
       languageTableRows,
       lebanonCityRows,
+      lebanonPreciseTableRows,
       lebanonTableRows,
       limit,
       loadAnalytics,
@@ -894,6 +1010,7 @@ export default defineComponent({
       metrics,
       pageRows,
       pageTableRows,
+      preciseLocationTableRows,
       precisionRows,
       providerTableRows,
       quickRanges,

@@ -7,7 +7,9 @@ import {
   getAnalyticsCampaignKey,
   getAnalyticsClickKey,
   getAnalyticsFacts,
+  getAnalyticsGeoQualityKey,
   getAnalyticsLocationKey,
+  getAnalyticsPreciseLocationKey,
   parseAnalyticsFilters,
   parseAnalyticsLimit,
 } from '../../utils/analytics-report'
@@ -148,6 +150,16 @@ const serializeNamedCounters = (map: Map<string, Counter>) =>
     })),
   )
 
+const parseNullableNumber = (value: string): number | null => {
+  if (!value || value === 'unknown') {
+    return null
+  }
+
+  const parsedValue = Number.parseFloat(value)
+
+  return Number.isFinite(parsedValue) ? parsedValue : null
+}
+
 const getDayKey = (record: AnalyticsRecord): string => {
   const facts = getAnalyticsFacts(record)
   const date = new Date(facts.receivedAt)
@@ -183,11 +195,13 @@ export default defineEventHandler(async (event) => {
   const filteredRecords = filterAnalyticsRecords(records, filters)
   const total = createCounter()
   const locations = new Map<string, Counter>()
+  const preciseLocations = new Map<string, Counter>()
   const campaigns = new Map<string, Counter>()
   const campaignLocations = new Map<string, Counter>()
   const clicks = new Map<string, Counter>()
   const precision = new Map<string, Counter>()
   const providers = new Map<string, Counter>()
+  const geoQuality = new Map<string, Counter>()
   const pages = new Map<string, Counter>()
   const referrers = new Map<string, Counter>()
   const events = new Map<string, Counter>()
@@ -199,15 +213,18 @@ export default defineEventHandler(async (event) => {
   for (const record of filteredRecords) {
     const facts = getAnalyticsFacts(record)
     const locationKey = getAnalyticsLocationKey(record)
+    const preciseLocationKey = getAnalyticsPreciseLocationKey(record)
     const campaignKey = getAnalyticsCampaignKey(record)
     const campaignLocationKey = `${campaignKey}|${locationKey}`
 
     addRecordToCounter(total, record)
     addToMap(locations, locationKey, record)
+    addToMap(preciseLocations, preciseLocationKey, record)
     addToMap(campaigns, campaignKey, record)
     addToMap(campaignLocations, campaignLocationKey, record)
     addToMap(precision, normalizeKeyPart(facts.precision), record)
     addToMap(providers, normalizeKeyPart(facts.provider), record)
+    addToMap(geoQuality, getAnalyticsGeoQualityKey(record), record)
     addToMap(pages, normalizeKeyPart(facts.pagePath), record)
     addToMap(referrers, normalizeKeyPart(facts.referrerHost, 'direct'), record)
     addToMap(events, normalizeKeyPart(facts.eventName), record)
@@ -229,6 +246,36 @@ export default defineEventHandler(async (event) => {
         city,
         region,
         countryCode,
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
+  const byPreciseLocation = sortCounters(
+    [...preciseLocations.entries()].map(([key, stats]) => {
+      const [
+        city,
+        region,
+        countryCode,
+        postalCode,
+        timezone,
+        colo,
+        latitude,
+        longitude,
+        provider,
+        precisionLevel,
+      ] = key.split('|')
+
+      return {
+        city,
+        region,
+        countryCode,
+        postalCode,
+        timezone,
+        colo,
+        latitude: parseNullableNumber(latitude),
+        longitude: parseNullableNumber(longitude),
+        provider,
+        precision: precisionLevel,
         stats: serializeCounter(stats),
       }
     }),
@@ -292,6 +339,20 @@ export default defineEventHandler(async (event) => {
   const byHour = [...hours.entries()]
     .map(([hour, stats]) => ({ hour, stats: serializeCounter(stats) }))
     .sort((first, second) => first.hour.localeCompare(second.hour))
+  const byGeoQuality = sortCounters(
+    [...geoQuality.entries()].map(([key, stats]) => {
+      const [provider, precisionLevel, colo, postalStatus, coordinateStatus] = key.split('|')
+
+      return {
+        provider,
+        precision: precisionLevel,
+        colo,
+        hasPostalCode: postalStatus === 'postal',
+        hasCoordinates: coordinateStatus === 'coordinates',
+        stats: serializeCounter(stats),
+      }
+    }),
+  )
 
   return {
     generatedAt: new Date().toISOString(),
@@ -302,7 +363,9 @@ export default defineEventHandler(async (event) => {
     filterOptions: buildAnalyticsFilterOptions(records),
     stats: serializeCounter(total),
     lebanonCities: byLocation.filter((item) => item.countryCode === 'LB'),
+    lebanonPreciseLocations: byPreciseLocation.filter((item) => item.countryCode === 'LB'),
     byLocation,
+    byPreciseLocation,
     byCampaign,
     byCampaignLocation,
     topClicks,
@@ -315,5 +378,6 @@ export default defineEventHandler(async (event) => {
     byHour,
     precision: serializeNamedCounters(precision),
     providers: serializeNamedCounters(providers),
+    geoQuality: byGeoQuality,
   }
 })

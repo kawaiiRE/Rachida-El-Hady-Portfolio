@@ -1,4 +1,5 @@
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
+import type { H3Event } from 'h3'
 import { writeAnalyticsRecord } from '../../utils/analytics-storage'
 
 const MAX_BODY_SIZE = 32_000
@@ -113,6 +114,54 @@ const getNumberHeader = (
   return Number.isFinite(parsedValue) ? parsedValue : null
 }
 
+const asObject = (value: unknown): Record<string, unknown> =>
+  value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
+
+const getCloudflareRequestCf = (event: H3Event): Record<string, unknown> => {
+  const context = asObject(event.context)
+  const cloudflare = asObject(context.cloudflare)
+  const platform = asObject(context._platform)
+  const platformCloudflare = asObject(platform.cloudflare)
+  const cloudflareRequest = asObject(cloudflare.request)
+  const platformRequest = asObject(platformCloudflare.request)
+  const candidates = [
+    asObject(cloudflareRequest.cf),
+    asObject(cloudflare.cf),
+    asObject(platformRequest.cf),
+    asObject(platformCloudflare.cf),
+  ]
+
+  return candidates.find((candidate) => Object.keys(candidate).length > 0) || {}
+}
+
+const getCloudflareString = (cf: Record<string, unknown>, keys: string[]): string => {
+  for (const key of keys) {
+    const value = cf[key]
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      const cleanedValue = cleanString(String(value), 120)
+
+      if (cleanedValue) {
+        return safeDecode(cleanedValue)
+      }
+    }
+  }
+
+  return ''
+}
+
+const getCloudflareNumber = (cf: Record<string, unknown>, keys: string[]): number | null => {
+  const value = getCloudflareString(cf, keys)
+
+  if (!value) {
+    return null
+  }
+
+  const parsedValue = Number.parseFloat(value)
+
+  return Number.isFinite(parsedValue) ? parsedValue : null
+}
+
 const getAppEngineCityLatLong = (
   event: Parameters<typeof getHeader>[0],
 ): { latitude: number | null; longitude: number | null } => {
@@ -126,11 +175,20 @@ const getAppEngineCityLatLong = (
   }
 }
 
-const getCloudflareColo = (event: Parameters<typeof getHeader>[0]): string => {
+const getCloudflareColo = (
+  event: Parameters<typeof getHeader>[0],
+  cf: Record<string, unknown>,
+): string => {
   const explicitColo = getFirstHeader(event, ['cf-colo'])
 
   if (explicitColo) {
     return explicitColo
+  }
+
+  const requestColo = getCloudflareString(cf, ['colo'])
+
+  if (requestColo) {
+    return requestColo.toUpperCase()
   }
 
   const ray = getFirstHeader(event, ['cf-ray'])
@@ -139,8 +197,12 @@ const getCloudflareColo = (event: Parameters<typeof getHeader>[0]): string => {
   return cleanString(colo || '', 20).toUpperCase()
 }
 
-const getGeoProvider = (event: Parameters<typeof getHeader>[0]): string => {
+const getGeoProvider = (
+  event: Parameters<typeof getHeader>[0],
+  cf: Record<string, unknown>,
+): string => {
   if (getFirstHeader(event, ['x-vercel-ip-city', 'x-vercel-ip-country'])) return 'vercel'
+  if (Object.keys(cf).length > 0) return 'cloudflare'
   if (getFirstHeader(event, ['cf-ipcountry', 'cf-ray', 'cf-ipcity'])) return 'cloudflare'
   if (getFirstHeader(event, ['cloudfront-viewer-country', 'cloudfront-viewer-city'])) {
     return 'cloudfront'
@@ -153,7 +215,15 @@ const getGeoProvider = (event: Parameters<typeof getHeader>[0]): string => {
   return ''
 }
 
-const getGeoPayload = (event: Parameters<typeof getHeader>[0]) => {
+const getGeoValue = (
+  event: H3Event,
+  cf: Record<string, unknown>,
+  headers: string[],
+  cfKeys: string[],
+): string => getFirstHeader(event, headers) || getCloudflareString(cf, cfKeys)
+
+const getGeoPayload = (event: H3Event) => {
+  const cloudflareCf = getCloudflareRequestCf(event)
   const appEngineCoordinates = getAppEngineCityLatLong(event)
   const latitude =
     getNumberHeader(event, [
@@ -161,65 +231,94 @@ const getGeoPayload = (event: Parameters<typeof getHeader>[0]) => {
       'cloudfront-viewer-latitude',
       'cf-iplatitude',
       'x-latitude',
-    ]) ?? appEngineCoordinates.latitude
+    ]) ??
+    getCloudflareNumber(cloudflareCf, ['latitude']) ??
+    appEngineCoordinates.latitude
   const longitude =
     getNumberHeader(event, [
       'x-vercel-ip-longitude',
       'cloudfront-viewer-longitude',
       'cf-iplongitude',
       'x-longitude',
-    ]) ?? appEngineCoordinates.longitude
-  const city = getFirstHeader(event, [
-    'x-vercel-ip-city',
-    'cloudfront-viewer-city',
-    'cf-ipcity',
-    'x-appengine-city',
-    'x-city',
-  ])
-  const region = getFirstHeader(event, [
-    'x-vercel-ip-country-region',
-    'cloudfront-viewer-country-region-name',
-    'cloudfront-viewer-country-region',
-    'cf-region',
-    'x-appengine-region',
-    'x-region',
-  ])
-  const countryCode = getFirstHeader(event, [
-    'x-vercel-ip-country',
-    'cf-ipcountry',
-    'cloudfront-viewer-country',
-    'x-appengine-country',
-    'x-country-code',
-  ]).toUpperCase()
+    ]) ??
+    getCloudflareNumber(cloudflareCf, ['longitude']) ??
+    appEngineCoordinates.longitude
+  const city = getGeoValue(
+    event,
+    cloudflareCf,
+    ['x-vercel-ip-city', 'cloudfront-viewer-city', 'cf-ipcity', 'x-appengine-city', 'x-city'],
+    ['city'],
+  )
+  const region = getGeoValue(
+    event,
+    cloudflareCf,
+    [
+      'x-vercel-ip-country-region',
+      'cloudfront-viewer-country-region-name',
+      'cloudfront-viewer-country-region',
+      'cf-region',
+      'x-appengine-region',
+      'x-region',
+    ],
+    ['region', 'regionCode'],
+  )
+  const regionCode = getCloudflareString(cloudflareCf, ['regionCode'])
+  const countryCode = getGeoValue(
+    event,
+    cloudflareCf,
+    [
+      'x-vercel-ip-country',
+      'cf-ipcountry',
+      'cloudfront-viewer-country',
+      'x-appengine-country',
+      'x-country-code',
+    ],
+    ['country'],
+  ).toUpperCase()
   const country = getFirstHeader(event, ['cloudfront-viewer-country-name', 'x-country-name'])
-  const postalCode = getFirstHeader(event, [
-    'x-vercel-ip-postal-code',
-    'cloudfront-viewer-postal-code',
-    'cf-postal-code',
-    'x-postal-code',
-  ])
-  const timezone = getFirstHeader(event, [
-    'x-vercel-ip-timezone',
-    'cloudfront-viewer-time-zone',
-    'cf-timezone',
-    'x-timezone',
-  ])
-  const metroCode = getFirstHeader(event, [
-    'cloudfront-viewer-metro-code',
-    'cf-metro-code',
-    'x-metro-code',
-  ])
-  const continent = getFirstHeader(event, ['x-vercel-ip-continent', 'cf-ipcontinent'])
-  const colo = getCloudflareColo(event)
-  const precision = city ? 'city' : region ? 'region' : countryCode || country ? 'country' : 'none'
+  const postalCode = getGeoValue(
+    event,
+    cloudflareCf,
+    ['x-vercel-ip-postal-code', 'cloudfront-viewer-postal-code', 'cf-postal-code', 'x-postal-code'],
+    ['postalCode'],
+  )
+  const timezone = getGeoValue(
+    event,
+    cloudflareCf,
+    ['x-vercel-ip-timezone', 'cloudfront-viewer-time-zone', 'cf-timezone', 'x-timezone'],
+    ['timezone'],
+  )
+  const metroCode = getGeoValue(
+    event,
+    cloudflareCf,
+    ['cloudfront-viewer-metro-code', 'cf-metro-code', 'x-metro-code'],
+    ['metroCode'],
+  )
+  const continent = getGeoValue(
+    event,
+    cloudflareCf,
+    ['x-vercel-ip-continent', 'cf-ipcontinent'],
+    ['continent'],
+  )
+  const colo = getCloudflareColo(event, cloudflareCf)
+  const precision = postalCode
+    ? 'postal'
+    : city
+      ? 'city'
+      : region
+        ? 'region'
+        : countryCode || country
+          ? 'country'
+          : 'none'
 
   return {
-    provider: getGeoProvider(event),
+    provider: getGeoProvider(event, cloudflareCf),
     precision,
     isCityLevel: Boolean(city),
     countryCode,
     country,
     region,
+    regionCode,
     city,
     postalCode,
     timezone,
