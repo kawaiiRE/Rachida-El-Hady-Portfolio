@@ -1,0 +1,73 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1254 1254"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">PlayQuest icon</title>
+  <desc id="desc">A rounded dark app tile with a gradient play button shaped like a Q.</desc>
+  <defs>
+    <radialGradient id="tileGradient" cx="50%" cy="48%" r="75%">
+      <stop offset="0%" stop-color="#242424" />
+      <stop offset="65%" stop-color="#171717" />
+      <stop offset="100%" stop-color="#071124" />
+    </radialGradient>
+    <linearGradient
+      id="playQuestGradient"
+      x1="405"
+      y1="316"
+      x2="914"
+      y2="923"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0%" stop-color="#f2b134" />
+      <stop offset="42%" stop-color="#ef4f63" />
+      <stop offset="72%" stop-color="#7c55d8" />
+      <stop offset="100%" stop-color="#176bff" />
+    </linearGradient>
+  </defs>
+
+  <rect x="78" y="73" width="1095" height="1103" rx="225" fill="url(#tileGradient)" />
+
+  <path
+    fill="url(#playQuestGradient)"
+    d="
+    M 487 316
+    C 466 317 446 329 432 342
+    C 415 358 405 378 404 395
+    L 403 813
+    C 403 847 421 877 447 897
+    C 470 914 500 923 532 922
+    C 552 921 573 914 588 905
+    L 696 840
+    C 701 837 702 831 698 827
+    L 622 755
+    C 617 750 611 750 606 753
+    L 530 806
+    C 518 812 504 802 501 790
+    L 500 465
+    C 500 455 507 449 511 449
+    C 521 445 534 446 542 451
+    L 780 598
+    C 799 610 806 632 797 646
+    C 794 655 788 665 781 673
+    L 848 740
+    C 857 738 866 733 874 724
+    C 902 696 916 657 914 609
+    C 911 573 896 539 857 514
+    L 547 328
+    C 529 318 508 315 487 316
+    Z
+
+    M 668 711
+    C 658 720 654 731 659 742
+    L 835 919
+    C 839 923 846 923 852 918
+    L 912 867
+    C 918 862 914 854 901 845
+    L 747 688
+    C 737 682 718 683 711 685
+    C 694 690 679 700 668 711
+    Z"
+  />
+</svg>
