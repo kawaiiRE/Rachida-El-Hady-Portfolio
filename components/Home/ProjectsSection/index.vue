@@ -63,23 +63,36 @@
         </button>
       </div>
 
-      <div v-if="currentProject" :key="currentProject.id" class="projects__panel">
+      <div
+        v-if="currentProject"
+        :key="currentProject.id"
+        class="projects__panel"
+        :style="{ '--project-background': currentProject.background }"
+      >
         <div class="projects__panel-copy">
           <h3 class="projects__panel-title">{{ currentProject.title }}</h3>
           <p class="projects__panel-summary">{{ currentProject.summary }}</p>
-          <h4 class="projects__panel-meta">- {{ currentProject.category }}</h4>
         </div>
 
-        <div class="projects__stats">
-          <p v-for="metric in currentProject.metrics" :key="metric.label" class="projects__stat">
-            <span>{{ metric.value }}</span>
-            {{ metric.label }}
-          </p>
+        <div class="projects__panel-tags" aria-label="Project overview">
+          <span class="projects__panel-tag projects__panel-tag--category">
+            {{ currentProject.category }}
+          </span>
+          <span
+            v-for="technology in getPreviewStack(currentProject)"
+            :key="technology"
+            class="projects__panel-tag"
+          >
+            {{ technology }}
+          </span>
         </div>
 
         <div class="projects__actions">
-          <NuxtLink :to="currentProject.path" class="projects__cta projects__cta--primary">
-            View Project
+          <NuxtLink
+            :to="getProjectPath(currentProject)"
+            class="projects__cta projects__cta--primary"
+          >
+            See Full Project
           </NuxtLink>
         </div>
       </div>

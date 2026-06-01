@@ -27,6 +27,8 @@ const CARD_STATE_BY_DIFF: Record<string, ProjectCardState> = {
   '3': 'is-next-3',
 }
 
+const PREVIEW_STACK_LIMIT = 4
+
 export default defineComponent({
   name: 'ProjectsSection',
   props: {},
@@ -83,9 +85,22 @@ export default defineComponent({
       currentIndex.value = normalizeIndex(currentIndex.value + direction)
     }
 
+    const getPreviewStack = (project: PortfolioProject): string[] => {
+      return project.stack.slice(0, PREVIEW_STACK_LIMIT)
+    }
+
+    const getProjectPath = (project: PortfolioProject) => {
+      return {
+        path: '/projects',
+        hash: `#${project.id}`,
+      }
+    }
+
     return {
       carouselProjects,
       currentProject,
+      getPreviewStack,
+      getProjectPath,
       selectProject,
       shiftProject,
     }

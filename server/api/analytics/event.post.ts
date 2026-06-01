@@ -1,4 +1,3 @@
-import { createHmac } from 'node:crypto'
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
 import { writeAnalyticsRecord } from '../../utils/analytics-storage'
 
@@ -56,12 +55,27 @@ const getClientIp = (event: Parameters<typeof getHeader>[0]): string => {
   )
 }
 
-const createIpHash = (ipAddress: string, salt: string): string => {
+const createIpHash = async (ipAddress: string, salt: string): Promise<string> => {
   if (!ipAddress || !salt) {
     return ''
   }
 
-  return createHmac('sha256', salt).update(ipAddress).digest('hex')
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(salt),
+    {
+      name: 'HMAC',
+      hash: 'SHA-256',
+    },
+    false,
+    ['sign'],
+  )
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(ipAddress))
+
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 const safeDecode = (value: string): string => {
@@ -239,6 +253,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const clientIp = getClientIp(event)
+  const ipHash = await createIpHash(clientIp, String(runtimeConfig.analyticsIpSalt || ''))
   const record = {
     id: crypto.randomUUID(),
     receivedAt: new Date().toISOString(),
@@ -250,7 +265,7 @@ export default defineEventHandler(async (event) => {
       referrer: cleanString(getHeader(event, 'referer') || '', 500),
       host: cleanString(getHeader(event, 'host') || '', 200),
       geo: getGeoPayload(event),
-      ipHash: createIpHash(clientIp, String(runtimeConfig.analyticsIpSalt || '')),
+      ipHash,
     },
     payload: cleanValue(body) as Record<string, unknown>,
   }

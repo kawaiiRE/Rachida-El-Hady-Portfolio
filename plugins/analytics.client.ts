@@ -147,6 +147,8 @@ const applyAnalyticsPreferenceFromUrl = () => {
   removeAnalyticsPreferenceParams(url)
 }
 
+const isAnalyticsDashboardPath = (): boolean => window.location.pathname.startsWith('/analytics')
+
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const router = useRouter()
@@ -155,6 +157,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   const googleAnalyticsId = String(config.public.googleAnalyticsId || '')
 
   applyAnalyticsPreferenceFromUrl()
+
+  if (isAnalyticsDashboardPath()) {
+    return
+  }
 
   const globalPrivacyControl = Boolean(
     (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl,

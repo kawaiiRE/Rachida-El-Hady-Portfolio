@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, nextTick } from 'vue'
+import { defineComponent, ref, onBeforeUnmount, onMounted, nextTick } from 'vue'
 import { PROJECTS } from '~/constants/projects'
 import type { PortfolioProject } from '~/constants/projects'
 
@@ -12,6 +12,8 @@ export default defineComponent({
 
     // Track scroll state for each gallery
     const scrollState = ref<Record<string, { start: boolean; end: boolean }>>({})
+    let hashScrollFrameId: number | null = null
+    let hashScrollTimeoutId: number | null = null
 
     const setGalleryRef = (el: any, id: string) => {
       if (el) {
@@ -54,18 +56,125 @@ export default defineComponent({
       return project.links.filter((link) => link.url)
     }
 
-    onMounted(async () => {
+    const initializeScrollStates = () => {
+      projects.forEach((project) => {
+        scrollState.value[project.id] = { start: true, end: false }
+        checkScrollState(project.id)
+      })
+    }
+
+    const getCurrentHashId = () => {
+      if (typeof window === 'undefined') {
+        return ''
+      }
+
+      return decodeURIComponent(window.location.hash.replace(/^#/, ''))
+    }
+
+    const getHashProjectElement = () => {
+      const id = getCurrentHashId()
+
+      if (!id || !projects.some((project) => project.id === id)) {
+        return null
+      }
+
+      return document.getElementById(id)
+    }
+
+    const scrollToHashProject = async (behavior: ScrollBehavior = 'auto') => {
       await nextTick()
-      // Initialize scroll states
-      projects.forEach((p) => {
-        // Default assuming they can scroll right if content overflow
-        scrollState.value[p.id] = { start: true, end: false }
-        checkScrollState(p.id)
+
+      const target = getHashProjectElement()
+
+      if (!target) {
+        return
+      }
+
+      target.scrollIntoView({ block: 'start', behavior })
+      checkScrollState(target.id)
+    }
+
+    const waitForHashProjectImages = async () => {
+      const target = getHashProjectElement()
+
+      if (!target) {
+        return
+      }
+
+      const images = Array.from(target.querySelectorAll<HTMLImageElement>('img'))
+      const pendingImages = images.filter((image) => !image.complete)
+
+      if (!pendingImages.length) {
+        return
+      }
+
+      await Promise.all(
+        pendingImages.map(
+          (image) =>
+            new Promise<void>((resolve) => {
+              image.addEventListener('load', () => resolve(), { once: true })
+              image.addEventListener('error', () => resolve(), { once: true })
+            }),
+        ),
+      )
+    }
+
+    const clearHashScrollWork = () => {
+      if (hashScrollFrameId !== null) {
+        window.cancelAnimationFrame(hashScrollFrameId)
+        hashScrollFrameId = null
+      }
+
+      if (hashScrollTimeoutId !== null) {
+        window.clearTimeout(hashScrollTimeoutId)
+        hashScrollTimeoutId = null
+      }
+    }
+
+    const stabilizeHashScroll = async (behavior: ScrollBehavior = 'auto') => {
+      if (!getCurrentHashId()) {
+        return
+      }
+
+      clearHashScrollWork()
+      await scrollToHashProject(behavior)
+
+      hashScrollFrameId = window.requestAnimationFrame(() => {
+        void scrollToHashProject()
       })
 
-      window.addEventListener('resize', () => {
-        projects.forEach((p) => checkScrollState(p.id))
-      })
+      hashScrollTimeoutId = window.setTimeout(() => {
+        void waitForHashProjectImages().then(() => {
+          void scrollToHashProject()
+        })
+      }, 250)
+    }
+
+    const handleResize = () => {
+      projects.forEach((project) => checkScrollState(project.id))
+    }
+
+    const handleHashChange = () => {
+      void stabilizeHashScroll('smooth')
+    }
+
+    onMounted(async () => {
+      await nextTick()
+      initializeScrollStates()
+      await stabilizeHashScroll()
+
+      window.addEventListener('resize', handleResize)
+      window.addEventListener('hashchange', handleHashChange)
+    })
+
+    onBeforeUnmount(() => {
+      if (typeof window === 'undefined') {
+        return
+      }
+
+      clearHashScrollWork()
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('hashchange', handleHashChange)
     })
 
     return {

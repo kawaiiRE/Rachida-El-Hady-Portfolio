@@ -1,48 +1,29 @@
 import { createError, defineEventHandler, getHeader, getQuery } from 'h3'
+import type { AnalyticsRecord } from '../../utils/analytics-storage'
 import { readAnalyticsRecords } from '../../utils/analytics-storage'
-
-type AnalyticsRecord = {
-  eventName?: string
-  request?: {
-    geo?: {
-      precision?: string
-      countryCode?: string
-      country?: string
-      region?: string
-      city?: string
-      provider?: string
-    }
-  }
-  payload?: {
-    visitor?: {
-      visitorId?: string
-      sessionId?: string
-    }
-    page?: {
-      path?: string
-      utm?: {
-        source?: string
-        medium?: string
-        campaign?: string
-        content?: string
-        term?: string
-      }
-    }
-    click?: {
-      label?: string
-      href?: string
-      tag?: string
-      outbound?: boolean
-    }
-  }
-}
+import {
+  buildAnalyticsFilterOptions,
+  filterAnalyticsRecords,
+  getAnalyticsCampaignKey,
+  getAnalyticsClickKey,
+  getAnalyticsFacts,
+  getAnalyticsLocationKey,
+  parseAnalyticsFilters,
+  parseAnalyticsLimit,
+} from '../../utils/analytics-report'
 
 type Counter = {
   events: number
   pageViews: number
   clicks: number
   formSubmits: number
+  engagements: number
   visitors: Set<string>
+  sessions: Set<string>
+  engagementSeconds: number
+  engagementSamples: number
+  scrollDepth: number
+  scrollSamples: number
 }
 
 const createCounter = (): Counter => ({
@@ -50,18 +31,14 @@ const createCounter = (): Counter => ({
   pageViews: 0,
   clicks: 0,
   formSubmits: 0,
+  engagements: 0,
   visitors: new Set<string>(),
+  sessions: new Set<string>(),
+  engagementSeconds: 0,
+  engagementSamples: 0,
+  scrollDepth: 0,
+  scrollSamples: 0,
 })
-
-const parseLimit = (value: unknown): number => {
-  const limit = Number(value)
-
-  if (!Number.isFinite(limit)) {
-    return 10_000
-  }
-
-  return Math.min(50_000, Math.max(1, Math.round(limit)))
-}
 
 const getRequestToken = (event: Parameters<typeof getHeader>[0]): string => {
   const query = getQuery(event)
@@ -96,58 +73,52 @@ const normalizeKeyPart = (value: unknown, fallback = 'unknown'): string => {
   return normalized || fallback
 }
 
-const getLocationKey = (record: AnalyticsRecord): string => {
-  const geo = record.request?.geo || {}
-
-  return [
-    normalizeKeyPart(geo.city),
-    normalizeKeyPart(geo.region),
-    normalizeKeyPart(geo.countryCode || geo.country),
-  ].join('|')
-}
-
-const getCampaignKey = (record: AnalyticsRecord): string => {
-  const utm = record.payload?.page?.utm || {}
-
-  return [
-    normalizeKeyPart(utm.source),
-    normalizeKeyPart(utm.medium),
-    normalizeKeyPart(utm.campaign),
-    normalizeKeyPart(utm.content),
-  ].join('|')
-}
-
-const getClickKey = (record: AnalyticsRecord): string => {
-  const click = record.payload?.click || {}
-
-  return [
-    normalizeKeyPart(click.label),
-    normalizeKeyPart(click.href),
-    normalizeKeyPart(record.payload?.page?.path),
-  ].join('|')
-}
-
 const addRecordToCounter = (counter: Counter, record: AnalyticsRecord) => {
+  const facts = getAnalyticsFacts(record)
+
   counter.events += 1
 
-  if (record.eventName === 'page_view') counter.pageViews += 1
-  if (record.eventName === 'site_click') counter.clicks += 1
-  if (record.eventName === 'form_submit') counter.formSubmits += 1
+  if (facts.eventName === 'page_view') counter.pageViews += 1
+  if (facts.eventName === 'site_click') counter.clicks += 1
+  if (facts.eventName === 'form_submit') counter.formSubmits += 1
+  if (facts.eventName === 'page_engagement') counter.engagements += 1
 
-  const visitorId = record.payload?.visitor?.visitorId
+  if (facts.visitorId) counter.visitors.add(facts.visitorId)
+  if (facts.sessionId) counter.sessions.add(facts.sessionId)
 
-  if (visitorId) {
-    counter.visitors.add(visitorId)
+  if (facts.engagementSeconds) {
+    counter.engagementSeconds += facts.engagementSeconds
+    counter.engagementSamples += 1
+  }
+
+  if (facts.scrollDepth) {
+    counter.scrollDepth += facts.scrollDepth
+    counter.scrollSamples += 1
   }
 }
 
-const serializeCounter = (counter: Counter) => ({
-  events: counter.events,
-  uniqueVisitors: counter.visitors.size,
-  pageViews: counter.pageViews,
-  clicks: counter.clicks,
-  formSubmits: counter.formSubmits,
-})
+const serializeCounter = (counter: Counter) => {
+  const clickRate = counter.pageViews
+    ? Math.round((counter.clicks / counter.pageViews) * 1000) / 10
+    : 0
+
+  return {
+    events: counter.events,
+    uniqueVisitors: counter.visitors.size,
+    uniqueSessions: counter.sessions.size,
+    pageViews: counter.pageViews,
+    clicks: counter.clicks,
+    formSubmits: counter.formSubmits,
+    engagements: counter.engagements,
+    avgEngagementSeconds: counter.engagementSamples
+      ? Math.round(counter.engagementSeconds / counter.engagementSamples)
+      : 0,
+    avgScrollDepth: counter.scrollSamples
+      ? Math.round(counter.scrollDepth / counter.scrollSamples)
+      : 0,
+    clickRate,
+  }
+}
 
 const sortCounters = <T extends { stats: ReturnType<typeof serializeCounter> }>(items: T[]) =>
   items.sort((first, second) => {
@@ -155,18 +126,61 @@ const sortCounters = <T extends { stats: ReturnType<typeof serializeCounter> }>(
       return second.stats.uniqueVisitors - first.stats.uniqueVisitors
     }
 
+    if (second.stats.pageViews !== first.stats.pageViews) {
+      return second.stats.pageViews - first.stats.pageViews
+    }
+
     return second.stats.events - first.stats.events
   })
+
+const addToMap = (map: Map<string, Counter>, key: string, record: AnalyticsRecord) => {
+  const counter = map.get(key) || createCounter()
+
+  addRecordToCounter(counter, record)
+  map.set(key, counter)
+}
+
+const serializeNamedCounters = (map: Map<string, Counter>) =>
+  sortCounters(
+    [...map.entries()].map(([name, stats]) => ({
+      name,
+      stats: serializeCounter(stats),
+    })),
+  )
+
+const getDayKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+  const date = new Date(facts.receivedAt)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'unknown'
+  }
+
+  return date.toISOString().slice(0, 10)
+}
+
+const getHourKey = (record: AnalyticsRecord): string => {
+  const facts = getAnalyticsFacts(record)
+  const date = new Date(facts.receivedAt)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'unknown'
+  }
+
+  return date.getUTCHours().toString().padStart(2, '0')
+}
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = assertAuthorized(event)
   const query = getQuery(event)
-  const limit = parseLimit(query.limit)
+  const limit = parseAnalyticsLimit(query.limit, 10_000, 50_000)
+  const filters = parseAnalyticsFilters(query)
   const { records, storage } = await readAnalyticsRecords(event, {
     d1BindingName: String(runtimeConfig.analyticsD1Binding || ''),
     logPath: String(runtimeConfig.analyticsLogPath || ''),
     limit,
   })
+  const filteredRecords = filterAnalyticsRecords(records, filters)
   const total = createCounter()
   const locations = new Map<string, Counter>()
   const campaigns = new Map<string, Counter>()
@@ -174,33 +188,36 @@ export default defineEventHandler(async (event) => {
   const clicks = new Map<string, Counter>()
   const precision = new Map<string, Counter>()
   const providers = new Map<string, Counter>()
+  const pages = new Map<string, Counter>()
+  const referrers = new Map<string, Counter>()
+  const events = new Map<string, Counter>()
+  const devices = new Map<string, Counter>()
+  const languages = new Map<string, Counter>()
+  const timeline = new Map<string, Counter>()
+  const hours = new Map<string, Counter>()
 
-  for (const record of records as AnalyticsRecord[]) {
-    const locationKey = getLocationKey(record)
-    const campaignKey = getCampaignKey(record)
+  for (const record of filteredRecords) {
+    const facts = getAnalyticsFacts(record)
+    const locationKey = getAnalyticsLocationKey(record)
+    const campaignKey = getAnalyticsCampaignKey(record)
     const campaignLocationKey = `${campaignKey}|${locationKey}`
-    const precisionKey = normalizeKeyPart(record.request?.geo?.precision)
-    const providerKey = normalizeKeyPart(record.request?.geo?.provider)
 
     addRecordToCounter(total, record)
+    addToMap(locations, locationKey, record)
+    addToMap(campaigns, campaignKey, record)
+    addToMap(campaignLocations, campaignLocationKey, record)
+    addToMap(precision, normalizeKeyPart(facts.precision), record)
+    addToMap(providers, normalizeKeyPart(facts.provider), record)
+    addToMap(pages, normalizeKeyPart(facts.pagePath), record)
+    addToMap(referrers, normalizeKeyPart(facts.referrerHost, 'direct'), record)
+    addToMap(events, normalizeKeyPart(facts.eventName), record)
+    addToMap(devices, normalizeKeyPart(facts.device), record)
+    addToMap(languages, normalizeKeyPart(facts.language), record)
+    addToMap(timeline, getDayKey(record), record)
+    addToMap(hours, getHourKey(record), record)
 
-    for (const [key, map] of [
-      [locationKey, locations],
-      [campaignKey, campaigns],
-      [campaignLocationKey, campaignLocations],
-      [precisionKey, precision],
-      [providerKey, providers],
-    ] as const) {
-      const counter = map.get(key) || createCounter()
-      addRecordToCounter(counter, record)
-      map.set(key, counter)
-    }
-
-    if (record.eventName === 'site_click') {
-      const clickKey = getClickKey(record)
-      const counter = clicks.get(clickKey) || createCounter()
-      addRecordToCounter(counter, record)
-      clicks.set(clickKey, counter)
+    if (facts.eventName === 'site_click') {
+      addToMap(clicks, getAnalyticsClickKey(record), record)
     }
   }
 
@@ -257,22 +274,46 @@ export default defineEventHandler(async (event) => {
       }
     }),
   )
+  const byPage = sortCounters(
+    [...pages.entries()].map(([path, stats]) => ({
+      path,
+      stats: serializeCounter(stats),
+    })),
+  )
+  const byReferrer = sortCounters(
+    [...referrers.entries()].map(([host, stats]) => ({
+      host,
+      stats: serializeCounter(stats),
+    })),
+  )
+  const byDay = [...timeline.entries()]
+    .map(([date, stats]) => ({ date, stats: serializeCounter(stats) }))
+    .sort((first, second) => first.date.localeCompare(second.date))
+  const byHour = [...hours.entries()]
+    .map(([hour, stats]) => ({ hour, stats: serializeCounter(stats) }))
+    .sort((first, second) => first.hour.localeCompare(second.hour))
 
   return {
     generatedAt: new Date().toISOString(),
     storage,
     scannedEvents: records.length,
+    matchedEvents: filteredRecords.length,
+    filters,
+    filterOptions: buildAnalyticsFilterOptions(records),
     stats: serializeCounter(total),
     lebanonCities: byLocation.filter((item) => item.countryCode === 'LB'),
     byLocation,
     byCampaign,
     byCampaignLocation,
     topClicks,
-    precision: sortCounters(
-      [...precision.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
-    ),
-    providers: sortCounters(
-      [...providers.entries()].map(([name, stats]) => ({ name, stats: serializeCounter(stats) })),
-    ),
+    byPage,
+    byReferrer,
+    byEvent: serializeNamedCounters(events),
+    byDevice: serializeNamedCounters(devices),
+    byLanguage: serializeNamedCounters(languages),
+    byDay,
+    byHour,
+    precision: serializeNamedCounters(precision),
+    providers: serializeNamedCounters(providers),
   }
 })

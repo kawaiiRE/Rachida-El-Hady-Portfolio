@@ -1,0 +1,913 @@
+import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { useHead } from '#imports'
+
+type AnalyticsTab = 'overview' | 'geo' | 'acquisition' | 'behavior' | 'events'
+type AnalyticsStorage = 'd1' | 'file' | 'unconfigured'
+type SortMetric = 'uniqueVisitors' | 'uniqueSessions' | 'pageViews' | 'clicks' | 'events'
+type FilterKey = keyof AnalyticsFilters
+
+interface AnalyticsStats {
+  events: number
+  uniqueVisitors: number
+  uniqueSessions: number
+  pageViews: number
+  clicks: number
+  formSubmits: number
+  engagements: number
+  avgEngagementSeconds: number
+  avgScrollDepth: number
+  clickRate: number
+}
+
+interface AnalyticsFilters {
+  from: string
+  to: string
+  eventName: string
+  countryCode: string
+  region: string
+  city: string
+  utmSource: string
+  utmMedium: string
+  utmCampaign: string
+  pagePath: string
+  device: string
+  precision: string
+  provider: string
+  referrerHost: string
+  outbound: string
+  q: string
+}
+
+interface AnalyticsFilterOption {
+  value: string
+  label: string
+  count: number
+}
+
+interface AnalyticsFilterOptions {
+  eventNames: AnalyticsFilterOption[]
+  countryCodes: AnalyticsFilterOption[]
+  regions: AnalyticsFilterOption[]
+  cities: AnalyticsFilterOption[]
+  utmSources: AnalyticsFilterOption[]
+  utmMediums: AnalyticsFilterOption[]
+  utmCampaigns: AnalyticsFilterOption[]
+  pagePaths: AnalyticsFilterOption[]
+  devices: AnalyticsFilterOption[]
+  precision: AnalyticsFilterOption[]
+  providers: AnalyticsFilterOption[]
+  referrerHosts: AnalyticsFilterOption[]
+}
+
+interface AnalyticsLocationRow {
+  city: string
+  region: string
+  countryCode: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsCampaignRow {
+  source: string
+  medium: string
+  campaign: string
+  content: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsCampaignLocationRow extends AnalyticsCampaignRow {
+  city: string
+  region: string
+  countryCode: string
+}
+
+interface AnalyticsClickRow {
+  label: string
+  href: string
+  path: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsNamedRow {
+  name: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsPageRow {
+  path: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsReferrerRow {
+  host: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsDayRow {
+  date: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsHourRow {
+  hour: string
+  stats: AnalyticsStats
+}
+
+interface AnalyticsSummary {
+  generatedAt: string
+  storage: AnalyticsStorage
+  scannedEvents: number
+  matchedEvents: number
+  filters: AnalyticsFilters
+  filterOptions: AnalyticsFilterOptions
+  stats: AnalyticsStats
+  lebanonCities: AnalyticsLocationRow[]
+  byLocation: AnalyticsLocationRow[]
+  byCampaign: AnalyticsCampaignRow[]
+  byCampaignLocation: AnalyticsCampaignLocationRow[]
+  topClicks: AnalyticsClickRow[]
+  byPage: AnalyticsPageRow[]
+  byReferrer: AnalyticsReferrerRow[]
+  byEvent: AnalyticsNamedRow[]
+  byDevice: AnalyticsNamedRow[]
+  byLanguage: AnalyticsNamedRow[]
+  byDay: AnalyticsDayRow[]
+  byHour: AnalyticsHourRow[]
+  precision: AnalyticsNamedRow[]
+  providers: AnalyticsNamedRow[]
+}
+
+interface AnalyticsEvent {
+  id: string
+  receivedAt: string
+  eventName: string
+  request?: {
+    referrer?: string
+    geo?: {
+      city?: string
+      region?: string
+      countryCode?: string
+      country?: string
+      precision?: string
+      provider?: string
+    }
+  }
+  payload?: {
+    page?: {
+      title?: string
+      path?: string
+      fullPath?: string
+      referrer?: string
+      utm?: {
+        source?: string
+        medium?: string
+        campaign?: string
+        content?: string
+      }
+    }
+    click?: {
+      label?: string
+      href?: string
+      isOutbound?: boolean
+    }
+    form?: {
+      label?: string
+    }
+    engagement?: {
+      timeOnPageMs?: number
+      maxScrollDepth?: number
+    }
+    environment?: {
+      language?: string
+      viewport?: {
+        width?: number
+        height?: number
+      }
+    }
+  }
+}
+
+interface AnalyticsEventsResponse {
+  storage: AnalyticsStorage
+  scanned: number
+  matched: number
+  count: number
+  filters: AnalyticsFilters
+  events: AnalyticsEvent[]
+}
+
+interface AnalyticsListItem {
+  label: string
+  value: string
+  meta?: string
+  percentage: number
+}
+
+const TOKEN_STORAGE_KEY = 'portfolio:analytics:admin-token'
+
+const defaultFilters = (): AnalyticsFilters => ({
+  from: '',
+  to: '',
+  eventName: '',
+  countryCode: '',
+  region: '',
+  city: '',
+  utmSource: '',
+  utmMedium: '',
+  utmCampaign: '',
+  pagePath: '',
+  device: '',
+  precision: '',
+  provider: '',
+  referrerHost: '',
+  outbound: '',
+  q: '',
+})
+
+const emptyFilterOptions = (): AnalyticsFilterOptions => ({
+  eventNames: [],
+  countryCodes: [],
+  regions: [],
+  cities: [],
+  utmSources: [],
+  utmMediums: [],
+  utmCampaigns: [],
+  pagePaths: [],
+  devices: [],
+  precision: [],
+  providers: [],
+  referrerHosts: [],
+})
+
+const tabs: { id: AnalyticsTab; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'geo', label: 'Geo' },
+  { id: 'acquisition', label: 'Acquisition' },
+  { id: 'behavior', label: 'Behavior' },
+  { id: 'events', label: 'Events' },
+]
+
+const quickRanges = [
+  { id: 'today', label: 'Today', days: 0 },
+  { id: '7d', label: '7D', days: 7 },
+  { id: '30d', label: '30D', days: 30 },
+  { id: '90d', label: '90D', days: 90 },
+  { id: 'all', label: 'All', days: null },
+]
+
+const filterLabels: Record<FilterKey, string> = {
+  from: 'From',
+  to: 'To',
+  eventName: 'Event',
+  countryCode: 'Country',
+  region: 'Region',
+  city: 'City',
+  utmSource: 'Source',
+  utmMedium: 'Medium',
+  utmCampaign: 'Campaign',
+  pagePath: 'Page',
+  device: 'Device',
+  precision: 'Precision',
+  provider: 'Provider',
+  referrerHost: 'Referrer',
+  outbound: 'Outbound',
+  q: 'Search',
+}
+
+const formatNumber = (value: number): string => new Intl.NumberFormat('en-US').format(value || 0)
+
+const formatPercent = (value: number): string => `${value || 0}%`
+
+const formatSeconds = (value: number): string => {
+  if (!value) {
+    return '0s'
+  }
+
+  if (value < 60) {
+    return `${value}s`
+  }
+
+  const minutes = Math.floor(value / 60)
+  const seconds = value % 60
+
+  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`
+}
+
+const formatDateInput = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+const getPercentage = (value: number, total: number): number => {
+  if (!total || !value) {
+    return 0
+  }
+
+  return Math.max(4, Math.min(100, Math.round((value / total) * 100)))
+}
+
+const cleanPart = (value: string): string => {
+  const cleanedValue = value.trim()
+
+  return cleanedValue && cleanedValue !== 'unknown' ? cleanedValue : ''
+}
+
+const joinParts = (parts: string[], fallback: string): string => {
+  const label = parts.map(cleanPart).filter(Boolean).join(', ')
+
+  return label || fallback
+}
+
+const formatEventName = (value: string): string =>
+  value
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    .trim()
+
+const formatOptionLabel = (option: AnalyticsFilterOption): string =>
+  `${option.label} (${formatNumber(option.count)})`
+
+const optionValue = (value: string): string => cleanPart(value) || 'unknown'
+
+const getLocationLabel = (row: AnalyticsLocationRow | AnalyticsCampaignLocationRow): string =>
+  joinParts([row.city, row.region, row.countryCode], 'Unknown location')
+
+const getCampaignLabel = (row: AnalyticsCampaignRow): string =>
+  joinParts([row.source, row.medium, row.campaign], 'Direct or untagged')
+
+const getCampaignMeta = (row: AnalyticsCampaignRow): string =>
+  [
+    cleanPart(row.content) ? `content: ${cleanPart(row.content)}` : '',
+    `${formatNumber(row.stats.pageViews)} views`,
+    `${formatNumber(row.stats.clicks)} clicks`,
+  ]
+    .filter(Boolean)
+    .join(' - ')
+
+const getClickLabel = (row: AnalyticsClickRow): string =>
+  cleanPart(row.label) || cleanPart(row.href) || 'Unlabeled click'
+
+const getClickMeta = (row: AnalyticsClickRow): string =>
+  joinParts([row.path, row.href], `${formatNumber(row.stats.events)} click events`)
+
+const getSortableValue = (stats: AnalyticsStats, metric: SortMetric): number => stats[metric] || 0
+
+const sortByMetric = <T extends { stats: AnalyticsStats }>(rows: T[], metric: SortMetric): T[] =>
+  [...rows].sort((first, second) => {
+    const metricDiff =
+      getSortableValue(second.stats, metric) - getSortableValue(first.stats, metric)
+
+    if (metricDiff) {
+      return metricDiff
+    }
+
+    return second.stats.events - first.stats.events
+  })
+
+const makeListItems = <T extends { stats: AnalyticsStats }>(
+  rows: T[],
+  total: number,
+  getLabel: (row: T) => string,
+  getMeta: (row: T) => string,
+  getValue: (stats: AnalyticsStats) => number = (stats) => stats.uniqueVisitors,
+): AnalyticsListItem[] =>
+  rows.slice(0, 8).map((row) => {
+    const value = getValue(row.stats)
+
+    return {
+      label: getLabel(row),
+      value: formatNumber(value),
+      meta: `${getMeta(row)} - ${formatNumber(row.stats.events)} events`,
+      percentage: getPercentage(value, total),
+    }
+  })
+
+const escapeCsv = (value: unknown): string => {
+  const text = String(value ?? '')
+
+  if (/[",\n\r]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`
+  }
+
+  return text
+}
+
+export default defineComponent({
+  name: 'AnalyticsPage',
+  setup() {
+    useHead({
+      title: 'Analytics | Rachida El Hady',
+      meta: [{ name: 'robots', content: 'noindex,nofollow' }],
+    })
+
+    const tokenInput = ref('')
+    const adminToken = ref('')
+    const limit = ref(10000)
+    const eventLimit = ref(250)
+    const activeTab = ref<AnalyticsTab>('overview')
+    const sortMetric = ref<SortMetric>('uniqueVisitors')
+    const isLoading = ref(false)
+    const errorMessage = ref('')
+    const summary = ref<AnalyticsSummary | null>(null)
+    const eventsResponse = ref<AnalyticsEventsResponse | null>(null)
+    const draftFilters = ref<AnalyticsFilters>(defaultFilters())
+    const appliedFilters = ref<AnalyticsFilters>(defaultFilters())
+
+    const hasToken = computed(() => Boolean(adminToken.value))
+    const filterOptions = computed(() => summary.value?.filterOptions || emptyFilterOptions())
+
+    const storageLabel = computed(() => {
+      if (!summary.value) {
+        return ''
+      }
+
+      const labels: Record<AnalyticsStorage, string> = {
+        d1: 'Cloudflare D1',
+        file: 'Local file',
+        unconfigured: 'Storage missing',
+      }
+
+      return labels[summary.value.storage]
+    })
+
+    const storageClass = computed(() => ({
+      'analytics-page__status--ready': summary.value?.storage === 'd1',
+      'analytics-page__status--local': summary.value?.storage === 'file',
+      'analytics-page__status--warning': summary.value?.storage === 'unconfigured',
+    }))
+
+    const metrics = computed(() => {
+      const stats = summary.value?.stats
+
+      if (!stats || !summary.value) {
+        return []
+      }
+
+      return [
+        {
+          label: 'Visitors',
+          value: formatNumber(stats.uniqueVisitors),
+          sub: `${formatNumber(stats.uniqueSessions)} sessions`,
+        },
+        {
+          label: 'Page Views',
+          value: formatNumber(stats.pageViews),
+          sub: `${formatNumber(summary.value.matchedEvents)} matched events`,
+        },
+        {
+          label: 'Clicks',
+          value: formatNumber(stats.clicks),
+          sub: `${formatPercent(stats.clickRate)} click rate`,
+        },
+        {
+          label: 'Forms',
+          value: formatNumber(stats.formSubmits),
+          sub: `${formatNumber(stats.engagements)} engagement pings`,
+        },
+        {
+          label: 'Avg Time',
+          value: formatSeconds(stats.avgEngagementSeconds),
+          sub: `${formatPercent(stats.avgScrollDepth)} avg scroll`,
+        },
+        {
+          label: 'Scan',
+          value: formatNumber(summary.value.scannedEvents),
+          sub: `${formatNumber(summary.value.matchedEvents)} after filters`,
+        },
+      ]
+    })
+
+    const activeFilterChips = computed(() =>
+      (Object.entries(appliedFilters.value) as [FilterKey, string][])
+        .filter(([, value]) => Boolean(value))
+        .map(([key, value]) => ({
+          key,
+          label: filterLabels[key],
+          value: key === 'eventName' ? formatEventName(value) : value,
+        })),
+    )
+
+    const tableLimit = computed(() => (activeTab.value === 'events' ? 100 : 40))
+    const totalVisitors = computed(() => summary.value?.stats.uniqueVisitors || 0)
+    const totalClicks = computed(() => summary.value?.stats.clicks || 0)
+    const maxDayEvents = computed(() =>
+      Math.max(...(summary.value?.byDay || []).map((row) => row.stats.events), 0),
+    )
+    const maxHourEvents = computed(() =>
+      Math.max(...hourRows.value.map((row) => row.stats.events), 0),
+    )
+
+    const lebanonCityRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.lebanonCities || [], sortMetric.value),
+        totalVisitors.value,
+        getLocationLabel,
+        (row) => `${formatNumber(row.stats.pageViews)} views`,
+      ),
+    )
+
+    const campaignRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.byCampaign || [], sortMetric.value),
+        totalVisitors.value,
+        getCampaignLabel,
+        getCampaignMeta,
+      ),
+    )
+
+    const clickRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.topClicks || [], 'events'),
+        totalClicks.value,
+        getClickLabel,
+        getClickMeta,
+        (stats) => stats.events,
+      ),
+    )
+
+    const pageRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.byPage || [], sortMetric.value),
+        totalVisitors.value,
+        (row) => optionValue(row.path),
+        (row) =>
+          `${formatNumber(row.stats.pageViews)} views - ${formatPercent(row.stats.clickRate)} click rate`,
+      ),
+    )
+
+    const precisionRows = computed(() =>
+      makeListItems(
+        sortByMetric(summary.value?.precision || [], 'events'),
+        summary.value?.matchedEvents || 0,
+        (row) => optionValue(row.name),
+        (row) => `${formatNumber(row.stats.pageViews)} views`,
+        (stats) => stats.events,
+      ),
+    )
+
+    const locationTableRows = computed(() =>
+      sortByMetric(summary.value?.byLocation || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const lebanonTableRows = computed(() =>
+      sortByMetric(summary.value?.lebanonCities || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const campaignTableRows = computed(() =>
+      sortByMetric(summary.value?.byCampaign || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const campaignLocationTableRows = computed(() =>
+      sortByMetric(summary.value?.byCampaignLocation || [], sortMetric.value).slice(
+        0,
+        tableLimit.value,
+      ),
+    )
+    const pageTableRows = computed(() =>
+      sortByMetric(summary.value?.byPage || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const referrerTableRows = computed(() =>
+      sortByMetric(summary.value?.byReferrer || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const clickTableRows = computed(() =>
+      sortByMetric(summary.value?.topClicks || [], 'events').slice(0, tableLimit.value),
+    )
+    const eventTypeTableRows = computed(() =>
+      sortByMetric(summary.value?.byEvent || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const deviceTableRows = computed(() =>
+      sortByMetric(summary.value?.byDevice || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const languageTableRows = computed(() =>
+      sortByMetric(summary.value?.byLanguage || [], sortMetric.value).slice(0, tableLimit.value),
+    )
+    const providerTableRows = computed(() =>
+      sortByMetric(summary.value?.providers || [], 'events').slice(0, tableLimit.value),
+    )
+    const recentEvents = computed(() => eventsResponse.value?.events || [])
+    const dayRows = computed(() => summary.value?.byDay || [])
+    const hourRows = computed(() => {
+      const currentRows = new Map((summary.value?.byHour || []).map((row) => [row.hour, row]))
+      const zeroStats: AnalyticsStats = {
+        events: 0,
+        uniqueVisitors: 0,
+        uniqueSessions: 0,
+        pageViews: 0,
+        clicks: 0,
+        formSubmits: 0,
+        engagements: 0,
+        avgEngagementSeconds: 0,
+        avgScrollDepth: 0,
+        clickRate: 0,
+      }
+
+      return Array.from({ length: 24 }, (_, hour) => {
+        const key = hour.toString().padStart(2, '0')
+
+        return currentRows.get(key) || { hour: key, stats: zeroStats }
+      })
+    })
+
+    const buildAnalyticsQuery = (includeEventLimit = false): string => {
+      const params = new URLSearchParams()
+
+      params.set('limit', String(limit.value))
+      if (includeEventLimit) {
+        params.set('eventLimit', String(eventLimit.value))
+      }
+
+      for (const [key, value] of Object.entries(appliedFilters.value)) {
+        if (value) {
+          params.set(key, value)
+        }
+      }
+
+      return params.toString()
+    }
+
+    const fetchWithToken = async <T>(url: string): Promise<T> => {
+      const response = await fetch(url, {
+        headers: {
+          'x-analytics-admin-token': adminToken.value,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(
+          response.status === 403
+            ? 'That analytics token is not valid.'
+            : `Analytics request failed (${response.status}).`,
+        )
+      }
+
+      return (await response.json()) as T
+    }
+
+    const loadAnalytics = async () => {
+      if (!adminToken.value) {
+        return
+      }
+
+      isLoading.value = true
+      errorMessage.value = ''
+
+      try {
+        const [summaryData, eventsData] = await Promise.all([
+          fetchWithToken<AnalyticsSummary>(`/api/analytics/summary?${buildAnalyticsQuery()}`),
+          fetchWithToken<AnalyticsEventsResponse>(
+            `/api/analytics/events?${buildAnalyticsQuery(true)}`,
+          ),
+        ])
+
+        summary.value = summaryData
+        eventsResponse.value = eventsData
+      } catch (error) {
+        errorMessage.value = error instanceof Error ? error.message : 'Unable to load analytics.'
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    const saveToken = () => {
+      const nextToken = tokenInput.value.trim()
+
+      if (!nextToken) {
+        return
+      }
+
+      adminToken.value = nextToken
+      localStorage.setItem(TOKEN_STORAGE_KEY, nextToken)
+      loadAnalytics()
+    }
+
+    const clearToken = () => {
+      adminToken.value = ''
+      tokenInput.value = ''
+      summary.value = null
+      eventsResponse.value = null
+      localStorage.removeItem(TOKEN_STORAGE_KEY)
+    }
+
+    const applyFilters = () => {
+      appliedFilters.value = { ...draftFilters.value }
+      loadAnalytics()
+    }
+
+    const resetFilters = () => {
+      draftFilters.value = defaultFilters()
+      appliedFilters.value = defaultFilters()
+      loadAnalytics()
+    }
+
+    const clearFilter = (key: FilterKey) => {
+      draftFilters.value[key] = ''
+      appliedFilters.value[key] = ''
+      loadAnalytics()
+    }
+
+    const setQuickRange = (days: number | null) => {
+      if (days === null) {
+        draftFilters.value.from = ''
+        draftFilters.value.to = ''
+        applyFilters()
+        return
+      }
+
+      const today = new Date()
+      const from = new Date()
+      from.setDate(today.getDate() - days)
+
+      draftFilters.value.from = formatDateInput(from)
+      draftFilters.value.to = formatDateInput(today)
+      applyFilters()
+    }
+
+    const formatDate = (value: string): string => {
+      if (!value) {
+        return 'unknown'
+      }
+
+      const date = new Date(value)
+
+      if (Number.isNaN(date.getTime())) {
+        return value
+      }
+
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date)
+    }
+
+    const formatDay = (value: string): string => {
+      const date = new Date(`${value}T00:00:00`)
+
+      if (Number.isNaN(date.getTime())) {
+        return value
+      }
+
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }).format(date)
+    }
+
+    const formatLocation = (event: AnalyticsEvent): string =>
+      joinParts(
+        [
+          event.request?.geo?.city || '',
+          event.request?.geo?.region || '',
+          event.request?.geo?.countryCode || event.request?.geo?.country || '',
+        ],
+        'unknown',
+      )
+
+    const formatEventDetail = (event: AnalyticsEvent): string => {
+      if (event.eventName === 'site_click') {
+        return joinParts(
+          [event.payload?.click?.label || '', event.payload?.click?.href || ''],
+          'click',
+        )
+      }
+
+      if (event.eventName === 'form_submit') {
+        return event.payload?.form?.label || 'form submit'
+      }
+
+      if (event.eventName === 'page_engagement') {
+        const timeOnPageSeconds = Math.round((event.payload?.engagement?.timeOnPageMs || 0) / 1000)
+        const scrollDepth = event.payload?.engagement?.maxScrollDepth || 0
+
+        return `${formatSeconds(timeOnPageSeconds)} - ${scrollDepth}% scroll`
+      }
+
+      const utm = event.payload?.page?.utm
+      const campaign = joinParts([utm?.source || '', utm?.medium || '', utm?.campaign || ''], '')
+
+      return campaign || event.payload?.page?.fullPath || event.payload?.page?.path || 'page view'
+    }
+
+    const getDayHeight = (row: AnalyticsDayRow): string =>
+      `${getPercentage(row.stats.events, maxDayEvents.value)}%`
+
+    const getHourIntensity = (row: AnalyticsHourRow): number =>
+      getPercentage(row.stats.events, maxHourEvents.value)
+
+    const exportEventsCsv = () => {
+      const rows = recentEvents.value.map((event) => [
+        event.receivedAt,
+        event.eventName,
+        formatLocation(event),
+        event.payload?.page?.path || '',
+        event.payload?.page?.utm?.source || '',
+        event.payload?.page?.utm?.medium || '',
+        event.payload?.page?.utm?.campaign || '',
+        formatEventDetail(event),
+      ])
+      const csv = [
+        [
+          'receivedAt',
+          'eventName',
+          'location',
+          'pagePath',
+          'utmSource',
+          'utmMedium',
+          'utmCampaign',
+          'detail',
+        ],
+        ...rows,
+      ]
+        .map((row) => row.map(escapeCsv).join(','))
+        .join('\n')
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+
+      anchor.href = url
+      anchor.download = `portfolio-analytics-${formatDateInput(new Date())}.csv`
+      anchor.click()
+      URL.revokeObjectURL(url)
+    }
+
+    watch([limit, eventLimit], () => {
+      if (adminToken.value) {
+        loadAnalytics()
+      }
+    })
+
+    onMounted(() => {
+      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY) || ''
+
+      if (!savedToken) {
+        return
+      }
+
+      tokenInput.value = savedToken
+      adminToken.value = savedToken
+      loadAnalytics()
+    })
+
+    return {
+      activeFilterChips,
+      activeTab,
+      applyFilters,
+      campaignLocationTableRows,
+      campaignRows,
+      campaignTableRows,
+      clearFilter,
+      clearToken,
+      clickRows,
+      clickTableRows,
+      dayRows,
+      deviceTableRows,
+      draftFilters,
+      errorMessage,
+      eventLimit,
+      eventTypeTableRows,
+      exportEventsCsv,
+      filterOptions,
+      formatDate,
+      formatDay,
+      formatEventDetail,
+      formatEventName,
+      formatLocation,
+      formatNumber,
+      formatOptionLabel,
+      formatPercent,
+      getCampaignLabel,
+      getCampaignMeta,
+      getClickLabel,
+      getClickMeta,
+      getDayHeight,
+      getHourIntensity,
+      getLocationLabel,
+      hasToken,
+      hourRows,
+      isLoading,
+      languageTableRows,
+      lebanonCityRows,
+      lebanonTableRows,
+      limit,
+      loadAnalytics,
+      locationTableRows,
+      metrics,
+      pageRows,
+      pageTableRows,
+      precisionRows,
+      providerTableRows,
+      quickRanges,
+      recentEvents,
+      referrerTableRows,
+      resetFilters,
+      saveToken,
+      setQuickRange,
+      sortMetric,
+      storageClass,
+      storageLabel,
+      summary,
+      tabs,
+      tokenInput,
+    }
+  },
+})
