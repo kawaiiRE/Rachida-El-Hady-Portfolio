@@ -506,11 +506,27 @@ const getBestGeoPayload = (
     return ipGeo
   }
 
+  const ipCountryCode = cleanString(ipGeo.countryCode || ipGeo.country || '', 20).toUpperCase()
+  const browserIsInsideLebanon = isInsideLebanonBounds(browserGeo.latitude, browserGeo.longitude)
+
+  if (ipCountryCode === 'LB' && !browserIsInsideLebanon) {
+    return {
+      ...ipGeo,
+      rejectedBrowserGeo: {
+        reason: 'outside-ip-country',
+        latitude: browserGeo.latitude,
+        longitude: browserGeo.longitude,
+        accuracyMeters: browserGeo.accuracyMeters,
+      },
+    }
+  }
+
   const nearestLocality = getNearestLebanonLocality(browserGeo.latitude, browserGeo.longitude)
   const hasHighAccuracy = browserGeo.accuracyMeters > 0 && browserGeo.accuracyMeters <= 2500
   const hasUsableAccuracy = browserGeo.accuracyMeters === 0 || browserGeo.accuracyMeters <= 15_000
+  const usableLocality = nearestLocality && hasHighAccuracy ? nearestLocality : null
   const precision = nearestLocality
-    ? hasHighAccuracy
+    ? usableLocality
       ? 'browser-locality'
       : 'browser-coordinate'
     : hasUsableAccuracy
@@ -521,12 +537,12 @@ const getBestGeoPayload = (
     ...ipGeo,
     provider: 'browser-geolocation',
     precision,
-    isCityLevel: Boolean(nearestLocality?.city),
+    isCityLevel: Boolean(usableLocality?.city),
     source: 'browser-geolocation',
-    countryCode: nearestLocality?.countryCode || ipGeo.countryCode,
-    country: nearestLocality?.country || ipGeo.country,
-    region: nearestLocality?.region || '',
-    city: nearestLocality?.city || '',
+    countryCode: usableLocality?.countryCode || (browserIsInsideLebanon ? 'LB' : ipGeo.countryCode),
+    country: usableLocality?.country || (browserIsInsideLebanon ? 'Lebanon' : ipGeo.country),
+    region: usableLocality?.region || '',
+    city: usableLocality?.city || '',
     postalCode: '',
     latitude: browserGeo.latitude,
     longitude: browserGeo.longitude,
@@ -534,6 +550,7 @@ const getBestGeoPayload = (
     browserCapturedAt: browserGeo.capturedAt,
     browserPermission: browserGeo.permission,
     nearestLocalityDistanceKm: nearestLocality?.distanceKm ?? null,
+    nearestLocalityRejectedReason: nearestLocality && !usableLocality ? 'low-accuracy' : '',
     ipProvider: ipGeo.provider,
     ipPrecision: ipGeo.precision,
     ipCountryCode: ipGeo.countryCode,
