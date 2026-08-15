@@ -49,13 +49,27 @@
 
 .projects__arc-path {
   fill: none;
-  stroke: rgba(var(--gray-scale-50-rgb), 0.18);
+  stroke: var(--line-subtle);
   stroke-width: 1;
 }
 
 .projects__carousel {
   position: relative;
   transform-style: preserve-3d;
+  touch-action: pan-y;
+  outline: none;
+}
+
+.projects__carousel:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem 50% auto auto;
+  width: 13.5rem;
+  height: 13.5rem;
+  border: 0.125rem solid var(--primary-scale-400);
+  border-radius: 1rem;
+  transform: translateX(50%);
+  pointer-events: none;
 }
 
 .projects__carousel-card {
@@ -65,7 +79,7 @@
   width: 12.5rem;
   height: 12.5rem;
   padding: 0;
-  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.14);
+  border: 0.0625rem solid var(--line-subtle);
   border-radius: 0.75rem;
   background:
     linear-gradient(rgba(var(--gray-scale-950-rgb), 0.96), rgba(var(--gray-scale-950-rgb), 0.96))
@@ -106,8 +120,13 @@
 .projects__carousel-card.is-active {
   z-index: 100;
   transform: translateX(-50%) translateY(var(--translate-y-0)) scale(var(--carousel-scale-active));
-  box-shadow: 0 -2.625rem 5.0625rem rgba(var(--primary-scale-400-rgb), 0.17);
+  box-shadow: 0 -2.625rem 5.0625rem rgba(var(--primary-scale-400-rgb), 0.2);
   transition-delay: 0s;
+}
+
+.projects__carousel-card.is-active:hover {
+  transform: translateX(-50%) translateY(calc(var(--translate-y-0) - 0.35rem))
+    scale(var(--carousel-scale-active)) rotate(-1deg);
 }
 
 .projects__carousel-card.is-prev-1 {
@@ -174,17 +193,35 @@
   max-width: 20rem;
   margin: auto auto 2rem auto;
   padding: 0 1.5rem;
+  align-items: center;
+}
+
+.projects__position {
+  font-family: var(--font-space-mono);
+  color: rgba(var(--gray-scale-50-rgb), 0.62);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
 }
 
 .projects__nav-button {
   width: 3rem;
   height: 3rem;
-  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.22);
+  border: 0.0625rem solid var(--line-subtle);
   border-radius: 0.5rem;
   background: transparent;
   color: var(--primary-scale-400);
   font-size: 1.3rem;
   cursor: pointer;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.projects__nav-button:hover {
+  border-color: rgba(var(--primary-scale-400-rgb), 0.38);
+  background: var(--surface-accent-soft);
+  transform: translateY(-0.08rem);
 }
 
 .projects__panel {
@@ -222,7 +259,7 @@
   align-items: center;
   min-height: 2rem;
   padding: 0.35rem 0.75rem;
-  border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.16);
+  border: 0.0625rem solid var(--line-subtle);
   border-radius: 999rem;
   background: rgba(var(--gray-scale-50-rgb), 0.055);
   color: rgba(var(--gray-scale-50-rgb), 0.78);
@@ -265,7 +302,7 @@
     )
     0% 0% / 200% 100%;
   background-size: 200% auto;
-  color: #fff;
+  color: var(--static-white);
   animation: projects-gradient-loop 4.5s linear infinite alternate;
   transition: transform 0.2s ease;
 
@@ -279,9 +316,9 @@
 }
 
 .projects__cta--secondary {
-  border-color: rgba(var(--gray-scale-50-rgb), 0.22);
+  border-color: var(--line-subtle);
   color: var(--gray-scale-50);
-  background: rgba(var(--gray-scale-950-rgb), 0.3);
+  background: var(--surface-card);
 }
 
 @keyframes gradientShift {

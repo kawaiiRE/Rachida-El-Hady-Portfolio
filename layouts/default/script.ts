@@ -1,7 +1,6 @@
-import { useState } from '#imports'
+import { useHead, useState } from '#imports'
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-
-const THEME_STORAGE_KEY = 'theme-mode'
+import { DEFAULT_THEME_MODE, THEME_STORAGE_KEY, type ThemeMode } from '~/constants/theme'
 
 export default defineComponent({
   name: 'DefaultLayout',
@@ -9,7 +8,13 @@ export default defineComponent({
   emits: [],
   setup() {
     // -------------------- Composables --------------------
-    const themeMode = useState<'light' | 'dark'>('theme-mode', () => 'light')
+    const themeMode = useState<ThemeMode>('theme-mode', () => DEFAULT_THEME_MODE)
+
+    useHead(() => ({
+      htmlAttrs: {
+        class: themeMode.value === 'dark' ? 'dark' : undefined,
+      },
+    }))
 
     // -------------------- State --------------------
     const isThemeTransitionActive = ref(false)
@@ -64,6 +69,7 @@ export default defineComponent({
         themeMode.value = savedThemeMode
         document.documentElement.classList.toggle('dark', themeMode.value === 'dark')
       } else {
+        themeMode.value = DEFAULT_THEME_MODE
         localStorage.setItem(THEME_STORAGE_KEY, themeMode.value)
         document.documentElement.classList.toggle('dark', themeMode.value === 'dark')
       }

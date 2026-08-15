@@ -1,6 +1,6 @@
 <template>
   <section id="leadership" class="about">
-    <div class="app-container">
+    <div class="app-container section-content">
       <!-- <div ref="textCanvasRef" class="about__visual" aria-hidden="true"></div> -->
 
       <p class="section-label">Leadership</p>

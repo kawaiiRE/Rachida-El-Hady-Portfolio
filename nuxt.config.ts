@@ -17,6 +17,23 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  hooks: {
+    'pages:extend'(pages) {
+      const removePageImplementationRoutes = (routes: typeof pages): void => {
+        for (let index = routes.length - 1; index >= 0; index -= 1) {
+          const route = routes[index]
+          if (route.file?.endsWith('/script.ts') || route.file?.endsWith('\\script.ts')) {
+            routes.splice(index, 1)
+            continue
+          }
+          if (route.children?.length) removePageImplementationRoutes(route.children)
+        }
+      }
+
+      removePageImplementationRoutes(pages)
+    },
+  },
+
   runtimeConfig: {
     analyticsAdminToken: process.env.ANALYTICS_ADMIN_TOKEN || '',
     analyticsD1Binding: process.env.ANALYTICS_D1_BINDING || 'ANALYTICS_DB',
@@ -56,7 +73,7 @@ export default defineNuxtConfig({
         },
         {
           name: 'theme-color',
-          content: '#121212',
+          content: '#08090b',
         },
         {
           property: 'og:type',
@@ -105,10 +122,6 @@ export default defineNuxtConfig({
       ],
       link: [
         {
-          rel: 'canonical',
-          href: siteUrl,
-        },
-        {
           rel: 'preconnect',
           href: 'https://fonts.googleapis.com',
         },
@@ -153,8 +166,8 @@ export default defineNuxtConfig({
     config: {
       colors: {
         variables: {
-          primary: '#7c5cff',
-          secondary: '#00d4ff',
+          primary: '#2f5bea',
+          secondary: '#f06449',
         },
       },
     },

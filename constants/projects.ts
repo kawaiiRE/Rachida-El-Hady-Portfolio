@@ -66,7 +66,7 @@ export const AURAFLOW_PROJECT: PortfolioProject = {
       url: 'https://auraflow.rachida.dev/',
     },
   ],
-  path: '/projects#auraflow',
+  path: '/projects/auraflow',
 }
 
 export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
@@ -129,7 +129,7 @@ export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
       url: 'https://play.google.com/store/apps/details?id=com.kawaiire.crazysudoku',
     },
   ],
-  path: '/projects#crazy-sudoku',
+  path: '/projects/crazy-sudoku',
 }
 
 export const TRACKPAL_WEB_PROJECT: PortfolioProject = {
@@ -182,7 +182,7 @@ export const TRACKPAL_WEB_PROJECT: PortfolioProject = {
       url: 'https://trackpal.rachida.dev',
     },
   ],
-  path: '/projects#trackpal-web',
+  path: '/projects/trackpal-web',
 }
 
 export const TRACKPAL_MOBILE_PROJECT: PortfolioProject = {
@@ -232,7 +232,7 @@ export const TRACKPAL_MOBILE_PROJECT: PortfolioProject = {
       url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
     },
   ],
-  path: '/projects#trackpal-mobile',
+  path: '/projects/trackpal-mobile',
 }
 
 export const NOTIFY_PROJECT: PortfolioProject = {
@@ -282,7 +282,7 @@ export const NOTIFY_PROJECT: PortfolioProject = {
       url: 'https://notify.rachida.dev/',
     },
   ],
-  path: '/projects#notify',
+  path: '/projects/notify',
 }
 
 export const WHISPER_PROJECT: PortfolioProject = {
@@ -327,7 +327,7 @@ export const WHISPER_PROJECT: PortfolioProject = {
       url: 'https://whisper.rachida.dev',
     },
   ],
-  path: '/projects#whisper',
+  path: '/projects/whisper',
 }
 
 export const PLAYQUEST_PROJECT: PortfolioProject = {
@@ -379,7 +379,7 @@ export const PLAYQUEST_PROJECT: PortfolioProject = {
       url: 'https://playquest.rachida.dev',
     },
   ],
-  path: '/projects#playquest',
+  path: '/projects/playquest',
 }
 
 export const PROJECTS: PortfolioProject[] = [

@@ -32,7 +32,7 @@ export const homeContactItems: HomeContactItem[] = [
     value: '+961 81977603',
     href: 'https://wa.me/96181977603',
     isIcon: true,
-    color: '#25D366',
+    color: 'var(--social-whatsapp)',
   },
   {
     id: 'github',
@@ -47,7 +47,7 @@ export const homeContactItems: HomeContactItem[] = [
     value: 'linkedin.com/in/rachida-el-hady',
     href: 'https://www.linkedin.com/in/rachida-el-hady-8a5251223/',
     isIcon: true,
-    color: '#0A66C2',
+    color: 'var(--social-linkedin)',
   },
 ]
 

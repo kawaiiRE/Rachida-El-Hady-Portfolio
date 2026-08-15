@@ -23,7 +23,6 @@
           <span class="navbar__theme-track" aria-hidden="true">
             <span class="navbar__theme-thumb"></span>
           </span>
-          <span class="navbar__theme-text">{{ themeToggleText }}</span>
         </button>
 
         <button
@@ -59,6 +58,10 @@
         {{ link.label }}
       </NuxtLink>
     </nav>
+
+    <span class="navbar__progress" aria-hidden="true">
+      <span :style="scrollProgressStyle"></span>
+    </span>
   </header>
 </template>
 <script lang="ts" src="./script.ts" />

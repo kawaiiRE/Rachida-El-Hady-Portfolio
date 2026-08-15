@@ -1,6 +1,6 @@
 <template>
   <section id="projects" class="projects">
-    <div class="app-container">
+    <div class="app-container section-content">
       <div class="projects__header">
         <div>
           <p class="section-label">Projects</p>
@@ -26,7 +26,17 @@
           <path class="projects__arc-path" d="M 700 850 A 800.5 800.5 0 0 1 2300 850"></path>
         </svg>
 
-        <div class="projects__carousel" aria-label="Featured projects carousel">
+        <div
+          ref="carouselRef"
+          class="projects__carousel"
+          aria-label="Featured projects carousel"
+          tabindex="0"
+          @keydown.left.prevent="shiftProject(-1)"
+          @keydown.right.prevent="shiftProject(1)"
+          @pointerdown="startDrag"
+          @pointerup="finishDrag"
+          @pointercancel="cancelDrag"
+        >
           <button
             v-for="(carouselProject, index) in carouselProjects"
             :key="carouselProject.project.id"
@@ -53,6 +63,9 @@
         >
           <IconArrowLeft />
         </button>
+        <span class="projects__position" aria-live="polite">
+          {{ currentPosition }} / {{ totalProjects }}
+        </span>
         <button
           type="button"
           class="projects__nav-button"

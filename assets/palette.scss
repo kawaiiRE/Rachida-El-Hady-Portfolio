@@ -5,110 +5,157 @@
     Raw palette tokens
   */
 
-  /* Grayscale */
-  --gray-scale-50: #1e293b;
-  --gray-scale-100: #26364b;
-  --gray-scale-200: #334155;
-  --gray-scale-300: #475569;
-  --gray-scale-400: #64748b;
-  --gray-scale-500: #94a3b8;
-  --gray-scale-600: #b8c5d2;
-  --gray-scale-700: #cbd5e1;
-  --gray-scale-800: #e2e8f0;
-  --gray-scale-900: #f0fdf4;
-  --gray-scale-950: #e9f5f8;
+  /* Neutral ink on true white */
+  --gray-scale-50: #17181b;
+  --gray-scale-100: #24262b;
+  --gray-scale-200: #363940;
+  --gray-scale-300: #52565f;
+  --gray-scale-400: #717680;
+  --gray-scale-500: #9a9ea6;
+  --gray-scale-600: #c1c4ca;
+  --gray-scale-700: #d9dbe0;
+  --gray-scale-800: #ececef;
+  --gray-scale-900: #f6f6f7;
+  --gray-scale-950: #ffffff;
 
   /* Primary scale */
-  --primary-scale-50: #eff6ff;
-  --primary-scale-100: #dbeafe;
-  --primary-scale-200: #bfdbfe;
-  --primary-scale-300: #93c5fd;
-  --primary-scale-400: #2563eb;
-  --primary-scale-500: #1d4ed8;
-  --primary-scale-600: #1e40af;
-  --primary-scale-700: #1d3a8a;
-  --primary-scale-800: #1e316e;
-  --primary-scale-900: #172554;
-  --primary-scale-950: #0f172a;
+  --primary-scale-50: #eef2ff;
+  --primary-scale-100: #dfe6ff;
+  --primary-scale-200: #becbff;
+  --primary-scale-300: #8fa7ff;
+  --primary-scale-400: #2f5bea;
+  --primary-scale-500: #2448c7;
+  --primary-scale-600: #1d399f;
+  --primary-scale-700: #192f7c;
+  --primary-scale-800: #17275f;
+  --primary-scale-900: #131e45;
+  --primary-scale-950: #0c122b;
 
   /* Secondary scale */
-  --secondary-scale-50: #fff1f4;
-  --secondary-scale-100: #ffe4ea;
-  --secondary-scale-200: #fecdd6;
-  --secondary-scale-300: #fda4b4;
-  --secondary-scale-400: #ff8fa3;
-  --secondary-scale-500: #ff758d;
-  --secondary-scale-600: #e55e78;
-  --secondary-scale-700: #c44560;
-  --secondary-scale-800: #9d324d;
-  --secondary-scale-900: #6c2035;
-  --secondary-scale-950: #45111f;
+  --secondary-scale-50: #fff2ed;
+  --secondary-scale-100: #ffe2d8;
+  --secondary-scale-200: #ffc2ae;
+  --secondary-scale-300: #ff9979;
+  --secondary-scale-400: #f06449;
+  --secondary-scale-500: #d94b32;
+  --secondary-scale-600: #b83a26;
+  --secondary-scale-700: #922f22;
+  --secondary-scale-800: #75291f;
+  --secondary-scale-900: #60251e;
+  --secondary-scale-950: #34110c;
 
   /*
     RGB helpers for alpha-based usage
   */
-  --gray-scale-50-rgb: 30, 41, 59;
-  --gray-scale-700-rgb: 203, 213, 225;
-  --gray-scale-800-rgb: 226, 232, 240;
-  --gray-scale-900-rgb: 240, 253, 244;
-  --gray-scale-950-rgb: 233, 245, 248;
-  --primary-scale-400-rgb: 37, 99, 235;
-  --secondary-scale-400-rgb: 255, 143, 163;
+  --gray-scale-50-rgb: 23, 24, 27;
+  --gray-scale-700-rgb: 217, 219, 224;
+  --gray-scale-800-rgb: 236, 236, 239;
+  --gray-scale-900-rgb: 246, 246, 247;
+  --gray-scale-950-rgb: 255, 255, 255;
+  --primary-scale-400-rgb: 47, 91, 234;
+  --secondary-scale-400-rgb: 240, 100, 73;
 
-  --animated-text-shadow: #8a2be2;
+  --animated-text-shadow: #2f5bea;
+  --home-page-background: var(--gray-scale-950);
+
+  /* Semantic surfaces: true white with soft, modern depth */
+  --surface-page: var(--gray-scale-950);
+  --surface-card: rgba(var(--gray-scale-950-rgb), 0.88);
+  --surface-input: var(--gray-scale-950);
+  --surface-accent-soft: rgba(var(--primary-scale-400-rgb), 0.055);
+  --line-subtle: rgba(var(--gray-scale-50-rgb), 0.14);
+  --line-strong: rgba(var(--gray-scale-50-rgb), 0.22);
+  --shadow-card: 0 1.25rem 3rem rgba(var(--gray-scale-50-rgb), 0.07);
+  --shadow-card-hover: 0 1.5rem 3.5rem rgba(var(--primary-scale-400-rgb), 0.11);
+  --shadow-image: 0 1.5rem 3rem rgba(var(--gray-scale-50-rgb), 0.16);
+  --media-overlay-rgb: 8, 9, 11;
+  --accent-contrast: var(--gray-scale-950);
+  --feature-band-background: var(--gray-scale-50);
+  --feature-band-text: var(--gray-scale-950);
+  --feature-band-text-rgb: var(--gray-scale-950-rgb);
+  --feature-band-line: rgba(var(--gray-scale-950-rgb), 0.2);
+  --static-white: #ffffff;
+  --success-color: #15803d;
+  --success-color-rgb: 21, 128, 61;
+  --error-color: #c2413a;
+  --error-color-rgb: 194, 65, 58;
+  --social-whatsapp: #25d366;
+  --social-linkedin: #0a66c2;
 }
 
 html.dark,
 .default-layout.dark {
   color-scheme: dark;
 
-  /* Grayscale - The Deep Abyss */
-  --gray-scale-50: #f1f5f9;
-  --gray-scale-100: #e2e8f0;
-  --gray-scale-200: #cbd5e1;
-  --gray-scale-300: #c7d2fe;
-  --gray-scale-400: #94a3b8;
-  --gray-scale-500: #64748b;
-  --gray-scale-600: #312e81;
-  --gray-scale-700: #1e1b4b;
-  --gray-scale-800: #0d0b1f;
-  --gray-scale-900: #05020a;
-  --gray-scale-950: #000000;
+  /* Neutral light on carbon */
+  --gray-scale-50: #f5f5f6;
+  --gray-scale-100: #e7e7e9;
+  --gray-scale-200: #d0d1d4;
+  --gray-scale-300: #a9abb1;
+  --gray-scale-400: #858890;
+  --gray-scale-500: #62656c;
+  --gray-scale-600: #414349;
+  --gray-scale-700: #2b2d32;
+  --gray-scale-800: #191a1e;
+  --gray-scale-900: #0e0f12;
+  --gray-scale-950: #08090b;
 
-  /* Primary scale - OMEN Ocean */
-  --primary-scale-50: #ecfeff;
-  --primary-scale-100: #cffafe;
-  --primary-scale-200: #a5f3fc;
-  --primary-scale-300: #67e8f9;
-  --primary-scale-400: #00f2ff;
-  --primary-scale-500: #007bff;
-  --primary-scale-600: #8a2be2;
-  --primary-scale-700: #7c3aed;
-  --primary-scale-800: #5b21b6;
-  --primary-scale-900: #312e81;
-  --primary-scale-950: #1e1b4b;
+  /* Cobalt accent */
+  --primary-scale-50: #f2f5ff;
+  --primary-scale-100: #e5ebff;
+  --primary-scale-200: #ccd8ff;
+  --primary-scale-300: #a8bbff;
+  --primary-scale-400: #7897ff;
+  --primary-scale-500: #5678f0;
+  --primary-scale-600: #3d5fd0;
+  --primary-scale-700: #324ca6;
+  --primary-scale-800: #2b4082;
+  --primary-scale-900: #263765;
+  --primary-scale-950: #17203b;
 
-  /* Secondary scale - OMEN Magenta Pulse */
-  --secondary-scale-50: #fff0ff;
-  --secondary-scale-100: #ffd6ff;
-  --secondary-scale-200: #ffadff;
-  --secondary-scale-300: #ff6fff;
-  --secondary-scale-400: #ff00ff;
-  --secondary-scale-500: #db00db;
-  --secondary-scale-600: #b800b8;
-  --secondary-scale-700: #940094;
-  --secondary-scale-800: #6f006f;
-  --secondary-scale-900: #490049;
-  --secondary-scale-950: #260026;
+  /* Warm coral accent */
+  --secondary-scale-50: #fff3ef;
+  --secondary-scale-100: #ffe4db;
+  --secondary-scale-200: #ffc8b7;
+  --secondary-scale-300: #ffa387;
+  --secondary-scale-400: #ff795e;
+  --secondary-scale-500: #ed5d43;
+  --secondary-scale-600: #ca4430;
+  --secondary-scale-700: #a23528;
+  --secondary-scale-800: #822d25;
+  --secondary-scale-900: #692820;
+  --secondary-scale-950: #39120d;
 
-  /* RGB helpers for OMEN colors */
-  --gray-scale-50-rgb: 241, 245, 249;
-  --gray-scale-700-rgb: 30, 27, 75;
-  --gray-scale-800-rgb: 13, 11, 31;
-  --gray-scale-900-rgb: 5, 2, 10;
-  --gray-scale-950-rgb: 0, 0, 0;
-  --primary-scale-400-rgb: 0, 242, 255;
-  --secondary-scale-400-rgb: 255, 0, 255;
+  --gray-scale-50-rgb: 245, 245, 246;
+  --gray-scale-700-rgb: 43, 45, 50;
+  --gray-scale-800-rgb: 25, 26, 30;
+  --gray-scale-900-rgb: 14, 15, 18;
+  --gray-scale-950-rgb: 8, 9, 11;
+  --primary-scale-400-rgb: 120, 151, 255;
+  --secondary-scale-400-rgb: 255, 121, 94;
 
-  --animated-text-shadow: #fff;
+  --animated-text-shadow: #7897ff;
+  --home-page-background: var(--gray-scale-950);
+
+  --surface-page: var(--gray-scale-950);
+  --surface-card: rgba(var(--gray-scale-800-rgb), 0.96);
+  --surface-input: rgba(var(--gray-scale-900-rgb), 0.92);
+  --surface-accent-soft: rgba(var(--primary-scale-400-rgb), 0.1);
+  --line-subtle: rgba(var(--gray-scale-50-rgb), 0.12);
+  --line-strong: rgba(var(--gray-scale-50-rgb), 0.2);
+  --shadow-card: 0 1.25rem 3rem rgba(var(--gray-scale-950-rgb), 0.22);
+  --shadow-card-hover: 0 1.5rem 3.5rem rgba(var(--primary-scale-400-rgb), 0.1);
+  --shadow-image: 0 1.5rem 3rem rgba(var(--gray-scale-950-rgb), 0.5);
+  --media-overlay-rgb: 8, 9, 11;
+  --accent-contrast: var(--gray-scale-950);
+  --feature-band-background: var(--gray-scale-800);
+  --feature-band-text: var(--gray-scale-50);
+  --feature-band-text-rgb: var(--gray-scale-50-rgb);
+  --feature-band-line: rgba(var(--gray-scale-50-rgb), 0.16);
+  --success-color: #4ade80;
+  --success-color-rgb: 74, 222, 128;
+  --error-color: #ff8178;
+  --error-color-rgb: 255, 129, 120;
+  --social-whatsapp: #55df88;
+  --social-linkedin: #72a7ff;
 }

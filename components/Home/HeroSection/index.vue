@@ -1,7 +1,7 @@
 <template>
   <section id="hero" class="hero">
     <div ref="heroBackgroundRef" class="hero__background" aria-hidden="true"></div>
-    <div class="app-container">
+    <div class="app-container section-content">
       <div class="hero__content">
         <h1 class="hero__title">Rachida El Hady</h1>
         <p class="hero__subtitle">
@@ -32,6 +32,9 @@
       class="sitting-image"
       alt="Character sitting with a laptop"
     />
+    <div class="hero__boundary" aria-hidden="true">
+      <span class="hero__boundary-mark"></span>
+    </div>
   </section>
 </template>
 <script lang="ts" src="./script.ts" />

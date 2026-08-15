@@ -1,6 +1,6 @@
 <template>
   <section id="vibe" class="vibe">
-    <div class="app-container">
+    <div class="app-container section-content">
       <div class="vibe__banner">
         <div class="vibe__marquee" aria-label="Animated list of design and frontend vibes">
           <div class="vibe__row" :class="{ 'vibe__row--reverse': false }">

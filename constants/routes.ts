@@ -1,6 +1,8 @@
 export const APP_ROUTES = {
   HOME: '/',
   PROJECTS: '/projects',
+  EXPERIENCE: '/#experience',
+  APPROACH: '/#approach',
   LEADERSHIP: '/#leadership',
   VIBE: '/#vibe',
   CONTACT: '/#contact',

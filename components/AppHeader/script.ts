@@ -1,6 +1,7 @@
 import { useState } from '#imports'
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { APP_ROUTES } from '~/constants/routes'
+import { DEFAULT_THEME_MODE, type ThemeMode } from '~/constants/theme'
 
 interface AppHeaderLink {
   id: string
@@ -22,10 +23,11 @@ export default defineComponent({
   emits: [],
   setup() {
     // -------------------- Composables --------------------
-    const themeMode = useState<'light' | 'dark'>('theme-mode', () => 'light')
+    const themeMode = useState<ThemeMode>('theme-mode', () => DEFAULT_THEME_MODE)
 
     // -------------------- State --------------------
     const isMobileMenuOpen = ref(false)
+    const scrollProgress = ref(0)
 
     // -------------------- Computed --------------------
     const menuButtonLabel = computed(() => (isMobileMenuOpen.value ? 'Close menu' : 'Open menu'))
@@ -33,7 +35,9 @@ export default defineComponent({
     const themeToggleLabel = computed(() =>
       isDarkTheme.value ? 'Switch to light theme' : 'Switch to dark theme',
     )
-    const themeToggleText = computed(() => (isDarkTheme.value ? 'Dark' : 'Light'))
+    const scrollProgressStyle = computed(() => ({
+      transform: `scaleX(${scrollProgress.value})`,
+    }))
 
     // -------------------- Methods --------------------
     const toggleMobileMenu = (): void => {
@@ -48,14 +52,30 @@ export default defineComponent({
       themeMode.value = isDarkTheme.value ? 'light' : 'dark'
     }
 
+    const syncScrollProgress = (): void => {
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
+
+      scrollProgress.value = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0
+    }
+
     // -------------------- Lifecycle --------------------
+    onMounted(() => {
+      syncScrollProgress()
+      window.addEventListener('scroll', syncScrollProgress, { passive: true })
+      window.addEventListener('resize', syncScrollProgress)
+    })
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', syncScrollProgress)
+      window.removeEventListener('resize', syncScrollProgress)
+    })
 
     return {
       isMobileMenuOpen,
       isDarkTheme,
       menuButtonLabel,
+      scrollProgressStyle,
       themeToggleLabel,
-      themeToggleText,
       toggleMobileMenu,
       toggleThemeMode,
       closeMobileMenu,

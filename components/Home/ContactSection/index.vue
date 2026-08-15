@@ -1,9 +1,15 @@
 <template>
   <section id="contact" class="contact app-container">
-    <div class="app-container contact__wrapper">
+    <div class="contact__wrapper section-content">
       <div class="contact__header">
-        <p class="section-label">Contact</p>
-        <h2 class="section-title">You can reach me via:</h2>
+        <div>
+          <p class="section-label">Contact / 08</p>
+          <h2 class="section-title">Tell me what you’re building.</h2>
+        </div>
+        <p class="contact__intro">
+          A rough idea is enough. Send the context, the constraint, or the problem you want to
+          solve.
+        </p>
 
         <!-- Contact items -->
         <ul class="contact__list" v-if="contactItems && contactItems.length">
@@ -37,10 +43,6 @@
           </li>
         </ul>
 
-        <div class="contact__divider">
-          <span>or</span>
-        </div>
-
         <a
           v-if="APP_LINKS.CV_DOWNLOAD"
           :href="APP_LINKS.CV_DOWNLOAD"
@@ -53,30 +55,42 @@
 
       <!-- Contact form -->
       <form class="contact__form" @submit.prevent="sendMessage">
+        <p class="contact__form-intro">Start with the essentials.</p>
         <div class="form-group">
+          <label class="form-label" for="contact-name">Name</label>
           <input
+            id="contact-name"
             v-model="formData.name"
             type="text"
-            placeholder="Your Name"
+            name="name"
+            autocomplete="name"
+            placeholder="Your name"
             class="form-input"
             required
           />
         </div>
 
         <div class="form-group">
+          <label class="form-label" for="contact-email">Email</label>
           <input
+            id="contact-email"
             v-model="formData.email"
             type="email"
-            placeholder="Your Email"
+            name="email"
+            autocomplete="email"
+            placeholder="you@example.com"
             class="form-input"
             required
           />
         </div>
 
         <div class="form-group">
+          <label class="form-label" for="contact-message">Message</label>
           <textarea
+            id="contact-message"
             v-model="formData.message"
-            placeholder="Your Message"
+            name="message"
+            placeholder="What are you working on?"
             class="form-textarea"
             rows="6"
             required
@@ -95,7 +109,8 @@
 
         <!-- Submit button -->
         <button type="submit" class="form-button" :disabled="isLoading">
-          {{ isLoading ? 'Sending...' : 'Send Message' }}
+          <span>{{ isLoading ? 'Sending...' : 'Send Message' }}</span>
+          <span aria-hidden="true">↗</span>
         </button>
       </form>
     </div>

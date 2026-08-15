@@ -36,11 +36,14 @@ export default defineComponent({
   setup() {
     const projects = PROJECTS
     const currentIndex = ref(0)
+    const carouselRef = ref<HTMLElement | null>(null)
+    const dragStartX = ref<number | null>(null)
     const totalProjects = computed(() => projects.length)
 
     const currentProject = computed<PortfolioProject | null>(() => {
       return projects[currentIndex.value] ?? null
     })
+    const currentPosition = computed(() => String(currentIndex.value + 1).padStart(2, '0'))
 
     const normalizeIndex = (index: number): number => {
       if (!totalProjects.value) {
@@ -85,24 +88,42 @@ export default defineComponent({
       currentIndex.value = normalizeIndex(currentIndex.value + direction)
     }
 
+    const startDrag = (event: PointerEvent): void => {
+      dragStartX.value = event.clientX
+      carouselRef.value?.setPointerCapture(event.pointerId)
+    }
+
+    const cancelDrag = (): void => {
+      dragStartX.value = null
+    }
+
+    const finishDrag = (event: PointerEvent): void => {
+      if (dragStartX.value === null) return
+      const distance = event.clientX - dragStartX.value
+      dragStartX.value = null
+      if (Math.abs(distance) < 42) return
+      shiftProject(distance > 0 ? -1 : 1)
+    }
+
     const getPreviewStack = (project: PortfolioProject): string[] => {
       return project.stack.slice(0, PREVIEW_STACK_LIMIT)
     }
 
-    const getProjectPath = (project: PortfolioProject) => {
-      return {
-        path: '/projects',
-        hash: `#${project.id}`,
-      }
-    }
+    const getProjectPath = (project: PortfolioProject): string => project.path
 
     return {
       carouselProjects,
+      carouselRef,
       currentProject,
+      currentPosition,
+      totalProjects,
       getPreviewStack,
       getProjectPath,
       selectProject,
       shiftProject,
+      startDrag,
+      finishDrag,
+      cancelDrag,
     }
   },
 })
