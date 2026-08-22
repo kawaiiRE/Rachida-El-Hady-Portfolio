@@ -3,7 +3,7 @@
     <div class="wrapper section-content" data-motion>
       <div class="header">
         <div>
-          <p class="section-label">Contact / 08</p>
+          <p class="section-label">Contact / 09</p>
           <h2 class="section-title">Tell me what you’re building.</h2>
         </div>
         <p class="intro">

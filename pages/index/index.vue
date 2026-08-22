@@ -5,8 +5,9 @@
     </ClientOnly>
     <HomeHeroSection />
     <HomeAboutSection />
-    <HomeExperienceSection />
     <HomeProjectsSection />
+    <HomeExperienceSection />
+    <HomeTypingChallengeSection />
     <HomeFeaturedCaseStudy />
     <HomeEngineeringSection />
     <HomeVibeSection />

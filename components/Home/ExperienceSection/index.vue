@@ -29,12 +29,12 @@
           <div class="role-body">
             <div class="details-heading">
               <span>Selected responsibilities and delivery</span>
-              <span>{{ String(role.highlights.length).padStart(2, '0') }}</span>
+              <span>{{ String(role.highlights?.length ?? 0).padStart(2, '0') }}</span>
             </div>
 
             <ol class="achievements">
               <li
-                v-for="(highlight, index) in role.highlights"
+                v-for="(highlight, index) in role.highlights ?? []"
                 :key="highlight"
                 class="achievement"
                 data-motion
@@ -45,7 +45,7 @@
             </ol>
 
             <ul class="role-stack" :aria-label="`${role.company} technologies`">
-              <li v-for="technology in role.technologies" :key="technology">
+              <li v-for="technology in role.technologies ?? []" :key="technology">
                 {{ technology }}
               </li>
             </ul>

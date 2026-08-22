@@ -1,9 +1,10 @@
 export const APP_ROUTES = {
   HOME: '/',
   PROJECTS: '/projects',
-  EXPERIENCE: '/#experience',
+  EXPERIENCE: '/experience',
   APPROACH: '/#approach',
   LEADERSHIP: '/#leadership',
+  TYPING: '/typing',
   VIBE: '/#vibe',
   CONTACT: '/#contact',
 } as const

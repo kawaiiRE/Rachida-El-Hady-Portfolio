@@ -1,0 +1,17 @@
+.experience-page {
+  & {
+    min-height: 100vh;
+    overflow: clip;
+    background:
+      radial-gradient(
+        circle at 88% 8%,
+        rgba(var(--primary-scale-400-rgb), 0.12),
+        rgba(var(--gray-scale-950-rgb), 0) 28rem
+      ),
+      var(--surface-page);
+  }
+
+  :deep(.experience) {
+    padding-top: clamp(4rem, 8vw, 7rem);
+  }
+}

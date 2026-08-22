@@ -85,6 +85,17 @@
   --error-color-rgb: 194, 65, 58;
   --social-whatsapp: #25d366;
   --social-linkedin: #0a66c2;
+
+  /* Touch-typing finger guide */
+  --typing-left-pinky: #df426b;
+  --typing-left-ring: #d86913;
+  --typing-left-middle: #b78300;
+  --typing-left-index: #29824b;
+  --typing-right-index: #07877d;
+  --typing-right-middle: #2878d0;
+  --typing-right-ring: #7657d4;
+  --typing-right-pinky: #b33d9d;
+  --typing-thumb: var(--gray-scale-400);
 }
 
 html.dark,
@@ -166,4 +177,15 @@ html.dark,
   --error-color-rgb: 255, 129, 120;
   --social-whatsapp: #55df88;
   --social-linkedin: #72a7ff;
+
+  /* Touch-typing finger guide */
+  --typing-left-pinky: #ff718f;
+  --typing-left-ring: #ff9f43;
+  --typing-left-middle: #f6cf45;
+  --typing-left-index: #74d680;
+  --typing-right-index: #39d6c7;
+  --typing-right-middle: #55a8ff;
+  --typing-right-ring: #9c82ff;
+  --typing-right-pinky: #e274d3;
+  --typing-thumb: var(--gray-scale-400);
 }

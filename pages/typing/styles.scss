@@ -1,0 +1,22 @@
+.typing-page {
+  & {
+    min-height: 100vh;
+    overflow: clip;
+    background:
+      radial-gradient(
+        circle at 12% 12%,
+        rgba(var(--primary-scale-400-rgb), 0.14),
+        rgba(var(--gray-scale-950-rgb), 0) 27rem
+      ),
+      radial-gradient(
+        circle at 86% 46%,
+        rgba(var(--secondary-scale-400-rgb), 0.08),
+        rgba(var(--gray-scale-950-rgb), 0) 25rem
+      ),
+      var(--surface-page);
+  }
+
+  :deep(.typing-challenge) {
+    padding-top: clamp(4rem, 8vw, 7rem);
+  }
+}

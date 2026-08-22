@@ -7,7 +7,14 @@
 
       <div class="actions">
         <nav class="desktop" aria-label="Desktop navigation">
-          <NuxtLink v-for="link in links" :key="link.id" :to="`${link.path}`" class="link">
+          <NuxtLink
+            v-for="link in links"
+            :key="link.id"
+            :to="link.path"
+            class="link"
+            :class="{ 'is-active': isLinkActive(link) }"
+            :aria-current="getAriaCurrent(link)"
+          >
             {{ link.label }}
           </NuxtLink>
         </nav>
@@ -53,8 +60,10 @@
       <NuxtLink
         v-for="link in links"
         :key="`mobile-${link.id}`"
-        :to="`${link.path}`"
+        :to="link.path"
         class="mobile-link"
+        :class="{ 'is-active': isLinkActive(link) }"
+        :aria-current="getAriaCurrent(link)"
         @click="closeMobileMenu"
       >
         {{ link.label }}

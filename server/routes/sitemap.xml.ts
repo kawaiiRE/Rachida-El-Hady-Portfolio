@@ -1,4 +1,5 @@
 import { PROJECTS } from '~/constants/projects'
+import { APP_ROUTES } from '~/constants/routes'
 
 interface SitemapEntry {
   path: string
@@ -13,8 +14,10 @@ export default defineEventHandler((event) => {
   const runtimeConfig = useRuntimeConfig(event)
   const siteUrl = String(runtimeConfig.public.siteUrl || 'https://rachida.dev').replace(/\/$/, '')
   const entries: SitemapEntry[] = [
-    { path: '/', changeFrequency: 'monthly', priority: '1.0' },
-    { path: '/projects', changeFrequency: 'monthly', priority: '0.9' },
+    { path: APP_ROUTES.HOME, changeFrequency: 'monthly', priority: '1.0' },
+    { path: APP_ROUTES.PROJECTS, changeFrequency: 'monthly', priority: '0.9' },
+    { path: APP_ROUTES.EXPERIENCE, changeFrequency: 'monthly', priority: '0.9' },
+    { path: APP_ROUTES.TYPING, changeFrequency: 'monthly', priority: '0.8' },
     ...PROJECTS.map((project) => ({
       path: project.path,
       changeFrequency: 'monthly' as const,
