@@ -1,43 +1,9 @@
-export interface ExperienceChapter {
-  id: string
-  index: string
-  title: string
-  description: string
-  detail: string
-}
-
 export interface EngineeringPrinciple {
   id: string
   title: string
   description: string
   signal: string
 }
-
-export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  {
-    id: 'product-delivery',
-    index: '01',
-    title: 'Product delivery',
-    description: 'Taking ambitious interfaces from a loose brief to a production-ready release.',
-    detail: 'Web · Mobile · Responsive systems',
-  },
-  {
-    id: 'technical-direction',
-    index: '02',
-    title: 'Technical direction',
-    description:
-      'Turning product requirements into clear architecture, reusable patterns, and focused work.',
-    detail: 'Architecture · Planning · Reviews',
-  },
-  {
-    id: 'team-enablement',
-    index: '03',
-    title: 'Team enablement',
-    description:
-      'Helping developers understand the system, make confident decisions, and ship independently.',
-    detail: 'Mentorship · Standards · Documentation',
-  },
-]
 
 export const ENGINEERING_PRINCIPLES: EngineeringPrinciple[] = [
   {

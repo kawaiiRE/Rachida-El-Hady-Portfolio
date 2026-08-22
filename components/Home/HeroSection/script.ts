@@ -1,10 +1,16 @@
-import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
-import type { PropType } from 'vue'
-import { hexColorToNumber, resolveCssVarColor, themeColorVariables } from '~/lib/utils'
+import { useState } from '#imports'
+import { defineComponent, nextTick, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
 import { APP_LINKS, APP_ROUTES } from '~/constants/routes'
+import { DEFAULT_THEME_MODE, type ThemeMode } from '~/constants/theme'
+import { hexColorToNumber, resolveCssVarColor, themeColorVariables } from '~/lib/utils'
 
 type VantaEffect = {
   destroy: () => void
+}
+
+type GsapMatchMedia = {
+  add: (query: string, callback: () => void | (() => void)) => void
+  revert: () => void
 }
 
 export default defineComponent({
@@ -13,70 +19,165 @@ export default defineComponent({
   emits: [],
   setup() {
     // -------------------- Composables --------------------
+    const themeMode = useState<ThemeMode>('theme-mode', () => DEFAULT_THEME_MODE)
+
     // -------------------- State --------------------
-    const heroBackgroundRef = ref<HTMLElement | null>(null)
-    const vantaEffect = ref<VantaEffect | null>(null)
+    const heroRef = shallowRef<HTMLElement | null>(null)
+    const backgroundRef = shallowRef<HTMLElement | null>(null)
+    const sittingImageRef = shallowRef<HTMLImageElement | null>(null)
+    const scrollFlowerRef = shallowRef<HTMLElement | null>(null)
+    const vantaEffect = shallowRef<VantaEffect | null>(null)
+    let vantaCreationId = 0
+    let scrollMatchMedia: GsapMatchMedia | null = null
 
     // -------------------- Computed --------------------
     // -------------------- Methods --------------------
     const createVantaBackground = async (): Promise<void> => {
-      if (typeof window === 'undefined' || !heroBackgroundRef.value || vantaEffect.value) {
+      if (typeof window === 'undefined' || !backgroundRef.value || vantaEffect.value) {
         return
       }
 
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return
+      }
+
+      const creationId = ++vantaCreationId
+      const backgroundElement = backgroundRef.value
       const [birdsModule, threeModule] = await Promise.all([
         import('vanta/dist/vanta.birds.min'),
-        import('three'),
+        import('three-vanta'),
       ])
 
-      const primaryBirdColor = resolveCssVarColor(themeColorVariables.primary400)
-      const secondaryBirdColor = resolveCssVarColor(themeColorVariables.secondary400)
+      if (creationId !== vantaCreationId || !backgroundElement.isConnected) {
+        return
+      }
 
+      const primaryBirdColor = resolveCssVarColor(themeColorVariables.heroBirdPrimary)
+      const secondaryBirdColor = resolveCssVarColor(themeColorVariables.heroBirdSecondary)
       const birdsFactory = (birdsModule.default ?? birdsModule) as (options: unknown) => VantaEffect
-      ;(window as { THREE?: unknown }).THREE = threeModule
+      const three = threeModule.default ?? threeModule
 
+      ;(window as { THREE?: unknown }).THREE = three
       vantaEffect.value = birdsFactory({
-        el: heroBackgroundRef.value,
-        THREE: threeModule,
+        el: backgroundElement,
+        THREE: three,
         mouseControls: true,
-        touchControls: true,
+        touchControls: false,
         gyroControls: false,
         minHeight: 200,
         minWidth: 200,
         scale: 1,
-        scaleMobile: 1,
+        scaleMobile: 0.78,
         backgroundAlpha: 0,
         color1: hexColorToNumber(primaryBirdColor),
         color2: hexColorToNumber(secondaryBirdColor),
-        birdSize: 1.5,
-        wingSpan: 18,
-        speedLimit: 4,
-        separation: 24,
-        alignment: 26,
-        cohesion: 28,
+        colorMode: 'lerpGradient',
+        birdSize: 1.35,
+        wingSpan: 22,
+        speedLimit: 3.25,
+        separation: 26,
+        alignment: 34,
+        cohesion: 32,
+        quantity: 3,
       }) as VantaEffect
     }
 
     const destroyVantaBackground = (): void => {
-      if (!vantaEffect.value) {
+      vantaCreationId += 1
+      vantaEffect.value?.destroy()
+      vantaEffect.value = null
+    }
+
+    const createScrollAnimations = async (): Promise<void> => {
+      if (!heroRef.value || !sittingImageRef.value || !scrollFlowerRef.value) {
         return
       }
 
-      vantaEffect.value.destroy()
-      vantaEffect.value = null
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ])
+
+      if (!heroRef.value || !sittingImageRef.value || !scrollFlowerRef.value) {
+        return
+      }
+
+      const heroElement = heroRef.value
+      const sittingImageElement = sittingImageRef.value
+      const scrollFlowerElement = scrollFlowerRef.value
+
+      gsap.registerPlugin(ScrollTrigger)
+      scrollMatchMedia = gsap.matchMedia()
+      scrollMatchMedia.add('(prefers-reduced-motion: no-preference)', () => {
+        const context = gsap.context(() => {
+          gsap.from(['.eyebrow', '.title span', '.subtitle', '.actions'], {
+            opacity: 0,
+            y: 28,
+            duration: 0.82,
+            stagger: 0.075,
+            ease: 'power3.out',
+            clearProps: 'opacity,transform',
+          })
+
+          gsap.from(sittingImageElement, {
+            opacity: 0,
+            duration: 1,
+            delay: 0.18,
+            ease: 'power2.out',
+          })
+
+          gsap.from(scrollFlowerElement, {
+            opacity: 0,
+            duration: 0.9,
+            delay: 0.34,
+            ease: 'power2.out',
+          })
+
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: heroElement,
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 0.8,
+                invalidateOnRefresh: true,
+              },
+            })
+            .to(scrollFlowerElement, { rotation: 165, scale: 1.08, ease: 'none' }, 0)
+        }, heroElement)
+
+        return () => context.revert()
+      })
     }
+
+    const destroyScrollAnimations = (): void => {
+      scrollMatchMedia?.revert()
+      scrollMatchMedia = null
+    }
+
+    // -------------------- Watchers --------------------
+    watch(themeMode, async () => {
+      await nextTick()
+      destroyVantaBackground()
+      await createVantaBackground()
+    })
 
     // -------------------- Lifecycle --------------------
     onMounted(() => {
       void createVantaBackground()
+      void createScrollAnimations()
     })
 
     onBeforeUnmount(() => {
       destroyVantaBackground()
+      destroyScrollAnimations()
     })
 
     return {
-      heroBackgroundRef,
+      heroRef,
+      backgroundRef,
+      sittingImageRef,
+      scrollFlowerRef,
       APP_LINKS,
       APP_ROUTES,
     }

@@ -1,61 +1,57 @@
 <template>
   <section id="contact" class="contact app-container">
-    <div class="contact__wrapper section-content">
-      <div class="contact__header">
+    <div class="wrapper section-content" data-motion>
+      <div class="header">
         <div>
           <p class="section-label">Contact / 08</p>
           <h2 class="section-title">Tell me what you’re building.</h2>
         </div>
-        <p class="contact__intro">
+        <p class="intro">
           A rough idea is enough. Send the context, the constraint, or the problem you want to
           solve.
         </p>
 
         <!-- Contact items -->
-        <ul class="contact__list" v-if="contactItems && contactItems.length">
+        <ul class="list" v-if="contactItems && contactItems.length">
           <!-- Text Items -->
           <li
             v-for="item in contactItems.filter((i) => !i.isIcon)"
             :key="item.id"
-            class="contact__item contact__item--text"
+            class="item item--text"
           >
-            <span class="contact__label">{{ item.label }}</span>
-            <NuxtLink :to="item.href" class="contact__value">{{ item.value }}</NuxtLink>
+            <span class="label">{{ item.label }}</span>
+            <a :href="item.href" class="value">{{ item.value }}</a>
           </li>
 
           <!-- Icon Items -->
-          <li class="contact__item contact__item--icons">
-            <NuxtLink
+          <li class="item item--icons">
+            <a
               v-for="item in contactItems.filter((i) => i.isIcon)"
               :key="item.id"
-              :to="item.href"
+              :href="item.href"
               :title="item.label"
-              class="contact__icon"
-              target="_blank"
-              rel="noopener noreferrer"
+              :aria-label="item.label"
+              class="icon"
+              :target="item.href.startsWith('http') ? '_blank' : undefined"
+              :rel="item.href.startsWith('http') ? 'noopener noreferrer' : undefined"
               :style="{ '--icon-hover-color': item.color || 'var(--primary-scale-400)' }"
             >
               <IconGithub v-if="item.id === 'github'" />
               <IconLinkedin v-else-if="item.id === 'linkedin'" />
               <IconWhatsapp v-else-if="item.id === 'whatsapp'" />
               <IconPhone v-else-if="item.id === 'phone'" />
-            </NuxtLink>
+            </a>
           </li>
         </ul>
 
-        <a
-          v-if="APP_LINKS.CV_DOWNLOAD"
-          :href="APP_LINKS.CV_DOWNLOAD"
-          class="contact__cv-link"
-          download
-        >
+        <a v-if="APP_LINKS.CV_DOWNLOAD" :href="APP_LINKS.CV_DOWNLOAD" class="cv-link" download>
           Download CV
         </a>
       </div>
 
       <!-- Contact form -->
-      <form class="contact__form" @submit.prevent="sendMessage">
-        <p class="contact__form-intro">Start with the essentials.</p>
+      <form class="form" @submit.prevent="sendMessage">
+        <p class="form-intro">Start with the essentials.</p>
         <div class="form-group">
           <label class="form-label" for="contact-name">Name</label>
           <input
@@ -98,12 +94,17 @@
         </div>
 
         <!-- Error message -->
-        <div v-if="errorMessage" class="form-message form-message--error">
+        <div v-if="errorMessage" class="form-message form-message--error" role="alert">
           {{ errorMessage }}
         </div>
 
         <!-- Success message -->
-        <div v-if="successMessage" class="form-message form-message--success">
+        <div
+          v-if="successMessage"
+          class="form-message form-message--success"
+          role="status"
+          aria-live="polite"
+        >
           {{ successMessage }}
         </div>
 

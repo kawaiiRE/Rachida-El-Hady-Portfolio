@@ -735,9 +735,9 @@ export default defineComponent({
     })
 
     const storageClass = computed(() => ({
-      'analytics-page__status--ready': summary.value?.storage === 'd1',
-      'analytics-page__status--local': summary.value?.storage === 'file',
-      'analytics-page__status--warning': summary.value?.storage === 'unconfigured',
+      'status--ready': summary.value?.storage === 'd1',
+      'status--local': summary.value?.storage === 'file',
+      'status--warning': summary.value?.storage === 'unconfigured',
     }))
 
     const metrics = computed(() => {

@@ -231,7 +231,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   )
   const doNotTrackEnabled =
     navigator.doNotTrack === '1' ||
-    window.doNotTrack === '1' ||
+    (window as Window & { doNotTrack?: string }).doNotTrack === '1' ||
     navigator.doNotTrack === 'yes' ||
     globalPrivacyControl
 

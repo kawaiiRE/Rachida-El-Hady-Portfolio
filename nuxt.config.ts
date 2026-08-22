@@ -2,7 +2,7 @@
 const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://rachida.dev'
 const siteName = 'Rachida El Hady'
 const siteDescription =
-  'Frontend engineer portfolio for Rachida El Hady, featuring Nuxt, Vue, React Native, Expo, and production-focused interface work.'
+  'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products with strong architecture and team-lead responsibilities.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
 const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || ''
 const websiteStructuredData = {
@@ -14,7 +14,7 @@ const websiteStructuredData = {
 }
 
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
@@ -23,6 +23,8 @@ export default defineNuxtConfig({
       const removePageImplementationRoutes = (routes: typeof pages): void => {
         for (let index = routes.length - 1; index >= 0; index -= 1) {
           const route = routes[index]
+          if (!route) continue
+
           if (route.file?.endsWith('/script.ts') || route.file?.endsWith('\\script.ts')) {
             routes.splice(index, 1)
             continue
@@ -149,26 +151,12 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@vuestic/nuxt', '@pinia/nuxt'],
   css: ['./assets/fonts.scss', './assets/variables.scss', './assets/global.scss'],
   vite: {
     css: {
       preprocessorOptions: {
         scss: {
           additionalData: '@use "~/assets/breakpoints.scss" as *;',
-        },
-      },
-    },
-  },
-  build: {
-    transpile: ['vuestic-ui'],
-  },
-  vuestic: {
-    config: {
-      colors: {
-        variables: {
-          primary: '#2f5bea',
-          secondary: '#f06449',
         },
       },
     },

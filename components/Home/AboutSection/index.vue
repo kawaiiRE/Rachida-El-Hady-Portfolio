@@ -1,44 +1,51 @@
 <template>
   <section id="leadership" class="about">
     <div class="app-container section-content">
-      <!-- <div ref="textCanvasRef" class="about__visual" aria-hidden="true"></div> -->
+      <!-- <div ref="textCanvasRef" class="visual" aria-hidden="true"></div> -->
 
-      <p class="section-label">Leadership</p>
-      <h2 class="section-title">How I help teams move with clarity.</h2>
+      <p class="section-label">Leadership, with receipts</p>
+      <h2 class="section-title">Hands on the product. Eyes on the whole delivery.</h2>
 
-      <div class="leadership__highlights">
+      <p class="intro">
+        I grew from owning frontend tickets to coordinating delivery, reviewing implementation,
+        unblocking developers, and keeping product, design, and backend decisions connected.
+      </p>
+
+      <div class="highlights">
         <article
           v-for="highlight in leadershipHighlights"
           :key="highlight.id"
-          class="leadership__card"
+          class="card"
+          data-motion
         >
-          <h3 class="leadership__card-title">
-            {{ highlight.title }}
+          <strong class="card-value">{{ highlight.value }}</strong>
+          <h3 class="card-title">
+            {{ highlight.label }}
           </h3>
 
-          <p class="leadership__card-description">
+          <p class="card-description">
             {{ highlight.description }}
           </p>
         </article>
       </div>
 
-      <div id="skills" class="about__skills skills">
-        <div class="skills__header">
+      <div id="skills" class="skills skills">
+        <div class="header">
           <div>
             <p class="section-label">Skills</p>
-            <h2 class="section-title">Tools I Build With</h2>
+            <h2 class="section-title">Depth first. Range when the product needs it.</h2>
           </div>
-          <p class="skills__description">
-            I work across web and mobile interfaces, focusing on clean UI, reusable components, and
-            practical features that are easy to maintain.
+          <p class="description">
+            My strongest recent depth is Vue and Nuxt, backed by production React experience and
+            cross-platform React Native work. The constant is scalable frontend architecture.
           </p>
         </div>
 
-        <div class="skills__details">
-          <div v-for="group in skillGroups" :key="group.id" class="skills__detail-row">
-            <h3 class="skills__detail-title">{{ group.title }}:</h3>
+        <div class="details">
+          <div v-for="group in skillGroups" :key="group.id" class="detail-row">
+            <h3 class="detail-title">{{ group.title }}:</h3>
 
-            <p class="skills__detail-text">
+            <p class="detail-text">
               {{ group.skills.join(', ') }}
             </p>
           </div>

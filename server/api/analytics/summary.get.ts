@@ -322,12 +322,12 @@ const serializeSession = (session: SessionAccumulator) => ({
   stats: serializeCounter(session.counter),
 })
 
-const parseNullableNumber = (value: string): number | null => {
+const parseNullableNumber = (value: unknown): number | null => {
   if (!value || value === 'unknown') {
     return null
   }
 
-  const parsedValue = Number.parseFloat(value)
+  const parsedValue = Number.parseFloat(String(value))
 
   return Number.isFinite(parsedValue) ? parsedValue : null
 }

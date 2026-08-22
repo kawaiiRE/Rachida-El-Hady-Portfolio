@@ -1,6 +1,7 @@
 import { defineComponent, ref, onMounted } from 'vue'
-import emailjs from '@emailjs/browser'
 import { APP_LINKS } from '~/constants/routes'
+
+type EmailJsClient = typeof import('@emailjs/browser').default
 
 interface HomeContactItem {
   id: string
@@ -74,6 +75,7 @@ export default defineComponent({
     const isLoading = ref(false)
     const successMessage = ref('')
     const errorMessage = ref('')
+    let emailClient: EmailJsClient | null = null
 
     // -------------------- Computed --------------------
 
@@ -85,17 +87,23 @@ export default defineComponent({
     })
 
     // Initialize EmailJS
-    const initializeEmailJS = () => {
+    const initializeEmailJS = async (): Promise<EmailJsClient | null> => {
       const { publicKey } = getEmailJSConfig()
 
       if (!publicKey) {
         console.error(
           'EmailJS public key is missing. Check NUXT_PUBLIC_EMAILJS_PUBLIC_KEY in the deployment environment.',
         )
-        return
+        return null
       }
 
-      emailjs.init({ publicKey })
+      if (!emailClient) {
+        const emailModule = await import('@emailjs/browser')
+        emailClient = emailModule.default
+        emailClient.init({ publicKey })
+      }
+
+      return emailClient
     }
 
     // Send form
@@ -116,7 +124,13 @@ export default defineComponent({
           throw new Error('EmailJS configuration is missing')
         }
 
-        await emailjs.send(
+        const client = await initializeEmailJS()
+
+        if (!client) {
+          throw new Error('EmailJS client could not be initialized')
+        }
+
+        await client.send(
           serviceId,
           templateId,
           {
@@ -147,7 +161,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      initializeEmailJS()
+      void initializeEmailJS()
     })
 
     return {

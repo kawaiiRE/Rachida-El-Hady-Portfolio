@@ -1,19 +1,19 @@
 <template>
-  <main class="projects-page" data-page="projects-index">
-    <section class="projects-page__wrapper app-container">
-      <header class="projects-page__header">
-        <div class="projects-page__meta">
-          <span>Selected work</span>
-          <span>{{ projectCountLabel }} case studies / Web + mobile</span>
+  <div ref="projectsPageRef" class="projects-page" data-page="projects-index">
+    <section class="wrapper app-container">
+      <header class="header">
+        <div class="meta">
+          <span>Independent work</span>
+          <span>{{ projectCountLabel }} products / Web + mobile</span>
         </div>
 
-        <div class="projects-page__intro">
+        <div class="intro">
           <h1>Work, in the <em>wild.</em></h1>
-          <div class="projects-page__intro-copy">
+          <div class="intro-copy">
             <p>Products shaped from first system decisions to the details people actually touch.</p>
-            <span class="projects-page__browse-hint">
-              <span class="projects-page__browse-hint--desktop">Hover to browse</span>
-              <span class="projects-page__browse-hint--mobile">Scroll to browse</span>
+            <span class="browse-hint">
+              <span class="browse-hint--desktop">Hover to browse</span>
+              <span class="browse-hint--mobile">Scroll to browse</span>
               <span aria-hidden="true">&#8595;</span>
             </span>
           </div>
@@ -22,43 +22,50 @@
 
       <div class="projects-browser">
         <aside
-          class="projects-browser__stage"
+          v-if="isDesktopViewport"
+          class="stage"
           :style="{ '--project-background': activeProject.background }"
         >
-          <div class="projects-browser__signal" aria-hidden="true"></div>
+          <div class="signal" aria-hidden="true"></div>
 
-          <Transition name="project-stage" mode="out-in">
-            <div :key="activeProject.id" class="projects-browser__stage-content">
+          <Transition name="project-stage">
+            <div :key="activeProject.id" class="stage-content">
               <NuxtLink
                 :to="activeProject.path"
-                class="projects-browser__preview"
+                class="preview"
                 :aria-label="`Read the ${activeProject.title} case study`"
               >
-                <img :src="activeProject.bgImg" :alt="activeProject.imageAlt" />
-                <span class="projects-browser__preview-index">
+                <img
+                  :src="activeProject.bgImg"
+                  :alt="activeProject.imageAlt"
+                  width="1600"
+                  height="900"
+                  decoding="async"
+                />
+                <span class="preview-index">
                   {{ activeProjectIndexLabel }} / {{ projectCountLabel }}
                 </span>
-                <span class="projects-browser__preview-action">
+                <span class="preview-action">
                   Open case study <span aria-hidden="true">&#8599;</span>
                 </span>
               </NuxtLink>
 
-              <div class="projects-browser__caption">
-                <div class="projects-browser__identity">
+              <div class="caption">
+                <div class="identity">
                   <p>{{ activeProject.category }}</p>
                   <h2>{{ activeProject.title }}</h2>
                 </div>
-                <p class="projects-browser__summary">{{ activeProject.summary }}</p>
+                <p class="summary">{{ activeProject.summary }}</p>
               </div>
 
-              <div class="projects-browser__footer">
+              <div class="footer">
                 <ul aria-label="Featured technologies">
                   <li v-for="technology in activeProjectStack" :key="technology">
                     {{ technology }}
                   </li>
                 </ul>
 
-                <div class="projects-browser__links">
+                <div class="links">
                   <NuxtLink :to="activeProject.path">Read case study</NuxtLink>
                   <a
                     v-for="projectLink in activeProjectLinks"
@@ -75,40 +82,48 @@
           </Transition>
         </aside>
 
-        <ol class="projects-browser__index" aria-label="Project case studies">
+        <ol class="index" aria-label="Project case studies">
           <li
             v-for="(project, index) in projects"
             :id="project.id"
             :key="project.id"
-            :class="{ 'projects-browser__item--active': index === activeProjectIndex }"
-            class="projects-browser__item"
+            :class="{ 'item--active': index === activeProjectIndex }"
+            class="item"
+            :style="{ '--project-background': project.background }"
           >
             <NuxtLink
               :to="project.path"
-              class="projects-browser__item-link"
+              class="item-link"
               @mouseenter="setActiveProject(index)"
               @focus="setActiveProject(index)"
             >
-              <span class="projects-browser__item-index">{{ formatProjectIndex(index) }}</span>
+              <span class="item-index">{{ formatProjectIndex(index) }}</span>
 
-              <span class="projects-browser__item-copy">
-                <strong>{{ project.title }}</strong>
+              <span class="item-copy">
+                <h2>{{ project.title }}</h2>
                 <small>{{ project.category }}</small>
               </span>
 
-              <span class="projects-browser__item-arrow" aria-hidden="true">&#8599;</span>
+              <span class="item-arrow" aria-hidden="true">&#8599;</span>
 
-              <span class="projects-browser__mobile-preview">
-                <img :src="project.bgImg" :alt="project.imageAlt" loading="lazy" />
+              <span v-if="!isDesktopViewport" class="mobile-preview">
+                <img
+                  :src="project.bgImg"
+                  :alt="project.imageAlt"
+                  width="1600"
+                  height="900"
+                  loading="lazy"
+                  decoding="async"
+                />
               </span>
 
-              <span class="projects-browser__mobile-summary">{{ project.summary }}</span>
+              <span class="mobile-summary">{{ project.summary }}</span>
             </NuxtLink>
           </li>
         </ol>
       </div>
     </section>
-  </main>
+  </div>
 </template>
 <script lang="ts" src="./script.ts" />
 <style lang="scss" scoped src="./styles.scss" />

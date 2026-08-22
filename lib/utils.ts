@@ -6,6 +6,8 @@ export const themeColorVariables = {
   gray50: '--gray-scale-50',
   primary400: '--primary-scale-400',
   secondary400: '--secondary-scale-400',
+  heroBirdPrimary: '--hero-bird-primary',
+  heroBirdSecondary: '--hero-bird-secondary',
 } as const
 
 export const resolveCssVarColor = (cssVariableName: string): string => {

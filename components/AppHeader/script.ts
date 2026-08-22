@@ -58,16 +58,24 @@ export default defineComponent({
       scrollProgress.value = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0
     }
 
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        closeMobileMenu()
+      }
+    }
+
     // -------------------- Lifecycle --------------------
     onMounted(() => {
       syncScrollProgress()
       window.addEventListener('scroll', syncScrollProgress, { passive: true })
       window.addEventListener('resize', syncScrollProgress)
+      window.addEventListener('keydown', handleKeyDown)
     })
 
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', syncScrollProgress)
       window.removeEventListener('resize', syncScrollProgress)
+      window.removeEventListener('keydown', handleKeyDown)
     })
 
     return {

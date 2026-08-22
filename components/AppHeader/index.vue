@@ -1,39 +1,39 @@
 <template>
   <header class="navbar" aria-label="Main navigation">
-    <div class="navbar__inner app-container">
-      <NuxtLink :to="APP_ROUTES.HOME" class="navbar__brand">
+    <div class="inner app-container">
+      <NuxtLink :to="APP_ROUTES.HOME" class="brand">
         <GlowingText text="{ R }" font-preset="oleo" />
       </NuxtLink>
 
-      <div class="navbar__actions">
-        <nav class="navbar__desktop" aria-label="Desktop navigation">
-          <NuxtLink v-for="link in links" :key="link.id" :to="`${link.path}`" class="navbar__link">
+      <div class="actions">
+        <nav class="desktop" aria-label="Desktop navigation">
+          <NuxtLink v-for="link in links" :key="link.id" :to="`${link.path}`" class="link">
             {{ link.label }}
           </NuxtLink>
         </nav>
 
         <button
-          class="navbar__theme-toggle"
-          :class="{ 'navbar__theme-toggle--dark': isDarkTheme }"
+          class="theme-toggle"
+          :class="{ 'theme-toggle--dark': isDarkTheme }"
           type="button"
           :aria-label="themeToggleLabel"
           :aria-pressed="isDarkTheme"
           @click="toggleThemeMode"
         >
-          <span class="navbar__theme-track" aria-hidden="true">
-            <span class="navbar__theme-thumb"></span>
+          <span class="theme-track" aria-hidden="true">
+            <span class="theme-thumb"></span>
           </span>
         </button>
 
         <button
-          class="navbar__toggle"
+          class="toggle"
           type="button"
           :aria-label="menuButtonLabel"
           :aria-expanded="isMobileMenuOpen"
           aria-controls="mobile-nav"
           @click="toggleMobileMenu"
         >
-          <span class="navbar__toggle-icon" aria-hidden="true">
+          <span class="toggle-icon" aria-hidden="true">
             <span></span>
             <span></span>
             <span></span>
@@ -44,22 +44,24 @@
 
     <nav
       id="mobile-nav"
-      class="navbar__mobile"
-      :class="{ 'navbar__mobile--open': isMobileMenuOpen }"
+      class="mobile"
+      :class="{ 'mobile--open': isMobileMenuOpen }"
+      :aria-hidden="!isMobileMenuOpen"
+      :inert="!isMobileMenuOpen"
       aria-label="Mobile navigation"
     >
       <NuxtLink
         v-for="link in links"
         :key="`mobile-${link.id}`"
         :to="`${link.path}`"
-        class="navbar__mobile-link"
+        class="mobile-link"
         @click="closeMobileMenu"
       >
         {{ link.label }}
       </NuxtLink>
     </nav>
 
-    <span class="navbar__progress" aria-hidden="true">
+    <span class="progress" aria-hidden="true">
       <span :style="scrollProgressStyle"></span>
     </span>
   </header>

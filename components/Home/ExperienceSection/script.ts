@@ -1,6 +1,13 @@
 import { defineComponent } from 'vue'
-import { EXPERIENCE_CHAPTERS } from '~/constants/home'
+import { PROFESSIONAL_ROLES } from '~/constants/experience'
+
 export default defineComponent({
   name: 'ExperienceSection',
-  setup: () => ({ chapters: EXPERIENCE_CHAPTERS }),
+  props: {},
+  emits: [],
+  setup() {
+    return {
+      roles: PROFESSIONAL_ROLES,
+    }
+  },
 })

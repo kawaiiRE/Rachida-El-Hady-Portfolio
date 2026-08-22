@@ -9,7 +9,7 @@ Nuxt 4 portfolio for Rachida El Hady, focused on frontend engineering, mobile ap
 - TypeScript
 - SCSS
 - EmailJS for the contact form
-- Vanta/Three.js for the hero background
+- Vanta Birds for the hero and Three.js/GLSL for the section particle field
 
 ## Setup
 
@@ -63,6 +63,22 @@ If the live domain changes, update:
 - `NUXT_PUBLIC_SITE_URL`
 - `public/sitemap.xml`
 - the `Sitemap:` entry in `public/robots.txt`
+
+## Styling Conventions
+
+- Each Vue page or component has one meaningful root class.
+- Scoped child classes stay short and local, such as `.title`, `.content`, `.media`, and `.actions`.
+- Do not repeat the parent name in child classes; avoid names such as `.hero__title` and `.project-detail__gallery`.
+- Use SCSS nesting for relationships that only exist inside a component.
+- Use concise state or variant classes such as `.is-active`, `.primary`, and `.wide`.
+- Keep global classes limited to shared utilities such as `.app-container` and `.section-title`.
+
+## Motion System
+
+- The hero owns its original Vanta Birds canvas; the persistent GPU particle field begins after it.
+- Section formations and their visual score live in `lib/particle-field/looks.ts`.
+- `components/Home/SectionField` directs section changes, pointer interaction, and lifecycle cleanup.
+- Do not layer another full-screen engine over either system; extend the field formations or score instead.
 
 ## Content To Maintain
 

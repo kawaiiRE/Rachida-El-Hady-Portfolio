@@ -20,6 +20,8 @@
       </text>
     </symbol>
 
+    <use :xlink:href="`#${symbolId}`" class="text-base"></use>
+
     <use :xlink:href="`#${symbolId}`" class="text-glow"></use>
 
     <use :xlink:href="`#${symbolId}`" class="text-border white" x="-0.5" y="0.5"></use>

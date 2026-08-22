@@ -1,3 +1,22 @@
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.7rem 1rem;
+  border-radius: 999rem;
+  color: var(--accent-contrast);
+  background: var(--primary-scale-400);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 1rem));
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .default-layout {
   min-height: 100vh;
   position: relative;
@@ -36,17 +55,6 @@
 
 .default-layout.default-layout--theme-transition::before {
   animation: theme-bloom 720ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.default-layout :deep(*) {
-  transition:
-    color 280ms ease,
-    background-color 320ms ease,
-    border-color 320ms ease,
-    transform 320ms ease,
-    fill 320ms ease,
-    stroke 320ms ease,
-    box-shadow 320ms ease;
 }
 
 @keyframes theme-bloom {

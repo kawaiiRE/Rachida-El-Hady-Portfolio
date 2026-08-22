@@ -19,6 +19,13 @@
   font-family: inherit;
 }
 
+.text-base {
+  fill: none;
+  stroke: var(--primary-scale-400);
+  stroke-width: 1.15px;
+  opacity: 0.52;
+}
+
 /* The Border Animation */
 .text-border,
 .text-glow {

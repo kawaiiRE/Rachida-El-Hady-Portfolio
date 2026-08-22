@@ -1,19 +1,5 @@
 {
-  // https://nuxt.com/docs/guide/concepts/typescript
-  "files": [],
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
-    }
-  ],
-    "include": ["types/**/*.d.ts"]
+  // Nuxt 4.1's generated project configs are not composite yet, so use the
+  // supported aggregate config until Nuxt itself is upgraded.
+  "extends": "./.nuxt/tsconfig.json"
 }

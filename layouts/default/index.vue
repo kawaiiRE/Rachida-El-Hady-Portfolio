@@ -1,7 +1,8 @@
 <template>
   <div class="app-layout">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <AppHeader />
-    <main class="default-layout" :class="layoutClasses">
+    <main id="main-content" class="default-layout" :class="layoutClasses" tabindex="-1">
       <slot />
     </main>
   </div>

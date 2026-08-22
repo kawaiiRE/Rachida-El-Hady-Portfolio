@@ -1,51 +1,56 @@
 <template>
   <section id="vibe" class="vibe">
     <div class="app-container section-content">
-      <div class="vibe__banner">
-        <div class="vibe__marquee" aria-label="Animated list of design and frontend vibes">
-          <div class="vibe__row" :class="{ 'vibe__row--reverse': false }">
+      <header class="header" data-motion>
+        <p class="section-label">Human signal</p>
+        <h2 class="section-title">Good systems still need a pulse.</h2>
+      </header>
+
+      <div class="banner">
+        <div class="marquee" aria-label="Animated list of design and frontend vibes">
+          <div class="row" :class="{ 'row--reverse': false }">
             <template v-for="copyIndex in ROW_REPEAT_COUNT" :key="`row1-copy-${copyIndex}`">
               <div
                 v-for="(label, itemIndex) in vibeRows[0]"
                 :key="`row1-${copyIndex}-${itemIndex}`"
-                class="vibe__item"
+                class="item"
                 :aria-hidden="copyIndex > 0 ? 'true' : undefined"
               >
-                <span class="vibe__text">{{ label }}</span>
-                <span class="vibe__dot" aria-hidden="true">.</span>
+                <span class="text">{{ label }}</span>
+                <span class="dot" aria-hidden="true">.</span>
               </div>
             </template>
           </div>
         </div>
       </div>
 
-      <div class="vibe__image-wrapper">
-        <div class="vibe__player" :class="{ 'vibe__player--active': isPlaying }">
-          <div class="vibe__player-bars" :class="{ 'vibe__player-bars--active': isPlaying }">
-            <span class="vibe__player-bar"></span>
-            <span class="vibe__player-bar"></span>
-            <span class="vibe__player-bar"></span>
-            <span class="vibe__player-bar"></span>
+      <div class="image-wrapper">
+        <div class="player" :class="{ 'player--active': isPlaying }">
+          <div class="player-bars" :class="{ 'player-bars--active': isPlaying }">
+            <span class="player-bar"></span>
+            <span class="player-bar"></span>
+            <span class="player-bar"></span>
+            <span class="player-bar"></span>
           </div>
 
-          <div class="vibe__player-copy">
-            <p class="vibe__player-title">{{ track.title }}</p>
-            <p class="vibe__player-subtitle">{{ track.subtitle }}</p>
+          <div class="player-copy">
+            <p class="player-title">{{ track.title }}</p>
+            <p class="player-subtitle">{{ track.subtitle }}</p>
           </div>
 
           <button
             type="button"
-            class="vibe__player-button"
-            :class="{ 'vibe__player-button--active': isPlaying }"
+            class="player-button"
+            :class="{ 'player-button--active': isPlaying }"
             :aria-pressed="isPlaying ? 'true' : 'false'"
             :aria-label="isPlaying ? 'Pause vibe track' : 'Play vibe track'"
             @click="togglePlayback"
           >
             <span
-              class="vibe__player-button-icon"
+              class="player-button-icon"
               :class="{
-                'vibe__player-button-icon--pause': isPlaying,
-                'vibe__player-button-icon--play': !isPlaying,
+                'player-button-icon--pause': isPlaying,
+                'player-button-icon--play': !isPlaying,
               }"
               aria-hidden="true"
             ></span>
@@ -53,7 +58,7 @@
 
           <audio
             ref="audioRef"
-            class="vibe__audio"
+            class="audio"
             :src="track.src"
             preload="metadata"
             loop
@@ -64,30 +69,36 @@
 
         <img
           src="/images/working-on-the-desk.avif"
-          alt="Abstract geometric shapes in soft colors, representing the vibe of the portfolio."
-          class="vibe__image"
+          alt="Illustrated developer working at a desk"
+          class="image"
+          width="2814"
+          height="1536"
+          loading="lazy"
         />
 
         <img
+          v-if="isPlaying"
           src="/images/with-headphones.avif"
-          alt="Abstract geometric shapes in soft colors, representing the vibe of the portfolio."
-          class="vibe__image headphones"
-          :class="{ 'vibe__image--visible': isPlaying }"
+          alt="Illustrated developer wearing headphones while working"
+          class="image headphones"
+          :class="{ 'image--visible': isPlaying }"
+          width="2814"
+          height="1536"
         />
       </div>
 
-      <div class="vibe__banner">
-        <div class="vibe__marquee" aria-label="Animated list of design and frontend vibes">
-          <div class="vibe__row" :class="{ 'vibe__row--reverse': true }">
+      <div class="banner">
+        <div class="marquee" aria-label="Animated list of design and frontend vibes">
+          <div class="row" :class="{ 'row--reverse': true }">
             <template v-for="copyIndex in ROW_REPEAT_COUNT" :key="`row2-copy-${copyIndex}`">
               <div
                 v-for="(label, itemIndex) in vibeRows[1]"
                 :key="`row2-${copyIndex}-${itemIndex}`"
-                class="vibe__item"
+                class="item"
                 :aria-hidden="copyIndex > 0 ? 'true' : undefined"
               >
-                <span class="vibe__text">{{ label }}</span>
-                <span class="vibe__dot" aria-hidden="true">.</span>
+                <span class="text">{{ label }}</span>
+                <span class="dot" aria-hidden="true">.</span>
               </div>
             </template>
           </div>

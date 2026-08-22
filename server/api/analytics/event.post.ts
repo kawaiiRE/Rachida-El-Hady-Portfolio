@@ -306,7 +306,9 @@ const getCloudflareNumber = (cf: Record<string, unknown>, keys: string[]): numbe
 const getAppEngineCityLatLong = (
   event: Parameters<typeof getHeader>[0],
 ): { latitude: number | null; longitude: number | null } => {
-  const [latitude, longitude] = getFirstHeader(event, ['x-appengine-citylatlong'])
+  const [latitude = Number.NaN, longitude = Number.NaN] = getFirstHeader(event, [
+    'x-appengine-citylatlong',
+  ])
     .split(',')
     .map((value) => Number.parseFloat(value.trim()))
 

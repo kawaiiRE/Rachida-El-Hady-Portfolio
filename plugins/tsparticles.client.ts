@@ -1,6 +1,6 @@
 import Particles from '@tsparticles/vue3'
-import { loadFull } from 'tsparticles'
 import { loadPolygonMaskPlugin } from '@tsparticles/plugin-polygon-mask'
+import { loadFull } from 'tsparticles'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(Particles, {

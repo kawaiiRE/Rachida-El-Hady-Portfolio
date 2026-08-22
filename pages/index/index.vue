@@ -1,11 +1,13 @@
 <template>
-  <div class="home-page">
-    <HomeSectionField />
+  <div ref="homePageRef" class="home-page">
+    <ClientOnly>
+      <LazyHomeSectionField />
+    </ClientOnly>
     <HomeHeroSection />
     <HomeAboutSection />
+    <HomeExperienceSection />
     <HomeProjectsSection />
     <HomeFeaturedCaseStudy />
-    <HomeExperienceSection />
     <HomeEngineeringSection />
     <HomeVibeSection />
     <HomeContactSection />

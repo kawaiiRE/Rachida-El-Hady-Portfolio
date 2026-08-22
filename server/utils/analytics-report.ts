@@ -220,7 +220,8 @@ const getDeviceType = (record: AnalyticsRecord): string => {
 const getPrimaryLanguage = (record: AnalyticsRecord): string => {
   const language =
     getStringValue(record, ['payload', 'environment', 'language']) ||
-    getStringValue(record, ['request', 'acceptLanguage']).split(',')[0]
+    getStringValue(record, ['request', 'acceptLanguage']).split(',')[0] ||
+    ''
 
   return language.trim()
 }

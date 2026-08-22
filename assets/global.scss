@@ -106,6 +106,21 @@ p {
   background: var(--primary-scale-400);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+section[id] {
+  scroll-margin-top: calc(var(--navbar-height) + 1rem);
+}
+
 .app-container {
   width: 100%;
   padding: 0 4.5rem;
@@ -139,22 +154,24 @@ p {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 .default-layout.dark {
   --home-page-background: var(--gray-scale-950);
 }
 
-.default-layout.dark .hero__background {
-  background: var(--gray-scale-900);
-}
-
-.default-layout.dark .hero__badge {
+.default-layout.dark .hero .badge {
   border-color: rgba(var(--primary-scale-400-rgb), 0.28);
   background-color: rgba(var(--gray-scale-800-rgb), 0.9);
   color: rgba(var(--gray-scale-50-rgb), 0.88);
   box-shadow: 0 0.75rem 1.6rem rgba(var(--gray-scale-950-rgb), 0.24);
 }
 
-.default-layout.dark .hero__cta--primary {
+.default-layout.dark .hero .cta--primary {
   color: var(--gray-scale-950);
   border: 0.0625rem solid rgba(var(--primary-scale-400-rgb), 0.26);
   background: var(--primary-scale-400);
@@ -163,12 +180,12 @@ p {
     0 0 0 0.0625rem rgba(var(--primary-scale-400-rgb), 0.08);
 }
 
-.default-layout.dark .hero__cta--ghost {
+.default-layout.dark .hero .cta--ghost {
   border-color: rgba(var(--gray-scale-700-rgb), 0.72);
   background-color: rgba(var(--gray-scale-800-rgb), 0.92);
 }
 
-.default-layout.dark .hero__visual {
+.default-layout.dark .hero .visual {
   border-color: rgba(var(--primary-scale-400-rgb), 0.2);
   background: var(--gray-scale-800);
   box-shadow:
@@ -182,18 +199,18 @@ p {
   box-shadow: 0 1rem 2.2rem rgba(var(--gray-scale-950-rgb), 0.32);
 }
 
-.default-layout.dark .navbar__link,
-.default-layout.dark .navbar__mobile-link {
+.default-layout.dark .navbar .link,
+.default-layout.dark .navbar .mobile-link {
   color: rgba(var(--gray-scale-50-rgb), 0.84);
 }
 
-.default-layout.dark .navbar__link:hover,
-.default-layout.dark .navbar__mobile-link:hover {
+.default-layout.dark .navbar .link:hover,
+.default-layout.dark .navbar .mobile-link:hover {
   background-color: rgba(var(--primary-scale-400-rgb), 0.12);
   color: var(--gray-scale-50);
 }
 
-.default-layout.dark .navbar__toggle {
+.default-layout.dark .navbar .toggle {
   border-color: rgba(var(--primary-scale-400-rgb), 0.2);
   background-color: rgba(var(--gray-scale-800-rgb), 0.92);
 }
