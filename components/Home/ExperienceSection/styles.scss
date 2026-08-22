@@ -5,8 +5,8 @@
   .role,
   .role-intro,
   .role-body,
-  .projects,
-  .project {
+  .achievements,
+  .achievement {
     box-sizing: border-box;
   }
 
@@ -66,10 +66,8 @@
 
   .role-index,
   .period,
-  .projects-heading,
-  .project-index,
-  .project-copy > p:first-child,
-  .additional > span {
+  .details-heading,
+  .achievement-index {
     font-family: var(--font-space-mono);
     font-size: 0.7rem;
     letter-spacing: 0.06em;
@@ -114,57 +112,28 @@
     min-width: 0;
   }
 
-  .highlights {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    border-block: 0.0625rem solid var(--line-subtle);
-    list-style: none;
-  }
-
-  .highlights > li {
-    min-width: 0;
-    padding: 1.35rem;
-    border-right: 0.0625rem solid var(--line-subtle);
-    color: rgba(var(--gray-scale-50-rgb), 0.76);
-    font-size: 0.9rem;
-    line-height: 1.62;
-  }
-
-  .highlights > li:first-child {
-    padding-left: 0;
-  }
-
-  .highlights > li:last-child {
-    padding-right: 0;
-    border-right: 0;
-  }
-
-  .projects-heading {
+  .details-heading {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: 3.5rem;
     padding-bottom: 0.75rem;
     color: rgba(var(--gray-scale-50-rgb), 0.52);
   }
 
-  .projects {
+  .achievements {
     margin: 0;
     padding: 0;
     border-top: 0.0625rem solid var(--line-strong);
     list-style: none;
   }
 
-  .project {
+  .achievement {
     position: relative;
     display: grid;
-    grid-template-columns: 2.2rem minmax(0, 1fr) minmax(8rem, 0.35fr);
+    grid-template-columns: 2.2rem minmax(0, 1fr);
     gap: clamp(1rem, 3vw, 2.5rem);
     align-items: start;
-    padding: 1.6rem 0;
+    padding: 1.35rem 0;
     border-bottom: 0.0625rem solid var(--line-subtle);
     background: linear-gradient(
       90deg,
@@ -176,7 +145,7 @@
       border-color 300ms ease;
   }
 
-  .project::after {
+  .achievement::after {
     content: '';
     position: absolute;
     inset: auto 0 -0.0625rem;
@@ -187,8 +156,7 @@
     transition: transform 300ms ease;
   }
 
-  .project:hover,
-  .project:focus-within {
+  .achievement:hover {
     border-color: transparent;
     background: linear-gradient(
       90deg,
@@ -198,46 +166,31 @@
     );
   }
 
-  .project:hover::after,
-  .project:focus-within::after {
+  .achievement:hover::after {
     transform: scaleX(1);
   }
 
-  .project-index {
+  .achievement-index {
     color: var(--primary-scale-400);
     font-weight: 700;
   }
 
-  .project-copy > p:first-child {
-    color: rgba(var(--gray-scale-50-rgb), 0.52);
-  }
-
-  .project-copy h4 {
-    margin: 0.45rem 0 0.65rem;
-    color: var(--gray-scale-50);
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.7vw, 2.35rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-  }
-
-  .project-copy > p:last-child {
+  .achievement p {
     max-width: 47rem;
     color: rgba(var(--gray-scale-50-rgb), 0.72);
     line-height: 1.68;
   }
 
-  .project-stack {
+  .role-stack {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
     gap: 0.4rem;
-    margin: 0;
+    margin: 1.5rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .project-stack li {
+  .role-stack li {
     padding: 0.28rem 0.5rem;
     border: 0.0625rem solid var(--line-subtle);
     border-radius: 999rem;
@@ -247,41 +200,10 @@
     white-space: nowrap;
   }
 
-  .additional {
-    display: grid;
-    grid-template-columns: minmax(8rem, 0.27fr) minmax(0, 1fr);
-    gap: 1.5rem;
-    margin-top: 2rem;
-    padding-top: 1.25rem;
-    color: rgba(var(--gray-scale-50-rgb), 0.68);
-    line-height: 1.7;
-  }
-
-  .additional > span {
-    color: var(--secondary-scale-400);
-    font-weight: 700;
-  }
-
   @media (max-width: breakpoint('skills-two-column')) {
     .role {
       grid-template-columns: minmax(13rem, 0.32fr) minmax(0, 1fr);
       gap: 3rem;
-    }
-
-    .highlights {
-      grid-template-columns: 1fr;
-    }
-
-    .highlights > li,
-    .highlights > li:first-child,
-    .highlights > li:last-child {
-      padding: 1rem 0;
-      border-right: 0;
-      border-bottom: 0.0625rem solid var(--line-subtle);
-    }
-
-    .highlights > li:last-child {
-      border-bottom: 0;
     }
   }
 
@@ -302,15 +224,6 @@
     .role-intro {
       position: static;
     }
-
-    .project {
-      grid-template-columns: 2rem minmax(0, 1fr);
-    }
-
-    .project-stack {
-      grid-column: 2;
-      justify-content: flex-start;
-    }
   }
 
   @media (max-width: breakpoint('phone-wide')) {
@@ -326,23 +239,15 @@
       margin-top: 1.5rem;
     }
 
-    .projects-heading {
-      margin-top: 2.5rem;
-    }
-
-    .project {
-      padding: 1.35rem 0;
-    }
-
-    .additional {
-      grid-template-columns: 1fr;
-      gap: 0.55rem;
+    .achievement {
+      gap: 0.8rem;
+      padding: 1.15rem 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .project,
-    .project::after {
+    .achievement,
+    .achievement::after {
       transition-duration: 0.01ms;
     }
   }

@@ -5,15 +5,6 @@ export interface LeadershipMetric {
   description: string
 }
 
-export interface ProfessionalProject {
-  id: string
-  index: string
-  title: string
-  context: string
-  description: string
-  technologies: string[]
-}
-
 export interface ProfessionalRole {
   id: string
   index: string
@@ -25,8 +16,7 @@ export interface ProfessionalRole {
   endLabel: string
   summary: string
   highlights: string[]
-  projects: ProfessionalProject[]
-  additional?: string
+  technologies: string[]
 }
 
 export const LEADERSHIP_METRICS: LeadershipMetric[] = [
@@ -59,59 +49,26 @@ export const PROFESSIONAL_ROLES: ProfessionalRole[] = [
     summary:
       'Progressed into frontend delivery leadership across live SaaS, AI, analytics, creator-economy, and client platforms while remaining hands-on in the code.',
     highlights: [
-      'Owned project-level frontend delivery, planning, pull-request reviews, and production follow-through.',
+      'Owned frontend delivery planning, implementation, pull-request reviews, release coordination, and production follow-through across multiple client products.',
       'Coordinated API requirements and priorities directly with backend developers, designers, product owners, and client stakeholders.',
-      'Improved the shared Nuxt starter foundation with reusable wrappers, clearer structure, and maintainability enhancements.',
+      'Strengthened the shared Nuxt starter and built new frontend foundations with reusable wrappers, scalable interface patterns, and repeatable delivery workflows.',
+      'Refactored and extended established live SaaS products while supporting releases, integrations, and production issues.',
+      'Delivered onboarding, verification, localization, dynamic forms, financial reporting, and role-based access across complex operational workflows.',
+      'Built financial analysis and account-structure interfaces, and evaluated rendering strategies for large data-heavy tables.',
+      'Delivered creator-facing web experiences with custom JavaScript, CMS architecture, experiments, forms, and workflow automation.',
     ],
-    projects: [
-      {
-        id: 'ai-operations-platform',
-        index: '01',
-        title: 'AI-enabled operations platform',
-        context: 'Workflow and decision-support software',
-        description:
-          'Built the frontend from the ground up and established its Nuxt architecture, reusable interface system, shared wrappers, and delivery workflow.',
-        technologies: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia'],
-      },
-      {
-        id: 'identity-platform',
-        index: '02',
-        title: 'Identity-focused SaaS product',
-        context: 'Digital identity and rights workflows',
-        description:
-          'Took broad frontend delivery ownership across an established live product, including refactors, releases, and integration support.',
-        technologies: ['Nuxt', 'Vue', 'Production delivery'],
-      },
-      {
-        id: 'compliance-platform',
-        index: '03',
-        title: 'Compliance operations platform',
-        context: 'Professional-services workflow software',
-        description:
-          'Delivered onboarding and verification flows, dynamic forms, localization, complex business interfaces, and financial reporting workflows.',
-        technologies: ['Nuxt', 'Vue', 'i18n', 'Financial UI'],
-      },
-      {
-        id: 'analytics-workspace',
-        index: '04',
-        title: 'Financial analytics workspace',
-        context: 'Data-heavy reporting product',
-        description:
-          'Built financial analysis and account-structure interfaces, then researched rendering approaches for large data-heavy tables.',
-        technologies: ['Vue', 'REST APIs', 'Data visualization'],
-      },
-      {
-        id: 'creator-platforms',
-        index: '05',
-        title: 'Creator-facing web platforms',
-        context: 'Marketing and community experiences',
-        description:
-          'Built multiple experiences from the ground up and delivered custom JavaScript, CMS architecture, experiments, forms, and workflow automation.',
-        technologies: ['JavaScript', 'Webflow', 'WordPress', 'Integrations'],
-      },
+    technologies: [
+      'Nuxt 4',
+      'Vue 3',
+      'TypeScript',
+      'Pinia',
+      'React',
+      'Next.js',
+      'REST APIs',
+      'i18n',
+      'Webflow',
+      'WordPress',
     ],
-    additional:
-      'Additional delivery included an AI-assisted media-management tool, a creator-platform foundation, React and Next.js product support, and role-based access integration.',
   },
   {
     id: 'axentech',
@@ -128,17 +85,8 @@ export const PROFESSIONAL_ROLES: ProfessionalRole[] = [
       'Delivered complete pages and workflows for clients, invoices, receipts, and installment tracking.',
       'Built data-heavy interfaces with complex forms, validation, tables, and business calculations.',
       'Integrated REST APIs and debugged frontend and API behavior with Postman.',
+      'Created reusable React components and complete business workflows using class-based and functional components.',
     ],
-    projects: [
-      {
-        id: 'operations-erp',
-        index: '01',
-        title: 'Insurance operations ERP',
-        context: 'Internal operations platform',
-        description:
-          'Created reusable React components and complete business workflows using both class-based and functional components.',
-        technologies: ['React', 'JavaScript', 'REST APIs', 'Data tables'],
-      },
-    ],
+    technologies: ['React', 'JavaScript', 'REST APIs', 'Postman', 'Data tables'],
   },
 ]

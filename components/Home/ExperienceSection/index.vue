@@ -27,39 +27,28 @@
           </aside>
 
           <div class="role-body">
-            <ul class="highlights" aria-label="Role highlights">
-              <li v-for="highlight in role.highlights" :key="highlight">
-                {{ highlight }}
-              </li>
-            </ul>
-
-            <div class="projects-heading">
-              <span>Selected client delivery — product names withheld</span>
-              <span>{{ String(role.projects.length).padStart(2, '0') }}</span>
+            <div class="details-heading">
+              <span>Selected responsibilities and delivery</span>
+              <span>{{ String(role.highlights.length).padStart(2, '0') }}</span>
             </div>
 
-            <ol class="projects">
-              <li v-for="project in role.projects" :key="project.id" class="project" data-motion>
-                <span class="project-index">{{ project.index }}</span>
-
-                <div class="project-copy">
-                  <p>{{ project.context }}</p>
-                  <h4>{{ project.title }}</h4>
-                  <p>{{ project.description }}</p>
-                </div>
-
-                <ul class="project-stack" :aria-label="`${project.title} technologies`">
-                  <li v-for="technology in project.technologies" :key="technology">
-                    {{ technology }}
-                  </li>
-                </ul>
+            <ol class="achievements">
+              <li
+                v-for="(highlight, index) in role.highlights"
+                :key="highlight"
+                class="achievement"
+                data-motion
+              >
+                <span class="achievement-index">{{ String(index + 1).padStart(2, '0') }}</span>
+                <p>{{ highlight }}</p>
               </li>
             </ol>
 
-            <p v-if="role.additional" class="additional">
-              <span>More shipped work</span>
-              {{ role.additional }}
-            </p>
+            <ul class="role-stack" :aria-label="`${role.company} technologies`">
+              <li v-for="technology in role.technologies" :key="technology">
+                {{ technology }}
+              </li>
+            </ul>
           </div>
         </article>
       </div>
