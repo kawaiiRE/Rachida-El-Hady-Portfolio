@@ -67,24 +67,26 @@
           ></audio>
         </div>
 
-        <img
-          src="/images/working-on-the-desk.avif"
-          alt="Illustrated developer working at a desk"
-          class="image"
-          width="2814"
-          height="1536"
-          loading="lazy"
-        />
+        <div class="stage">
+          <img
+            src="/images/working-on-the-desk.avif"
+            alt="Illustrated developer working at a desk"
+            class="image"
+            width="2814"
+            height="1536"
+            loading="lazy"
+          />
 
-        <img
-          v-if="isPlaying"
-          src="/images/with-headphones.avif"
-          alt="Illustrated developer wearing headphones while working"
-          class="image headphones"
-          :class="{ 'image--visible': isPlaying }"
-          width="2814"
-          height="1536"
-        />
+          <img
+            v-if="isPlaying"
+            src="/images/with-headphones.avif"
+            alt="Illustrated developer wearing headphones while working"
+            class="image headphones"
+            :class="{ 'image--visible': isPlaying }"
+            width="2814"
+            height="1536"
+          />
+        </div>
       </div>
 
       <div class="banner">

@@ -69,10 +69,13 @@
   .image-wrapper {
     position: relative;
     width: 100%;
-    max-width: 100%;
-    margin-block: 1rem;
     max-width: 100rem;
-    margin: auto;
+    margin: 1rem auto;
+    box-sizing: border-box;
+  }
+
+  .stage {
+    position: relative;
   }
 
   .image {
@@ -113,6 +116,7 @@
     background: rgba(var(--gray-scale-950-rgb), 0.5);
     backdrop-filter: blur(0.5rem);
     box-shadow: 0 1rem 2rem rgba(var(--gray-scale-800-rgb), 0.18);
+    box-sizing: border-box;
   }
 
   .player--active {
@@ -352,22 +356,33 @@
   }
 
   @media (max-width: breakpoint('phone-wide')) {
+    .image-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage {
+      order: 1;
+    }
+
     .player {
-      top: 0.55rem;
-      left: 0.55rem;
+      position: relative;
+      inset: auto;
+      order: 2;
+      align-self: flex-end;
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
       gap: 0.55rem;
-      width: auto;
-      width: calc(100% - 1.1rem);
-      max-width: 20rem;
+      width: fit-content;
+      max-width: 100%;
+      margin-top: 0.65rem;
       padding: 0.55rem;
       border-radius: 0.75rem;
     }
 
     .player-copy {
-      width: auto;
+      width: min(9rem, 36vw);
     }
 
     .player-bars {
