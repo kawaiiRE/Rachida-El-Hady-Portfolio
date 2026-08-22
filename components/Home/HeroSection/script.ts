@@ -56,29 +56,30 @@ export default defineComponent({
       const secondaryBirdColor = resolveCssVarColor(themeColorVariables.heroBirdSecondary)
       const birdsFactory = (birdsModule.default ?? birdsModule) as (options: unknown) => VantaEffect
       const three = threeModule.default ?? threeModule
+      const isPhoneViewport = window.matchMedia('(max-width: 38rem)').matches
 
       ;(window as { THREE?: unknown }).THREE = three
       vantaEffect.value = birdsFactory({
         el: backgroundElement,
         THREE: three,
         mouseControls: true,
-        touchControls: false,
+        touchControls: true,
         gyroControls: false,
         minHeight: 200,
         minWidth: 200,
         scale: 1,
-        scaleMobile: 0.78,
+        scaleMobile: 1,
         backgroundAlpha: 0,
         color1: hexColorToNumber(primaryBirdColor),
         color2: hexColorToNumber(secondaryBirdColor),
         colorMode: 'lerpGradient',
-        birdSize: 1.35,
-        wingSpan: 22,
-        speedLimit: 3.25,
+        birdSize: isPhoneViewport ? 1.5 : 1.35,
+        wingSpan: isPhoneViewport ? 18 : 22,
+        speedLimit: isPhoneViewport ? 4 : 3.25,
         separation: 26,
         alignment: 34,
         cohesion: 32,
-        quantity: 3,
+        quantity: isPhoneViewport ? 4 : 3,
       }) as VantaEffect
     }
 

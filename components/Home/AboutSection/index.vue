@@ -1,8 +1,6 @@
 <template>
   <section id="leadership" class="about">
     <div class="app-container section-content">
-      <!-- <div ref="textCanvasRef" class="visual" aria-hidden="true"></div> -->
-
       <p class="section-label">Leadership, with receipts</p>
       <h2 class="section-title">Hands on the product. Eyes on the whole delivery.</h2>
 
@@ -19,17 +17,12 @@
           data-motion
         >
           <strong class="card-value">{{ highlight.value }}</strong>
-          <h3 class="card-title">
-            {{ highlight.label }}
-          </h3>
-
-          <p class="card-description">
-            {{ highlight.description }}
-          </p>
+          <h3 class="card-title">{{ highlight.label }}</h3>
+          <p class="card-description">{{ highlight.description }}</p>
         </article>
       </div>
 
-      <div id="skills" class="skills skills">
+      <div id="skills" class="skills">
         <div class="header">
           <div>
             <p class="section-label">Skills</p>

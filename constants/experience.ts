@@ -32,7 +32,7 @@ export interface ProfessionalRole {
 export const LEADERSHIP_METRICS: LeadershipMetric[] = [
   {
     id: 'delivery-team',
-    value: '2 + 1',
+    value: '3+',
     label: 'Delivery team coordinated',
     description:
       'Coordinated two frontend developers and one intern while following features through release.',
@@ -40,16 +40,9 @@ export const LEADERSHIP_METRICS: LeadershipMetric[] = [
   {
     id: 'developers-trained',
     value: '6+',
-    label: 'Developers onboarded',
+    label: 'Developers trained and onboarded',
     description:
       'Trained developers and interns on project structure, implementation standards, and independent delivery.',
-  },
-  {
-    id: 'candidate-reviews',
-    value: '40+',
-    label: 'Candidates evaluated',
-    description:
-      'Reviewed frontend assessments, led technical follow-ups, and provided hiring recommendations.',
   },
 ]
 

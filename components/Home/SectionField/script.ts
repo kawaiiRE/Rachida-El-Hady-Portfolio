@@ -33,11 +33,11 @@ export default defineComponent({
     }
 
     const findActiveSection = (): FieldSectionId => {
-      const probe = window.innerHeight * 0.34
+      const probe = window.scrollY + window.innerHeight * 0.34
       let current = sections[0]?.id ?? 'hero'
 
       for (const section of sections) {
-        if (section.element.getBoundingClientRect().top <= probe) {
+        if (section.element.offsetTop <= probe) {
           current = section.id
         }
       }
@@ -57,14 +57,9 @@ export default defineComponent({
 
       active = next
       isHero.value = next === 'hero'
+      document.documentElement.dataset.section = next
       field.setLook(FIELD_LOOKS[next], 1.5)
-      if (next !== 'hero') {
-        field.wave(new Vector3(0, 0, 0), 16, 22, 2.6)
-      }
-    }
-
-    const handleScroll = (): void => {
-      applySection()
+      field.wave(new Vector3(0, 0, 0), 16, 22, 2.6)
     }
 
     const handlePointerMove = (event: PointerEvent): void => {
@@ -96,6 +91,10 @@ export default defineComponent({
       lastFrame = time
 
       if (isVisible) {
+        // Tarraf's director resolves the active section on the shared frame
+        // loop. Doing the same keeps morphs synchronized with native mobile
+        // scrolling, programmatic jumps, and late layout shifts.
+        applySection()
         elapsed += delta
         field.update(delta, elapsed)
       }
@@ -148,6 +147,7 @@ export default defineComponent({
 
       active = findActiveSection()
       isHero.value = active === 'hero'
+      document.documentElement.dataset.section = active
       bootTimer = window.setTimeout(() => {
         if (!field) {
           return
@@ -159,7 +159,6 @@ export default defineComponent({
         }
       }, 120)
 
-      window.addEventListener('scroll', handleScroll, { passive: true })
       window.addEventListener('pointermove', handlePointerMove, { passive: true })
       window.addEventListener('pointerleave', releasePointer)
       window.addEventListener('blur', releasePointer)
@@ -176,7 +175,6 @@ export default defineComponent({
       isUnmounted = true
       window.clearTimeout(bootTimer)
       cancelAnimationFrame(frameId)
-      window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerleave', releasePointer)
       window.removeEventListener('blur', releasePointer)

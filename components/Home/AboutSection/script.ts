@@ -51,7 +51,7 @@ export default defineComponent({
       {
         id: 'backend',
         title: 'Backend & data',
-        skills: ['Node.js', 'Fastify', 'PostgreSQL', 'MySQL', 'MSSQL', 'SQL'],
+        skills: ['Node.js', 'Fastify', 'SQL'],
       },
       {
         id: 'delivery',

@@ -134,11 +134,12 @@
   .sitting-image {
     position: absolute;
     right: clamp(-1.5rem, -1vw, 0rem);
-    bottom: -12.25rem;
-    z-index: 3;
+    bottom: 0;
+    z-index: 4;
     width: clamp(16rem, 24vw, 21rem);
     height: auto;
     max-width: none;
+    transform: translateY(40%);
     transform-origin: bottom center;
     pointer-events: none;
     will-change: transform;
@@ -249,9 +250,9 @@
     &::before {
       background: linear-gradient(
         180deg,
-        rgba(var(--gray-scale-950-rgb), 0.94) 0%,
-        rgba(var(--gray-scale-950-rgb), 0.82) 48%,
-        rgba(var(--gray-scale-950-rgb), 0.14) 82%,
+        rgba(var(--gray-scale-950-rgb), 0.9) 0%,
+        rgba(var(--gray-scale-950-rgb), 0.76) 48%,
+        rgba(var(--gray-scale-950-rgb), 0.1) 82%,
         rgba(var(--gray-scale-950-rgb), 0) 100%
       );
     }
@@ -297,7 +298,6 @@
 
     .sitting-image {
       right: -3.2rem;
-      bottom: -15.25rem;
       width: 15.5rem;
     }
 

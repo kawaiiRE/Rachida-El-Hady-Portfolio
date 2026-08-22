@@ -88,7 +88,10 @@ void main() {
   // The renderer is left in linear output space so this is the only encode.
   c = pow(c, vec3(1.0 / 2.2));
   float luminance = max(c.r, max(c.g, c.b));
-  float alpha = clamp(max(scene.a, luminance * 0.94), 0.0, 0.96);
+  // The browser composites this premultiplied framebuffer over the page.
+  // Keeping alpha at least as bright as the strongest channel preserves the
+  // original opaque Tarraf field instead of multiplying dim particles twice.
+  float alpha = clamp(max(scene.a, luminance), 0.0, 1.0);
   gl_FragColor = vec4(c, alpha);
 }
 `

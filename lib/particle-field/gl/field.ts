@@ -239,7 +239,9 @@ export class Field {
       canvas,
       antialias: false,
       alpha: true,
-      premultipliedAlpha: false,
+      // The final composer writes premultiplied color so the transparent
+      // canvas keeps Tarraf's original field intensity over section surfaces.
+      premultipliedAlpha: true,
       powerPreference: 'high-performance',
       stencil: false,
       depth: false,
