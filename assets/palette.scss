@@ -5,7 +5,7 @@
     Raw palette tokens
   */
 
-  /* Cool slate on a deliberately blue surface */
+  /* Cool slate on a true-white surface */
   --gray-scale-50: #1e293b;
   --gray-scale-100: #26364b;
   --gray-scale-200: #334155;
@@ -14,9 +14,9 @@
   --gray-scale-500: #94a3b8;
   --gray-scale-600: #b8c5d2;
   --gray-scale-700: #cbd5e1;
-  --gray-scale-800: #dceaf1;
-  --gray-scale-900: #e4f1f5;
-  --gray-scale-950: #e9f5f8;
+  --gray-scale-800: #ececf2;
+  --gray-scale-900: #f6f6f8;
+  --gray-scale-950: #ffffff;
 
   /* Primary scale */
   --primary-scale-50: #eef2ff;
@@ -49,9 +49,9 @@
   */
   --gray-scale-50-rgb: 30, 41, 59;
   --gray-scale-700-rgb: 203, 213, 225;
-  --gray-scale-800-rgb: 220, 234, 241;
-  --gray-scale-900-rgb: 228, 241, 245;
-  --gray-scale-950-rgb: 233, 245, 248;
+  --gray-scale-800-rgb: 236, 236, 242;
+  --gray-scale-900-rgb: 246, 246, 248;
+  --gray-scale-950-rgb: 255, 255, 255;
   --primary-scale-400-rgb: 37, 99, 235;
   --secondary-scale-400-rgb: 255, 143, 163;
 
