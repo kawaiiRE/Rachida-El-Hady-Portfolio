@@ -10,6 +10,7 @@ import {
 
 const WORDMARK = ['RACHIDA', 'EL HADY']
 const DELIVERY_BARS = [8.4, 6.8, 9.6, 7.5, 10.8, 8.9, 6.2]
+const WORDMARK_SCROLL_DISTANCE = 200
 
 export default defineComponent({
   name: 'HomeSectionField',
@@ -20,6 +21,7 @@ export default defineComponent({
     let field: Field | null = null
     let frameId = 0
     let bootTimer = 0
+    let wordmarkStartScrollY: number | null = null
     let lastFrame = 0
     let elapsed = 0
     let active: FieldSectionId = 'hero'
@@ -55,11 +57,36 @@ export default defineComponent({
         return
       }
 
+      const previous = active
       active = next
       isHero.value = next === 'hero'
       document.documentElement.dataset.section = next
+
+      wordmarkStartScrollY = null
+      if (previous === 'hero' && next === 'leadership') {
+        wordmarkStartScrollY = window.scrollY
+        return
+      }
+
       field.setLook(FIELD_LOOKS[next], 1.5)
-      field.wave(new Vector3(0, 0, 0), 16, 22, 2.6)
+
+      if (next !== 'hero' && (previous !== 'hero' || next !== 'leadership')) {
+        field.wave(new Vector3(0, 0, 0), 16, 22, 2.6)
+      }
+    }
+
+    const advanceWordmark = (): void => {
+      if (
+        !field ||
+        active !== 'leadership' ||
+        wordmarkStartScrollY === null ||
+        window.scrollY - wordmarkStartScrollY < WORDMARK_SCROLL_DISTANCE
+      ) {
+        return
+      }
+
+      wordmarkStartScrollY = null
+      field.setLook(FIELD_LOOKS.leadership, 1.5)
     }
 
     const handlePointerMove = (event: PointerEvent): void => {
@@ -95,6 +122,7 @@ export default defineComponent({
         // loop. Doing the same keeps morphs synchronized with native mobile
         // scrolling, programmatic jumps, and late layout shifts.
         applySection()
+        advanceWordmark()
         elapsed += delta
         field.update(delta, elapsed)
       }

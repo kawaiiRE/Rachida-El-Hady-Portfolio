@@ -19,4 +19,10 @@
   :deep(.typing-challenge) {
     padding-top: clamp(4rem, 8vw, 7rem);
   }
+
+  @media (max-width: breakpoint('phone-wide')) {
+    :deep(.typing-challenge) {
+      padding-block: 2.75rem;
+    }
+  }
 }

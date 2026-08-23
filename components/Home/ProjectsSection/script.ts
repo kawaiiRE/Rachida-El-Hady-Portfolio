@@ -28,6 +28,7 @@ const CARD_STATE_BY_DIFF: Record<string, ProjectCardState> = {
 }
 
 const PREVIEW_STACK_LIMIT = 4
+const DRAG_CAPTURE_THRESHOLD = 6
 
 export default defineComponent({
   name: 'ProjectsSection',
@@ -77,7 +78,19 @@ export default defineComponent({
     })
 
     const selectProject = (index: number): void => {
-      currentIndex.value = normalizeIndex(index)
+      const normalizedIndex = normalizeIndex(index)
+
+      if (normalizedIndex === currentIndex.value) {
+        const selectedProject = projects[normalizedIndex]
+
+        if (selectedProject) {
+          void navigateTo(selectedProject.path)
+        }
+
+        return
+      }
+
+      currentIndex.value = normalizedIndex
     }
 
     const shiftProject = (direction: number): void => {
@@ -90,7 +103,19 @@ export default defineComponent({
 
     const startDrag = (event: PointerEvent): void => {
       dragStartX.value = event.clientX
-      carouselRef.value?.setPointerCapture(event.pointerId)
+    }
+
+    const trackDrag = (event: PointerEvent): void => {
+      if (
+        dragStartX.value === null ||
+        Math.abs(event.clientX - dragStartX.value) < DRAG_CAPTURE_THRESHOLD
+      ) {
+        return
+      }
+
+      if (!carouselRef.value?.hasPointerCapture(event.pointerId)) {
+        carouselRef.value?.setPointerCapture(event.pointerId)
+      }
     }
 
     const cancelDrag = (): void => {
@@ -122,6 +147,7 @@ export default defineComponent({
       selectProject,
       shiftProject,
       startDrag,
+      trackDrag,
       finishDrag,
       cancelDrag,
     }

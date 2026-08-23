@@ -79,7 +79,7 @@ export default defineComponent({
         separation: 26,
         alignment: 34,
         cohesion: 32,
-        quantity: isPhoneViewport ? 4 : 3,
+        quantity: 4,
       }) as VantaEffect
     }
 

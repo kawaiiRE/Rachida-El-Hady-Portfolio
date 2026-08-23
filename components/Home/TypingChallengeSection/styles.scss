@@ -648,20 +648,45 @@
   }
 
   @media (max-width: breakpoint('phone-wide')) {
+    & {
+      padding-block: var(--space-section-sm);
+    }
+
+    .section-content {
+      padding-inline: 1rem;
+    }
+
+    .header {
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
     .header .section-title {
-      font-size: clamp(2.25rem, 12vw, 3.5rem);
+      max-width: 100%;
+      font-size: clamp(2rem, 10.5vw, 3rem);
+      overflow-wrap: anywhere;
+    }
+
+    .header > p {
+      font-size: 0.95rem;
+      line-height: 1.6;
     }
 
     .stat {
-      padding: 1rem;
+      gap: 0.15rem 0.5rem;
+      padding: 0.85rem 0.75rem;
     }
 
     .stat strong {
-      font-size: 1.65rem;
+      font-size: 1.5rem;
     }
 
     .timer strong {
-      font-size: 1rem;
+      font-size: 0.92rem;
+    }
+
+    .challenge {
+      padding: 1rem;
     }
 
     .controls {
@@ -673,6 +698,7 @@
 
     .settings {
       align-items: stretch;
+      margin-bottom: 1rem;
     }
 
     .level-picker {
@@ -681,8 +707,11 @@
     }
 
     .start-button {
+      gap: 0.5rem;
       min-width: 0;
       width: 100%;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.85rem;
     }
 
     .status {
@@ -691,42 +720,18 @@
     }
 
     .prompt-copy {
-      min-height: 8.5rem;
+      min-height: 7rem;
       font-size: 0.95rem;
       line-height: 1.7;
     }
 
     .keyboard-wrap {
-      margin-inline: -0.25rem;
-      padding-inline: 0;
+      display: none;
     }
 
-    .keyboard {
-      gap: 0.14rem;
-    }
-
-    .key-row {
-      gap: 0.14rem;
-    }
-
-    .key {
-      height: 1.9rem;
-      border-radius: 0.24rem;
-      font-size: 0.42rem;
-    }
-
-    .key .secondary {
-      inset: 0.14rem auto auto 0.17rem;
-      font-size: 0.32rem;
-    }
-
-    .finger-guide {
-      padding-inline: 0.6rem;
-    }
-
+    .hint-button,
     .game-footer {
-      flex-wrap: wrap;
-      justify-content: center;
+      display: none;
     }
   }
 

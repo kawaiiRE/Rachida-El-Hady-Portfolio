@@ -14,6 +14,6 @@
   opacity: 0;
 }
 
-:global(html:not(.dark)[data-section='contact']) .section-field {
-  opacity: 0.28;
+:global(html:not(.dark)[data-section='contact'] .section-field) {
+  opacity: 0.14;
 }

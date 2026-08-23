@@ -28,6 +28,7 @@
           @keydown.left.prevent="shiftProject(-1)"
           @keydown.right.prevent="shiftProject(1)"
           @pointerdown="startDrag"
+          @pointermove="trackDrag"
           @pointerup="finishDrag"
           @pointercancel="cancelDrag"
         >
@@ -37,7 +38,11 @@
             type="button"
             class="carousel-card"
             :class="carouselProject.state"
-            :aria-label="`Focus ${carouselProject.project.title}`"
+            :aria-label="
+              carouselProject.state === 'is-active'
+                ? `View ${carouselProject.project.title} project`
+                : `Focus ${carouselProject.project.title}`
+            "
             :aria-current="carouselProject.state === 'is-active' ? 'true' : undefined"
             :aria-hidden="carouselProject.state === 'is-hidden' ? 'true' : undefined"
             :tabindex="carouselProject.state === 'is-active' ? 0 : -1"
