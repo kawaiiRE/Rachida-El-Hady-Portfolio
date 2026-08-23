@@ -123,11 +123,5 @@
     </div>
   </div>
 </template>
-<script lang="ts">
-import ProjectDetailPage from './script'
-
-export default ProjectDetailPage
-</script>
-<style lang="scss" scoped>
-@use './styles.scss';
-</style>
+<script lang="ts" src="./script.ts" />
+<style lang="scss" scoped src="./styles.scss" />

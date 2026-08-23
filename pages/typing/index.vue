@@ -1,6 +1,6 @@
 <template>
   <div class="typing-page">
-    <HomeTypingChallengeSection />
+    <HomeTypingChallengeSection heading="Challenge yourself." />
   </div>
 </template>
 <script lang="ts" src="./script.ts" />

@@ -379,7 +379,7 @@
   }
 
   .prompt-copy .is-current {
-    color: var(--gray-scale-50);
+    color: rgba(var(--gray-scale-50-rgb), 0.42);
     background: rgba(var(--primary-scale-400-rgb), 0.2);
     animation: typing-caret-pulse 1s ease-in-out infinite;
   }

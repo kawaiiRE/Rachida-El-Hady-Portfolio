@@ -4,7 +4,7 @@
       <header class="header" data-motion>
         <div>
           <p class="section-label">A quick break</p>
-          <h2 class="section-title">Get to know my work, one keystroke at a time.</h2>
+          <h2 class="section-title">{{ heading }}</h2>
         </div>
         <p>
           A tiny typing sprint made from details across this portfolio. Follow the finger colors,

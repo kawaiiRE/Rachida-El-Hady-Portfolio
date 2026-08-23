@@ -148,7 +148,7 @@ export const useTypingChallenge = () => {
     }
 
     if (status.value === 'completed') {
-      return `Complete — ${currentWpm.value} WPM at ${accuracy.value}% accuracy.`
+      return `Complete — ${currentWpm.value} WPM at ${accuracy.value}% accuracy. Press Enter for another.`
     }
 
     if (status.value === 'timeout') {
@@ -301,11 +301,23 @@ export const useTypingChallenge = () => {
   }
 
   const handleKeydown = (event: KeyboardEvent): void => {
-    if (!isChallengeActive.value || event.metaKey || event.ctrlKey || event.altKey) {
+    if (event.metaKey || event.ctrlKey || event.altKey) {
       return
     }
 
     const key = event.key === 'Spacebar' ? ' ' : event.key
+
+    if (key === 'Enter' && (status.value === 'completed' || status.value === 'timeout')) {
+      event.preventDefault()
+      startChallenge()
+      showPressedKey('Enter')
+
+      return
+    }
+
+    if (!isChallengeActive.value) {
+      return
+    }
 
     if (key === 'Backspace') {
       event.preventDefault()
