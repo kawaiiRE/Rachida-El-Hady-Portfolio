@@ -15,6 +15,8 @@ const WORDMARK_SCROLL_DISTANCE = 200
 export default defineComponent({
   name: 'HomeSectionField',
   setup() {
+    // -------------------- Composables --------------------
+    // -------------------- State --------------------
     const canvasRef = shallowRef<HTMLCanvasElement | null>(null)
     const isHero = ref(true)
 
@@ -29,6 +31,8 @@ export default defineComponent({
     let isVisible = true
     let isUnmounted = false
 
+    // -------------------- Computed --------------------
+    // -------------------- Methods --------------------
     const frameHero = (extent: { width: number; height: number }): void => {
       FIELD_LOOKS.hero.fitWidth = extent.width * 1.12
       FIELD_LOOKS.hero.fitHeight = extent.height * 3.1
@@ -195,6 +199,7 @@ export default defineComponent({
       frameId = requestAnimationFrame(tick)
     }
 
+    // -------------------- Lifecycle --------------------
     onMounted(() => {
       void createField()
     })

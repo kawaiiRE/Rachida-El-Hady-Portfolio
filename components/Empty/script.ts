@@ -1,7 +1,7 @@
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "Empty",
+  name: 'Empty',
   props: {},
   emits: [],
   setup() {
@@ -11,6 +11,6 @@ export default defineComponent({
     // -------------------- Methods --------------------
     // -------------------- Lifecycle --------------------
 
-    return {};
+    return {}
   },
-});
+})

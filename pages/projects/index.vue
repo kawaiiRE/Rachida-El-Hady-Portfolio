@@ -24,7 +24,10 @@
         <aside
           v-if="isDesktopViewport"
           class="stage"
-          :style="{ '--project-background': activeProject.background }"
+          :style="{
+            '--project-background':
+              activeProject.background ?? activeProjectPreviews[0]?.background,
+          }"
         >
           <div class="signal" aria-hidden="true"></div>
 
@@ -33,20 +36,27 @@
               <NuxtLink
                 :to="activeProject.path"
                 class="preview"
-                :aria-label="`Read the ${activeProject.title} case study`"
+                :aria-label="`View the ${activeProject.title} project`"
               >
-                <img
-                  :src="activeProject.bgImg"
-                  :alt="activeProject.imageAlt"
-                  width="1600"
-                  height="900"
-                  decoding="async"
-                />
+                <span
+                  class="preview-media"
+                  :class="{ 'is-multiple': activeProjectPreviews.length > 1 }"
+                >
+                  <img
+                    v-for="preview in activeProjectPreviews"
+                    :key="preview.id"
+                    :src="preview.bgImg"
+                    :alt="preview.imageAlt"
+                    width="1600"
+                    height="900"
+                    decoding="async"
+                  />
+                </span>
                 <span class="preview-index">
                   {{ activeProjectIndexLabel }} / {{ projectCountLabel }}
                 </span>
                 <span class="preview-action">
-                  Open case study <span aria-hidden="true">&#8599;</span>
+                  Open project <span aria-hidden="true">&#8599;</span>
                 </span>
               </NuxtLink>
 
@@ -66,7 +76,7 @@
                 </ul>
 
                 <div class="links">
-                  <NuxtLink :to="activeProject.path">Read case study</NuxtLink>
+                  <NuxtLink :to="activeProject.path">View project</NuxtLink>
                   <a
                     v-for="projectLink in activeProjectLinks"
                     :key="projectLink.id"
@@ -82,14 +92,17 @@
           </Transition>
         </aside>
 
-        <ol class="index" aria-label="Project case studies">
+        <ol class="index" aria-label="Projects">
           <li
             v-for="(project, index) in projects"
             :id="project.id"
             :key="project.id"
             :class="{ 'item--active': index === activeProjectIndex }"
             class="item"
-            :style="{ '--project-background': project.background }"
+            :style="{
+              '--project-background':
+                project.background ?? getProjectPreviews(project)[0]?.background,
+            }"
           >
             <NuxtLink
               :to="project.path"
@@ -106,10 +119,16 @@
 
               <span class="item-arrow" aria-hidden="true">&#8599;</span>
 
-              <span v-if="!isDesktopViewport" class="mobile-preview">
+              <span
+                v-if="!isDesktopViewport"
+                class="mobile-preview"
+                :class="{ 'is-multiple': getProjectPreviews(project).length > 1 }"
+              >
                 <img
-                  :src="project.bgImg"
-                  :alt="project.imageAlt"
+                  v-for="preview in getProjectPreviews(project)"
+                  :key="preview.id"
+                  :src="preview.bgImg"
+                  :alt="preview.imageAlt"
                   width="1600"
                   height="900"
                   loading="lazy"

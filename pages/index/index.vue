@@ -8,7 +8,7 @@
     <HomeProjectsSection />
     <HomeExperienceSection />
     <HomeTypingChallengeSection />
-    <HomeFeaturedCaseStudy />
+    <HomeFeaturedProject />
     <HomeEngineeringSection />
     <HomeVibeSection />
     <HomeContactSection />

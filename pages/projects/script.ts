@@ -1,5 +1,5 @@
 import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { PROJECTS, type ProjectLink } from '~/constants/projects'
+import { PROJECTS, type PortfolioProject } from '~/constants/projects'
 
 type RevertibleMatchMedia = {
   revert: () => void
@@ -12,14 +12,14 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     const runtimeConfig = useRuntimeConfig()
-    const siteUrl = String(runtimeConfig.public.siteUrl || 'https://rachida.dev').replace(/\/$/, '')
+    const siteUrl = String(runtimeConfig.public.siteUrl)
 
     usePageSeo({
       title: 'Independent Web and Mobile Products',
       description:
         'Explore independent web and mobile products by Rachida El Hady, including TrackPal, Crazy Sudoku, Nuxt, Vue, React Native, TypeScript, and WebGL work.',
       path: '/projects',
-      image: PROJECTS[0]?.bgImg,
+      image: PROJECTS[0]?.platforms?.[0]?.bgImg ?? PROJECTS[0]?.bgImg ?? '',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -40,7 +40,6 @@ export default defineComponent({
     })
 
     // -------------------- State --------------------
-    const projects = PROJECTS
     const activeProjectIndex = ref(0)
     const projectsPageRef = ref<HTMLElement | null>(null)
     const isDesktopViewport = ref(false)
@@ -50,21 +49,35 @@ export default defineComponent({
     let responsiveBehaviorId = 0
 
     // -------------------- Computed --------------------
-    const activeProject = computed(() => projects[activeProjectIndex.value] ?? projects[0]!)
-    const activeProjectIndexLabel = computed(() => formatProjectIndex(activeProjectIndex.value))
-    const activeProjectLinks = computed<ProjectLink[]>(() =>
-      activeProject.value.links.filter((link) => Boolean(link.url)),
+    const activeProject = computed<PortfolioProject>(
+      () => PROJECTS[activeProjectIndex.value] ?? PROJECTS[0]!,
     )
-    const activeProjectStack = computed(() => activeProject.value.stack.slice(0, 4))
-    const projectCountLabel = computed(() => String(projects.length).padStart(2, '0'))
+    const activeProjectPreviews = computed(() => getProjectPreviews(activeProject.value))
+    const activeProjectIndexLabel = computed(() => formatProjectIndex(activeProjectIndex.value))
+    const activeProjectLinks = computed(() =>
+      activeProjectPreviews.value
+        .flatMap((project) => project.links ?? [])
+        .filter((link) => Boolean(link.url)),
+    )
+    const activeProjectStack = computed(() =>
+      [...new Set(activeProjectPreviews.value.flatMap((project) => project.stack ?? []))].slice(
+        0,
+        4,
+      ),
+    )
+    const projectCountLabel = computed(() => String(PROJECTS.length).padStart(2, '0'))
 
     // -------------------- Methods --------------------
+    function getProjectPreviews(project: PortfolioProject): PortfolioProject[] {
+      return project.platforms ?? [project]
+    }
+
     function formatProjectIndex(index: number): string {
       return String(index + 1).padStart(2, '0')
     }
 
     function setActiveProject(index: number): void {
-      if (index < 0 || index >= projects.length || index === activeProjectIndex.value) {
+      if (index < 0 || index >= PROJECTS.length || index === activeProjectIndex.value) {
         return
       }
 
@@ -187,15 +200,17 @@ export default defineComponent({
     })
 
     return {
-      projects,
+      projects: PROJECTS,
       projectsPageRef,
       isDesktopViewport,
       activeProject,
+      activeProjectPreviews,
       activeProjectIndex,
       activeProjectIndexLabel,
       activeProjectLinks,
       activeProjectStack,
       projectCountLabel,
+      getProjectPreviews,
       formatProjectIndex,
       setActiveProject,
     }

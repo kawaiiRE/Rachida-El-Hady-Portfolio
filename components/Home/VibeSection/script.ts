@@ -13,10 +13,14 @@ export default defineComponent({
   props: {},
   emits: [],
   setup() {
+    // -------------------- Composables --------------------
+    // -------------------- State --------------------
     const audioRef = ref<HTMLAudioElement | null>(null)
     const isPlaying = ref(false)
     const isFallbackPlayback = ref(false)
 
+    // -------------------- Computed --------------------
+    // -------------------- Methods --------------------
     const handleAudioPlay = (): void => {
       isFallbackPlayback.value = false
       isPlaying.value = true
@@ -55,6 +59,7 @@ export default defineComponent({
       audioRef.value.pause()
     }
 
+    // -------------------- Lifecycle --------------------
     onBeforeUnmount(() => {
       audioRef.value?.pause()
     })

@@ -1,48 +1,44 @@
-import { computed, defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { PROJECTS } from '~/constants/projects'
 import { APP_ROUTES } from '~/constants/routes'
 
 export default defineComponent({
   name: 'ProjectDetailPage',
   setup() {
+    // -------------------- Composables --------------------
     const route = useRoute()
-    const runtimeConfig = useRuntimeConfig()
-    const siteUrl = String(runtimeConfig.public.siteUrl || 'https://rachida.dev').replace(/\/$/, '')
+    const siteUrl = useRuntimeConfig().public.siteUrl
+
+    // -------------------- State --------------------
     const slug = String(route.params.slug || '')
-    const projectIndex = PROJECTS.findIndex((candidate) => candidate.id === slug)
-    const project = PROJECTS[projectIndex]
+    const project = PROJECTS.find((candidate) => candidate.id === slug)
 
     if (!project) {
       throw createError({ statusCode: 404, statusMessage: 'Project not found' })
     }
 
-    const formatIndex = (index: number) => String(index + 1).padStart(2, '0')
-    const getGalleryItemSize = (index: number) => ['wide', 'compact', 'full'][index % 3]
-    const projectLinks = computed(() => project.links.filter((link) => link.url))
-    const relatedProjects = computed(() => {
-      const followingProjects = [
-        ...PROJECTS.slice(projectIndex + 1),
-        ...PROJECTS.slice(0, projectIndex),
-      ]
+    const platforms = project.platforms ?? [project]
+    const projectIndex = PROJECTS.findIndex((candidate) => candidate.id === project.id)
+    const followingProjects = [
+      ...PROJECTS.slice(projectIndex + 1),
+      ...PROJECTS.slice(0, projectIndex),
+    ]
+    const relatedProjects = followingProjects.slice(0, 3)
+    const technologies = [...new Set(platforms.flatMap(({ stack }) => stack ?? []))]
+    const galleryCount = platforms.flatMap(({ images }) => images ?? []).length
+    const hasProjectLinks = platforms.some((platform) => platform.links?.length)
+    const galleryRef = ref<HTMLElement | null>(null)
 
-      return followingProjects.slice(0, 3)
-    })
-    const projectIndexLabel = formatIndex(projectIndex)
-    const projectCountLabel = String(PROJECTS.length).padStart(2, '0')
-    const technologyCountLabel = `${String(project.stack.length).padStart(2, '0')} tools`
-    const galleryCountLabel = `${String(project.images.length).padStart(2, '0')} views`
+    // -------------------- Computed --------------------
+    const projectNumber = projectIndex + 1
+    const projectCount = PROJECTS.length
     const canonicalUrl = `${siteUrl}${project.path}`
-    const operatingSystem = project.stack.some((technology) =>
-      ['Expo', 'React Native'].includes(technology),
-    )
-      ? 'Android, iOS'
-      : 'Web Browser'
 
     usePageSeo({
-      title: `${project.title} — ${project.category} Case Study`,
+      title: `${project.title} — ${project.category}`,
       description: project.summary,
       path: project.path,
-      image: project.bgImg,
+      image: platforms[0]?.images?.[0] ?? '',
       structuredData: [
         {
           '@context': 'https://schema.org',
@@ -51,15 +47,12 @@ export default defineComponent({
           url: canonicalUrl,
           description: project.description,
           applicationCategory: project.category,
-          operatingSystem,
-          image: project.images.map((image) => `${siteUrl}${image}`),
           author: {
             '@type': 'Person',
             '@id': `${siteUrl}/#person`,
             name: 'Rachida El Hady',
             url: siteUrl,
           },
-          keywords: project.stack.join(', '),
         },
         {
           '@context': 'https://schema.org',
@@ -73,17 +66,35 @@ export default defineComponent({
       ],
     })
 
+    // -------------------- Methods --------------------
+    function scrollGallery(direction: number): void {
+      const gallery = galleryRef.value
+
+      if (!gallery || gallery.children.length < 2) {
+        return
+      }
+
+      const currentSlide = Math.round(gallery.scrollLeft / gallery.clientWidth)
+      const nextSlide =
+        (currentSlide + direction + gallery.children.length) % gallery.children.length
+
+      gallery.scrollTo({ left: nextSlide * gallery.clientWidth })
+    }
+
+    // -------------------- Lifecycle --------------------
+
     return {
       APP_ROUTES,
       project,
-      projectLinks,
+      platforms,
+      technologies,
+      galleryRef,
+      galleryCount,
+      hasProjectLinks,
       relatedProjects,
-      projectIndexLabel,
-      projectCountLabel,
-      technologyCountLabel,
-      galleryCountLabel,
-      formatIndex,
-      getGalleryItemSize,
+      projectNumber,
+      projectCount,
+      scrollGallery,
     }
   },
 })

@@ -6,6 +6,7 @@ export default defineComponent({
   props: {},
   emits: [],
   setup() {
+    // -------------------- Composables --------------------
     usePageSeo({
       title: 'Professional Frontend Experience',
       description:
@@ -13,6 +14,11 @@ export default defineComponent({
       path: APP_ROUTES.EXPERIENCE,
       type: 'profile',
     })
+
+    // -------------------- State --------------------
+    // -------------------- Computed --------------------
+    // -------------------- Methods --------------------
+    // -------------------- Lifecycle --------------------
 
     return {}
   },

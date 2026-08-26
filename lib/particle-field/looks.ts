@@ -6,7 +6,7 @@ export const FIELD_SECTION_IDS = [
   'projects',
   'experience',
   'typing',
-  'case-study',
+  'featured-project',
   'approach',
   'vibe',
   'contact',
@@ -136,7 +136,7 @@ export const FIELD_LOOKS: Record<FieldSectionId, FieldLook> = {
     exposure: 1.18,
     bloom: 0.7,
   },
-  'case-study': {
+  'featured-project': {
     formation: FORMATION.BARS,
     spring: 64,
     damp: 0.76,

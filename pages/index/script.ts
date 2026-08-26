@@ -63,7 +63,7 @@ export default defineComponent({
               '@type': 'ListItem',
               position: index + 1,
               name: project.title,
-              url: `${siteUrl}/projects/${project.id}`,
+              url: `${siteUrl}${project.path}`,
             })),
           },
         },
@@ -74,6 +74,7 @@ export default defineComponent({
     const homePageRef = ref<HTMLElement | null>(null)
     let motionMatchMedia: RevertibleMatchMedia | null = null
 
+    // -------------------- Computed --------------------
     // -------------------- Methods --------------------
     const createSectionMotion = async (): Promise<void> => {
       if (!homePageRef.value) {

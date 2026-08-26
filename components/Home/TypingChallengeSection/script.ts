@@ -10,6 +10,14 @@ export default defineComponent({
   },
   emits: [],
   setup() {
-    return useTypingChallenge()
+    // -------------------- Composables --------------------
+    const typingChallenge = useTypingChallenge()
+
+    // -------------------- State --------------------
+    // -------------------- Computed --------------------
+    // -------------------- Methods --------------------
+    // -------------------- Lifecycle --------------------
+
+    return typingChallenge
   },
 })

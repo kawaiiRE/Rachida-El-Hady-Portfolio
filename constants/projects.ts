@@ -1,30 +1,22 @@
-export interface ProjectMetric {
-  value: string
-  label: string
-}
-
-export interface ProjectLink {
-  id: string
-  label: string
-  url: string
-}
-
 export interface PortfolioProject {
   id: string
   title: string
   category: string
   summary: string
   description: string
-  stack: string[]
-  imageAlt: string
-  logo: string
-  logoAlt: string
-  images: string[]
-  bgImg: string
-  background: string
-  metrics: ProjectMetric[]
-  links: ProjectLink[]
   path: string
+  platform?: 'Web' | 'Mobile'
+  stack?: string[]
+  imageAlt?: string
+  logo?: string
+  logoAlt?: string
+  images?: string[]
+  bgImg?: string
+  background?: string
+  metrics?: Array<{ value: string; label: string }>
+  links?: Array<{ id: string; label: string; url: string }>
+  platforms?: PortfolioProject[]
+  separatePlatformsInCarousel?: boolean
 }
 
 export const AURAFLOW_PROJECT: PortfolioProject = {
@@ -132,108 +124,110 @@ export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
   path: '/projects/crazy-sudoku',
 }
 
-export const TRACKPAL_WEB_PROJECT: PortfolioProject = {
-  id: 'trackpal-web',
-  title: 'TrackPal Web',
-  category: 'Web App',
+export const TRACKPAL_PROJECT = {
+  id: 'trackpal',
+  title: 'TrackPal',
+  category: 'Web + Mobile App',
   summary:
-    'A personal finance dashboard for tracking cash flow, forecasting balances, and turning daily spending into a clearer plan.',
+    'A connected personal finance system for planning on the web and keeping up with money on the go.',
   description:
-    'TrackPal Web is a Nuxt and Vue finance workspace with transaction management, recurring schedules, receipt uploads, forecast charts, insights, exports, and subscription-aware Pro areas. It connects to a Fastify API backed by Drizzle and Postgres, with Pinia for app state, Vuestic UI for the interface, Chart.js for analytics, and RevenueCat for subscriptions.',
-  stack: [
-    'Nuxt',
-    'Vue',
-    'TypeScript',
-    'Pinia',
-    'Vuestic UI',
-    'Chart.js',
-    'Fastify',
-    'Drizzle',
-    'Postgres',
-    'RevenueCat',
-  ],
-  imageAlt: 'TrackPal Web finance dashboard themed background.',
-  logo: '/images/projects/trackpal-web/trackpal-web-logo.png',
-  logoAlt: 'TrackPal Web logo.',
-  images: [
-    '/images/projects/trackpal-web/trackpal-web-prev-1-dashboard-forecast.png',
-    '/images/projects/trackpal-web/trackpal-web-prev-2-dashboard-analytics.png',
-    '/images/projects/trackpal-web/trackpal-web-prev-3-transactions.png',
-    '/images/projects/trackpal-web/trackpal-web-prev-4-recurring-payments.png',
-    '/images/projects/trackpal-web/trackpal-web-prev-5-forecast-patterns.png',
-    '/images/projects/trackpal-web/trackpal-web-prev-6-spending-history.png',
-  ],
-  bgImg: '/images/projects/trackpal-web/trackpal-web-bg.png',
-  background: 'linear-gradient(90deg, #00d4a6, #55b7ff, #7c5cff, #00d4a6)',
-  metrics: [
+    'TrackPal brings a Nuxt web workspace and an Expo mobile app into one finance product. Both platforms share the same Fastify, Drizzle, and Postgres foundation for transactions, recurring schedules, forecasts, insights, receipts, and subscriptions, while each interface is shaped for its own context.',
+  path: '/projects/trackpal',
+  platforms: [
     {
-      value: 'Nuxt',
-      label: 'Responsive finance dashboard',
+      id: 'trackpal-web',
+      platform: 'Web',
+      title: 'TrackPal Web',
+      category: 'Web App',
+      summary:
+        'A personal finance dashboard for tracking cash flow, forecasting balances, and turning daily spending into a clearer plan.',
+      description:
+        'TrackPal Web is a Nuxt and Vue finance workspace with transaction management, recurring schedules, receipt uploads, forecast charts, insights, exports, and subscription-aware Pro areas. It connects to a Fastify API backed by Drizzle and Postgres, with Pinia for app state, Vuestic UI for the interface, Chart.js for analytics, and RevenueCat for subscriptions.',
+      path: '/projects/trackpal',
+      stack: [
+        'Nuxt',
+        'Vue',
+        'TypeScript',
+        'Pinia',
+        'Vuestic UI',
+        'Chart.js',
+        'Fastify',
+        'Drizzle',
+        'Postgres',
+        'RevenueCat',
+      ],
+      imageAlt: 'TrackPal Web finance dashboard themed background.',
+      logo: '/images/projects/trackpal-web/trackpal-web-logo.png',
+      logoAlt: 'TrackPal Web logo.',
+      images: [
+        '/images/projects/trackpal-web/trackpal-web-prev-1-dashboard-forecast.png',
+        '/images/projects/trackpal-web/trackpal-web-prev-2-dashboard-analytics.png',
+        '/images/projects/trackpal-web/trackpal-web-prev-3-transactions.png',
+        '/images/projects/trackpal-web/trackpal-web-prev-4-recurring-payments.png',
+        '/images/projects/trackpal-web/trackpal-web-prev-5-forecast-patterns.png',
+        '/images/projects/trackpal-web/trackpal-web-prev-6-spending-history.png',
+      ],
+      bgImg: '/images/projects/trackpal-web/trackpal-web-bg.png',
+      background: 'linear-gradient(90deg, #00d4a6, #55b7ff, #7c5cff, #00d4a6)',
+      metrics: [
+        { value: 'Nuxt', label: 'Responsive finance dashboard' },
+        { value: 'API', label: 'Forecasts, exports, receipts' },
+      ],
+      links: [
+        {
+          id: 'website',
+          label: 'Visit Website',
+          url: 'https://trackpal.rachida.dev',
+        },
+      ],
     },
     {
-      value: 'API',
-      label: 'Forecasts, exports, receipts',
+      id: 'trackpal-mobile',
+      platform: 'Mobile',
+      title: 'TrackPal Mobile',
+      category: 'Mobile App',
+      summary:
+        'A companion finance app built for quick transaction capture, planning, and spending awareness on the go.',
+      description:
+        'TrackPal Mobile is an Expo and React Native app for tracking transactions, reviewing forecasts, checking insights, planning recurring payments, and syncing receipt images with the TrackPal API. It uses Expo Router, MobX, React Native Paper, local storage, image picking, RevenueCat purchases, and the same finance data model as the web app.',
+      path: '/projects/trackpal',
+      stack: [
+        'Expo',
+        'React Native',
+        'TypeScript',
+        'Expo Router',
+        'MobX',
+        'React Native Paper',
+        'AsyncStorage',
+        'RevenueCat',
+      ],
+      imageAlt: 'TrackPal Mobile finance app themed background.',
+      logo: '/images/projects/trackpal-mobile/trackpal-mobile-logo.png',
+      logoAlt: 'TrackPal Mobile logo.',
+      images: [
+        '/images/projects/trackpal-mobile/trackpal-mobile-prev-1-dashboard-cash-flow.png',
+        '/images/projects/trackpal-mobile/trackpal-mobile-prev-2-dashboard-category-spend.png',
+        '/images/projects/trackpal-mobile/trackpal-mobile-prev-3-transactions.png',
+        '/images/projects/trackpal-mobile/trackpal-mobile-prev-4-insights-overview.png',
+        '/images/projects/trackpal-mobile/trackpal-mobile-prev-5-insights-highlights.png',
+      ],
+      bgImg: '/images/projects/trackpal-mobile/trackpal-mobile-bg.png',
+      background: 'linear-gradient(90deg, #55b7ff, #00d4a6, #ffd166, #55b7ff)',
+      metrics: [
+        { value: 'Expo', label: 'Native mobile experience' },
+        { value: 'Sync', label: 'Offline capture and receipts' },
+      ],
+      links: [
+        {
+          id: 'google-play',
+          label: 'View on Google Play',
+          url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
+        },
+      ],
     },
   ],
-  links: [
-    {
-      id: 'website',
-      label: 'Visit Website',
-      url: 'https://trackpal.rachida.dev',
-    },
-  ],
-  path: '/projects/trackpal-web',
-}
-
-export const TRACKPAL_MOBILE_PROJECT: PortfolioProject = {
-  id: 'trackpal-mobile',
-  title: 'TrackPal Mobile',
-  category: 'Mobile App',
-  summary:
-    'A companion finance app built for quick transaction capture, planning, and spending awareness on the go.',
-  description:
-    'TrackPal Mobile is an Expo and React Native app for tracking transactions, reviewing forecasts, checking insights, planning recurring payments, and syncing receipt images with the TrackPal API. It uses Expo Router, MobX, React Native Paper, local storage, image picking, RevenueCat purchases, and the same finance data model as the web app.',
-  stack: [
-    'Expo',
-    'React Native',
-    'TypeScript',
-    'Expo Router',
-    'MobX',
-    'React Native Paper',
-    'AsyncStorage',
-    'RevenueCat',
-  ],
-  imageAlt: 'TrackPal Mobile finance app themed background.',
-  logo: '/images/projects/trackpal-mobile/trackpal-mobile-logo.png',
-  logoAlt: 'TrackPal Mobile logo.',
-  images: [
-    '/images/projects/trackpal-mobile/trackpal-mobile-prev-1-dashboard-cash-flow.png',
-    '/images/projects/trackpal-mobile/trackpal-mobile-prev-2-dashboard-category-spend.png',
-    '/images/projects/trackpal-mobile/trackpal-mobile-prev-3-transactions.png',
-    '/images/projects/trackpal-mobile/trackpal-mobile-prev-4-insights-overview.png',
-    '/images/projects/trackpal-mobile/trackpal-mobile-prev-5-insights-highlights.png',
-  ],
-  bgImg: '/images/projects/trackpal-mobile/trackpal-mobile-bg.png',
-  background: 'linear-gradient(90deg, #55b7ff, #00d4a6, #ffd166, #55b7ff)',
-  metrics: [
-    {
-      value: 'Expo',
-      label: 'Native mobile experience',
-    },
-    {
-      value: 'Sync',
-      label: 'Offline capture and receipts',
-    },
-  ],
-  links: [
-    {
-      id: 'google-play',
-      label: 'View on Google Play',
-      url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
-    },
-  ],
-  path: '/projects/trackpal-mobile',
-}
+  separatePlatformsInCarousel: true,
+} satisfies PortfolioProject
 
 export const NOTIFY_PROJECT: PortfolioProject = {
   id: 'notify',
@@ -383,8 +377,7 @@ export const PLAYQUEST_PROJECT: PortfolioProject = {
 }
 
 export const PROJECTS: PortfolioProject[] = [
-  TRACKPAL_WEB_PROJECT,
-  TRACKPAL_MOBILE_PROJECT,
+  TRACKPAL_PROJECT,
   CRAZY_SUDOKU_PROJECT,
   AURAFLOW_PROJECT,
   NOTIFY_PROJECT,

@@ -1,10 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://rachida.dev'
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL!
 const siteName = 'Rachida El Hady'
 const siteDescription =
   'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products with strong architecture and team-lead responsibilities.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
-const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || ''
+const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
 const websiteStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -38,27 +38,12 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    analyticsAdminToken: process.env.ANALYTICS_ADMIN_TOKEN || '',
-    analyticsD1Binding: process.env.ANALYTICS_D1_BINDING || 'ANALYTICS_DB',
-    analyticsIpSalt: process.env.ANALYTICS_IP_SALT || '',
-    analyticsLogPath: process.env.ANALYTICS_LOG_PATH || '.data/analytics-events.jsonl',
     public: {
       siteUrl,
-      analyticsEnabled:
-        process.env.NUXT_PUBLIC_ANALYTICS_ENABLED ||
-        (process.env.NODE_ENV === 'production' ? 'true' : 'false'),
-      analyticsEndpoint: process.env.NUXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics/event',
-      analyticsPreciseLocationEnabled:
-        process.env.NUXT_PUBLIC_ANALYTICS_PRECISE_LOCATION_ENABLED || 'false',
-      analyticsPreciseLocationMode:
-        process.env.NUXT_PUBLIC_ANALYTICS_PRECISE_LOCATION_MODE || 'campaign',
-      googleAnalyticsId,
-      emailjsPublicKey:
-        process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY || '',
-      emailjsServiceId:
-        process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID || '',
-      emailjsTemplateId:
-        process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID || '',
+      ...(googleAnalyticsId ? { googleAnalyticsId } : {}),
+      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
+      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID!,
+      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
     },
   },
 

@@ -48,7 +48,7 @@ export default defineComponent({
       })
     }
 
-    // -------------------- Lifecycle --------------------
+    // -------------------- Watchers --------------------
     watch(themeMode, (nextTheme, previousTheme) => {
       if (import.meta.client) {
         localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
@@ -62,6 +62,7 @@ export default defineComponent({
       startThemeTransition()
     })
 
+    // -------------------- Lifecycle --------------------
     onMounted(() => {
       const savedThemeMode = localStorage.getItem(THEME_STORAGE_KEY)
 

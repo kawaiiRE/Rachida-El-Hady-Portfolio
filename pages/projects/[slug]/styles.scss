@@ -5,9 +5,14 @@
   .intro,
   .introduction,
   .actions,
+  .hero-media,
   .overview,
   .technology,
   .gallery,
+  .carousel,
+  .track,
+  .slide,
+  .nav,
   .related {
     box-sizing: border-box;
   }
@@ -156,11 +161,29 @@
     );
   }
 
-  .hero img {
-    display: block;
+  .hero-media {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
+
+    &.is-multiple {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &.is-multiple img {
+      border-radius: 0.5rem;
+    }
   }
 
   .hero figcaption {
@@ -247,6 +270,122 @@
     border-top: 0.0625rem solid var(--line-subtle);
   }
 
+  .gallery {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .track {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      border: 0.0625rem solid var(--line-subtle);
+      border-radius: 1rem;
+      background: var(--surface-accent-soft);
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      &:focus-visible {
+        outline: 0.125rem solid var(--primary-scale-400);
+        outline-offset: 0.25rem;
+      }
+    }
+
+    .slide {
+      position: relative;
+      display: grid;
+      flex: 0 0 100%;
+      place-items: center;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      height: min(70dvh, 44rem);
+      margin: 0;
+      padding: 1rem;
+      overflow: hidden;
+      scroll-snap-align: start;
+
+      img {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      figcaption {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        padding: 0.4rem 0.55rem;
+        color: var(--static-white);
+        background: rgba(var(--media-overlay-rgb), 0.72);
+        font-family: var(--font-space-mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+    }
+
+    .nav {
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      padding: 0;
+      border: 0.0625rem solid rgba(var(--gray-scale-50-rgb), 0.22);
+      border-radius: 999rem;
+      color: var(--static-white);
+      background: rgba(var(--media-overlay-rgb), 0.72);
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition:
+        color 180ms ease,
+        border-color 180ms ease,
+        background-color 180ms ease;
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--primary-scale-400);
+        color: var(--primary-scale-400);
+        background: rgba(var(--media-overlay-rgb), 0.9);
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    .previous {
+      left: 1rem;
+    }
+
+    .next {
+      right: 1rem;
+    }
+  }
+
   .section-heading {
     display: flex;
     justify-content: space-between;
@@ -277,10 +416,10 @@
     position: relative;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.9rem;
+    gap: 0.75rem;
     align-items: center;
-    min-height: 4.5rem;
-    padding: 1rem 0;
+    min-height: 4rem;
+    padding: 0.75rem 0;
     border-bottom: 0.0625rem solid var(--line-subtle);
     color: rgba(var(--gray-scale-50-rgb), 0.78);
     font-family: var(--font-space-mono);
@@ -292,61 +431,6 @@
     content: counter(technology, decimal-leading-zero);
     color: var(--primary-scale-400);
     font-size: 0.58rem;
-  }
-
-  .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .gallery-grid figure {
-    position: relative;
-    display: grid;
-    min-width: 0;
-    margin: 0;
-    overflow: hidden;
-    border: 0.0625rem solid var(--line-subtle);
-    border-radius: 0.8rem;
-    background: var(--surface-accent-soft);
-  }
-
-  .gallery-item--wide {
-    grid-column: span 7;
-  }
-
-  .gallery-item--compact {
-    grid-column: span 5;
-  }
-
-  .gallery-item--full {
-    grid-column: span 12;
-  }
-
-  .gallery-grid img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    min-height: 20rem;
-    object-fit: contain;
-    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .gallery-grid figure:hover img {
-    transform: scale(1.018);
-  }
-
-  .gallery-grid figcaption {
-    position: absolute;
-    right: 0.7rem;
-    bottom: 0.7rem;
-    padding: 0.3rem 0.45rem;
-    color: var(--static-white);
-    background: rgba(var(--media-overlay-rgb), 0.72);
-    font-family: var(--font-space-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
   }
 
   .related-list {
@@ -499,9 +583,17 @@
       border-radius: 0.65rem;
     }
 
-    .hero img {
+    .hero-media {
       aspect-ratio: 4 / 3;
-      object-position: center;
+
+      &.is-multiple {
+        gap: 0.4rem;
+        padding: 0.4rem;
+      }
+
+      img {
+        object-position: center;
+      }
     }
 
     .hero figcaption {
@@ -556,29 +648,37 @@
     }
 
     .technology li {
-      min-height: 3.75rem;
-      padding: 0.8rem 0;
+      min-height: 3.4rem;
+      padding: 0.65rem 0;
     }
 
-    .gallery-grid {
-      gap: 1.25rem;
-    }
+    .gallery {
+      .track {
+        border-radius: 0.65rem;
+      }
 
-    .gallery-item--wide,
-    .gallery-item--compact,
-    .gallery-item--full {
-      grid-column: span 12;
-    }
+      .slide {
+        height: min(58dvh, 30rem);
+        padding: 0.5rem;
 
-    .gallery-grid img {
-      height: auto;
-      min-height: 0;
-      object-fit: contain;
-    }
+        figcaption {
+          right: 0.5rem;
+          bottom: 0.5rem;
+        }
+      }
 
-    .gallery-grid figcaption {
-      right: 0.5rem;
-      bottom: 0.5rem;
+      .nav {
+        width: 2.6rem;
+        height: 2.6rem;
+      }
+
+      .previous {
+        left: 0.6rem;
+      }
+
+      .next {
+        right: 0.6rem;
+      }
     }
 
     .related-list a {
@@ -610,8 +710,10 @@
       animation: none;
     }
 
-    .gallery-grid img {
-      transition-duration: 0.01ms;
+    .gallery {
+      .track {
+        scroll-behavior: auto;
+      }
     }
   }
 }

@@ -63,8 +63,10 @@ export default defineComponent({
   props: {},
   emits: [],
   setup() {
-    // -------------------- State --------------------
+    // -------------------- Composables --------------------
     const config = useRuntimeConfig()
+
+    // -------------------- State --------------------
     const contactItems = homeContactItems
     const formData = ref<FormData>({
       name: '',
@@ -78,15 +80,13 @@ export default defineComponent({
     let emailClient: EmailJsClient | null = null
 
     // -------------------- Computed --------------------
-
     // -------------------- Methods --------------------
     const getEmailJSConfig = () => ({
-      publicKey: config.public.emailjsPublicKey as string,
-      serviceId: config.public.emailjsServiceId as string,
-      templateId: config.public.emailjsTemplateId as string,
+      publicKey: config.public.emailjsPublicKey,
+      serviceId: config.public.emailjsServiceId,
+      templateId: config.public.emailjsTemplateId,
     })
 
-    // Initialize EmailJS
     const initializeEmailJS = async (): Promise<EmailJsClient | null> => {
       const { publicKey } = getEmailJSConfig()
 
@@ -106,7 +106,6 @@ export default defineComponent({
       return emailClient
     }
 
-    // Send form
     const sendMessage = async () => {
       if (!formData.value.name || !formData.value.email || !formData.value.message) {
         errorMessage.value = 'Please fill in all fields'
@@ -147,19 +146,18 @@ export default defineComponent({
         successMessage.value = 'Message sent successfully!'
         formData.value = { name: '', email: '', message: '' }
 
-        // Clear success message after 5 seconds
         setTimeout(() => {
           successMessage.value = ''
         }, 5000)
       } catch (error) {
         console.error('EmailJS error:', error)
-        // -------------------- Lifecycle --------------------
         errorMessage.value = 'Failed to send the message. Please try again.'
       } finally {
         isLoading.value = false
       }
     }
 
+    // -------------------- Lifecycle --------------------
     onMounted(() => {
       void initializeEmailJS()
     })

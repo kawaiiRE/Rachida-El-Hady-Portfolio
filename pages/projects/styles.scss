@@ -7,9 +7,12 @@
   .projects-browser,
   .stage,
   .stage-content,
+  .preview,
+  .preview-media,
   .caption,
   .footer,
-  .item-link {
+  .item-link,
+  .mobile-preview {
     box-sizing: border-box;
   }
 
@@ -157,15 +160,34 @@
     );
   }
 
-  .preview img {
-    display: block;
+  .preview-media {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
     aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  .preview-media.is-multiple {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .preview-media img {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
     object-fit: cover;
     transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .preview:hover img {
+  .preview-media.is-multiple img {
+    border-radius: 0.5rem;
+  }
+
+  .preview:hover .preview-media img {
     transform: scale(1.025);
   }
 
@@ -528,12 +550,19 @@
 
     .mobile-preview {
       grid-column: 1 / -1;
-      display: block;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
       width: 100%;
       min-width: 0;
       margin-top: 0.4rem;
       overflow: hidden;
       background: var(--surface-accent-soft);
+    }
+
+    .mobile-preview.is-multiple {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem;
+      padding: 0.4rem;
     }
 
     .mobile-preview img {
@@ -621,7 +650,7 @@
       animation: none;
     }
 
-    .preview img,
+    .preview-media img,
     .project-stage-enter-active,
     .project-stage-leave-active {
       transition-duration: 0.01ms;

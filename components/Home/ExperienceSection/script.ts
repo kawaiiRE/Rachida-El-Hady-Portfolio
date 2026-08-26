@@ -6,8 +6,16 @@ export default defineComponent({
   props: {},
   emits: [],
   setup() {
+    // -------------------- Composables --------------------
+    // -------------------- State --------------------
+    const roles = PROFESSIONAL_ROLES
+
+    // -------------------- Computed --------------------
+    // -------------------- Methods --------------------
+    // -------------------- Lifecycle --------------------
+
     return {
-      roles: PROFESSIONAL_ROLES,
+      roles,
     }
   },
 })

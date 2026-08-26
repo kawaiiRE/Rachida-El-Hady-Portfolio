@@ -41,17 +41,19 @@ export default defineComponent({
   },
   emits: [],
   setup(props) {
+    // -------------------- Composables --------------------
     const instance = getCurrentInstance()
+
+    // -------------------- State --------------------
     const symbolId = `glowing-text-${instance?.uid ?? Math.random().toString(36).slice(2)}`
     const fontRenderKey = ref(0)
+
+    // -------------------- Computed --------------------
     const selectedFontPreset = computed(
-      () => FONT_PRESETS[props.fontPreset as keyof typeof FONT_PRESETS] ?? FONT_PRESETS.display
+      () => FONT_PRESETS[props.fontPreset as keyof typeof FONT_PRESETS] ?? FONT_PRESETS.display,
     )
     const resolvedFontFamily = computed(() => selectedFontPreset.value.cssVariable)
 
-    // -------------------- Composables --------------------
-    // -------------------- State --------------------
-    // -------------------- Computed --------------------
     // -------------------- Methods --------------------
     // -------------------- Lifecycle --------------------
     onMounted(async () => {

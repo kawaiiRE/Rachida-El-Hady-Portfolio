@@ -1,6 +1,5 @@
 import { computed, defineComponent, ref } from 'vue'
-import { PROJECTS } from '~/constants/projects'
-import type { PortfolioProject } from '~/constants/projects'
+import { PROJECTS, type PortfolioProject } from '~/constants/projects'
 
 type ProjectCardState =
   | 'is-active'
@@ -35,17 +34,25 @@ export default defineComponent({
   props: {},
   emits: [],
   setup() {
-    const projects = PROJECTS
+    // -------------------- Composables --------------------
+    // -------------------- State --------------------
+    const projects = PROJECTS.flatMap((project) =>
+      project.separatePlatformsInCarousel && project.platforms?.length
+        ? project.platforms
+        : [project],
+    )
     const currentIndex = ref(0)
     const carouselRef = ref<HTMLElement | null>(null)
     const dragStartX = ref<number | null>(null)
     const totalProjects = computed(() => projects.length)
 
+    // -------------------- Computed --------------------
     const currentProject = computed<PortfolioProject | null>(() => {
       return projects[currentIndex.value] ?? null
     })
     const currentPosition = computed(() => String(currentIndex.value + 1).padStart(2, '0'))
 
+    // -------------------- Methods --------------------
     const normalizeIndex = (index: number): number => {
       if (!totalProjects.value) {
         return 0
@@ -131,10 +138,12 @@ export default defineComponent({
     }
 
     const getPreviewStack = (project: PortfolioProject): string[] => {
-      return project.stack.slice(0, PREVIEW_STACK_LIMIT)
+      return project.stack?.slice(0, PREVIEW_STACK_LIMIT) ?? []
     }
 
     const getProjectPath = (project: PortfolioProject): string => project.path
+
+    // -------------------- Lifecycle --------------------
 
     return {
       carouselProjects,
