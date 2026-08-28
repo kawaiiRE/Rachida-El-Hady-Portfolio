@@ -41,7 +41,7 @@ export const PROFESSIONAL_ROLES: ProfessionalRole[] = [
     id: 'sowlutions',
     index: '01',
     company: 'Sowlutions',
-    title: 'Front-End Developer · Team-lead responsibilities',
+    title: 'Front-End Developer',
     startDate: '2025-01',
     startLabel: 'Jan 2025',
     endDate: '2026-08',

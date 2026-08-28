@@ -16,9 +16,9 @@ export default defineComponent({
     const personId = `${siteUrl}/#person`
 
     usePageSeo({
-      title: 'Rachida El Hady | Frontend Engineer & Team-Lead Scope',
+      title: 'Rachida El Hady | Frontend Engineer',
       description:
-        'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products while leading frontend delivery, architecture, code reviews, and mentorship.',
+        'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products with scalable architecture, polished interfaces, and reliable delivery.',
       path: '/',
       type: 'profile',
       structuredData: [
@@ -34,7 +34,7 @@ export default defineComponent({
             url: siteUrl,
             jobTitle: 'Front-End Developer',
             description:
-              'Frontend engineer building production web and mobile products with React, Vue, Nuxt, React Native, and TypeScript, with frontend team-lead responsibilities.',
+              'Frontend engineer building production web and mobile products with React, Vue, Nuxt, React Native, and TypeScript.',
             knowsAbout: [
               'Frontend engineering',
               'React.js',

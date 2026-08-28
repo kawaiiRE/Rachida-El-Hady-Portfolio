@@ -6,7 +6,7 @@
       <div class="content">
         <p class="eyebrow">
           <span>Frontend engineer</span>
-          <span>Team-lead responsibilities</span>
+          <span>Web &amp; mobile products</span>
         </p>
 
         <h1 class="title">
