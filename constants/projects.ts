@@ -101,7 +101,7 @@ export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
   background: 'linear-gradient(90deg, #61c5ff, #61c5ff, #ff78a5, #ff78a5, #61c5ff)',
   metrics: [
     {
-      value: '900+',
+      value: '1k+',
       label: 'Downloads',
     },
     {
