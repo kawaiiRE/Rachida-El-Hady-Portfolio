@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <title id="title">Design Kernel inverse mark</title>
+  <path fill="#F5F6F8" d="M4 4h9v4H8v5H4V4Zm15 0h9v9h-4V8h-5V4ZM4 19h4v5h5v4H4v-9Zm20 0h4v9h-9v-4h5v-5Z"/>
+  <rect width="8" height="8" x="12" y="12" fill="#8C88FF" rx="1"/>
+</svg>

@@ -7,15 +7,15 @@ export default defineComponent({
     // -------------------- Composables --------------------
     // -------------------- State --------------------
     const project = TRACKPAL_PROJECT
-    const platforms = project.platforms
+    const images = project.images.slice(0, 2)
 
     // -------------------- Computed --------------------
-    const metrics = platforms.flatMap((platform) => platform.metrics.slice(0, 1))
-    const technologies = [...new Set(platforms.flatMap((platform) => platform.stack))].slice(0, 6)
+    const metrics = project.metrics.slice(0, 2)
+    const technologies = project.stack.slice(0, 6)
 
     // -------------------- Methods --------------------
     // -------------------- Lifecycle --------------------
 
-    return { project, platforms, metrics, technologies }
+    return { project, images, metrics, technologies }
   },
 })

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="project-detail"
-    :style="{ '--project-background': project.background ?? platforms[0]?.background }"
-  >
+  <div class="project-detail" :style="{ '--project-background': project.background }">
     <div class="app-container container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <NuxtLink :to="APP_ROUTES.HOME">Home</NuxtLink><span aria-hidden="true">/</span>
@@ -22,30 +19,23 @@
           <div class="introduction">
             <p>{{ project.summary }}</p>
             <div v-if="hasProjectLinks" class="actions">
-              <template v-for="platform in platforms" :key="platform.id">
-                <a
-                  v-for="projectLink in platform.links"
-                  :key="`${platform.id}-${projectLink.id}`"
-                  :href="projectLink.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ projectLink.label }} <span aria-hidden="true">&#8599;</span>
-                </a>
-              </template>
+              <a
+                v-for="projectLink in project.links"
+                :key="projectLink.id"
+                :href="projectLink.url"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ projectLink.label }} <span aria-hidden="true">&#8599;</span>
+              </a>
             </div>
           </div>
         </div>
       </header>
 
       <figure class="hero">
-        <div class="hero-media" :class="{ 'is-multiple': platforms.length > 1 }">
-          <img
-            v-for="platform in platforms"
-            :key="platform.id"
-            :src="platform.bgImg"
-            :alt="platform.imageAlt"
-          />
+        <div class="hero-media">
+          <img :src="project.bgImg" :alt="project.imageAlt" />
         </div>
         <figcaption>
           <span>{{ project.title }} / Platform previews</span>
@@ -61,18 +51,13 @@
         </div>
 
         <dl class="metrics">
-          <template v-for="platform in platforms" :key="platform.id">
-            <div
-              v-for="(metric, index) in platform.metrics"
-              :key="`${platform.id}-${metric.label}`"
-            >
-              <dt>
-                <span aria-hidden="true">{{ platform.platform ?? index + 1 }}</span>
-                <span>{{ metric.label }}</span>
-              </dt>
-              <dd>{{ metric.value }}</dd>
-            </div>
-          </template>
+          <div v-for="(metric, index) in project.metrics" :key="metric.label">
+            <dt>
+              <span aria-hidden="true">{{ index + 1 }}</span>
+              <span>{{ metric.label }}</span>
+            </dt>
+            <dd>{{ metric.value }}</dd>
+          </div>
         </dl>
       </section>
 
@@ -106,22 +91,20 @@
           :aria-label="`${project.title} product screenshots`"
         >
           <div ref="galleryRef" class="track" tabindex="0">
-            <template v-for="platform in platforms" :key="platform.id">
-              <figure
-                v-for="(image, index) in platform.images"
-                :key="image"
-                class="slide"
-                role="group"
-                :aria-label="`${platform.title} screenshot ${index + 1}`"
-              >
-                <img
-                  :src="image"
-                  :alt="`${platform.title} product screenshot ${index + 1}`"
-                  loading="lazy"
-                />
-                <figcaption>{{ platform.title }} / View {{ index + 1 }}</figcaption>
-              </figure>
-            </template>
+            <figure
+              v-for="(image, index) in project.images"
+              :key="image"
+              class="slide"
+              role="group"
+              :aria-label="`${project.title} screenshot ${index + 1}`"
+            >
+              <img
+                :src="image"
+                :alt="`${project.title} product screenshot ${index + 1}`"
+                loading="lazy"
+              />
+              <figcaption>{{ project.title }} / View {{ index + 1 }}</figcaption>
+            </figure>
           </div>
 
           <template v-if="galleryCount > 1">

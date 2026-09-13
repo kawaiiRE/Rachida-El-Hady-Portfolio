@@ -24,10 +24,7 @@
         <aside
           v-if="isDesktopViewport"
           class="stage"
-          :style="{
-            '--project-background':
-              activeProject.background ?? activeProjectPreviews[0]?.background,
-          }"
+          :style="{ '--project-background': activeProject.background }"
         >
           <div class="signal" aria-hidden="true"></div>
 
@@ -38,15 +35,10 @@
                 class="preview"
                 :aria-label="`View the ${activeProject.title} project`"
               >
-                <span
-                  class="preview-media"
-                  :class="{ 'is-multiple': activeProjectPreviews.length > 1 }"
-                >
+                <span class="preview-media">
                   <img
-                    v-for="preview in activeProjectPreviews"
-                    :key="preview.id"
-                    :src="preview.bgImg"
-                    :alt="preview.imageAlt"
+                    :src="activeProject.bgImg"
+                    :alt="activeProject.imageAlt"
                     width="1600"
                     height="900"
                     decoding="async"
@@ -99,10 +91,7 @@
             :key="project.id"
             :class="{ 'item--active': index === activeProjectIndex }"
             class="item"
-            :style="{
-              '--project-background':
-                project.background ?? getProjectPreviews(project)[0]?.background,
-            }"
+            :style="{ '--project-background': project.background }"
           >
             <NuxtLink
               :to="project.path"
@@ -119,16 +108,10 @@
 
               <span class="item-arrow" aria-hidden="true">&#8599;</span>
 
-              <span
-                v-if="!isDesktopViewport"
-                class="mobile-preview"
-                :class="{ 'is-multiple': getProjectPreviews(project).length > 1 }"
-              >
+              <span v-if="!isDesktopViewport" class="mobile-preview">
                 <img
-                  v-for="preview in getProjectPreviews(project)"
-                  :key="preview.id"
-                  :src="preview.bgImg"
-                  :alt="preview.imageAlt"
+                  :src="project.bgImg"
+                  :alt="project.imageAlt"
                   width="1600"
                   height="900"
                   loading="lazy"

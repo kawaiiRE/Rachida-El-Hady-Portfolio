@@ -17,16 +17,15 @@ export default defineComponent({
       throw createError({ statusCode: 404, statusMessage: 'Project not found' })
     }
 
-    const platforms = project.platforms ?? [project]
     const projectIndex = PROJECTS.findIndex((candidate) => candidate.id === project.id)
     const followingProjects = [
       ...PROJECTS.slice(projectIndex + 1),
       ...PROJECTS.slice(0, projectIndex),
     ]
     const relatedProjects = followingProjects.slice(0, 3)
-    const technologies = [...new Set(platforms.flatMap(({ stack }) => stack ?? []))]
-    const galleryCount = platforms.flatMap(({ images }) => images ?? []).length
-    const hasProjectLinks = platforms.some((platform) => platform.links?.length)
+    const technologies = project.stack ?? []
+    const galleryCount = project.images?.length ?? 0
+    const hasProjectLinks = Boolean(project.links?.length)
     const galleryRef = ref<HTMLElement | null>(null)
 
     // -------------------- Computed --------------------
@@ -38,7 +37,7 @@ export default defineComponent({
       title: `${project.title} — ${project.category}`,
       description: project.summary,
       path: project.path,
-      image: platforms[0]?.images?.[0] ?? '',
+      image: project.images?.[0] ?? '',
       structuredData: [
         {
           '@context': 'https://schema.org',
@@ -86,7 +85,6 @@ export default defineComponent({
     return {
       APP_ROUTES,
       project,
-      platforms,
       technologies,
       galleryRef,
       galleryCount,

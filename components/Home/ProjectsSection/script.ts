@@ -36,11 +36,7 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     // -------------------- State --------------------
-    const projects = PROJECTS.flatMap((project) =>
-      project.separatePlatformsInCarousel && project.platforms?.length
-        ? project.platforms
-        : [project],
-    )
+    const projects = PROJECTS
     const currentIndex = ref(0)
     const carouselRef = ref<HTMLElement | null>(null)
     const dragStartX = ref<number | null>(null)

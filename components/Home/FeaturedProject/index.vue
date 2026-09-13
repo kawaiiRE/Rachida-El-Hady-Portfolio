@@ -11,10 +11,10 @@
 
       <div class="visual" data-motion>
         <img
-          v-for="platform in platforms"
-          :key="platform.id"
-          :src="platform.images[0]"
-          :alt="platform.imageAlt"
+          v-for="(image, index) in images"
+          :key="image"
+          :src="image"
+          :alt="`${project.title} product view ${index + 1}`"
           loading="lazy"
         />
         <span class="field field--primary" aria-hidden="true"></span>

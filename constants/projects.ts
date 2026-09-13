@@ -5,7 +5,6 @@ export interface PortfolioProject {
   summary: string
   description: string
   path: string
-  platform?: 'Web' | 'Mobile'
   stack?: string[]
   imageAlt?: string
   logo?: string
@@ -15,8 +14,6 @@ export interface PortfolioProject {
   background?: string
   metrics?: Array<{ value: string; label: string }>
   links?: Array<{ id: string; label: string; url: string }>
-  platforms?: PortfolioProject[]
-  separatePlatformsInCarousel?: boolean
 }
 
 export const AURAFLOW_PROJECT: PortfolioProject = {
@@ -59,6 +56,56 @@ export const AURAFLOW_PROJECT: PortfolioProject = {
     },
   ],
   path: '/projects/auraflow',
+}
+
+export const DESIGN_KERNEL_PROJECT: PortfolioProject = {
+  id: 'design-kernel',
+  title: 'Design Kernel',
+  category: 'Local-first Design System Studio',
+  summary:
+    'A design-system workbench for shaping coordinated light and dark themes, validating contrast, refining tokens, and exporting production-ready CSS.',
+  description:
+    'Design Kernel turns a small set of creative foundations into a complete, portable design system. Designers can explore distinct visual presets, tune color, typography, density, roundness, contrast, and elevation, inspect every generated token, preview both themes in a realistic product dashboard, save local snapshots, share versioned configurations, and export deterministic CSS with WCAG AA contrast enforcement.',
+  stack: [
+    'Nuxt',
+    'Vue',
+    'TypeScript',
+    'Pinia',
+    'Vuestic UI',
+    'SCSS',
+    'LocalStorage',
+    'WCAG',
+    'Vitest',
+  ],
+  imageAlt: 'Design Kernel workbench showing live tokens and a product dashboard preview.',
+  logo: '/images/projects/design-kernel/design-kernel-logo.svg',
+  logoAlt: 'Design Kernel modular frame logo.',
+  images: [
+    '/images/projects/design-kernel/design-kernel-prev-1-clean-product.png',
+    '/images/projects/design-kernel/design-kernel-prev-2-warm-organic.png',
+    '/images/projects/design-kernel/design-kernel-prev-3-bold-dark.png',
+    '/images/projects/design-kernel/design-kernel-prev-4-css-tokens.png',
+  ],
+  bgImg: '/images/projects/design-kernel/design-kernel-prev-3-bold-dark.png',
+  background: 'linear-gradient(90deg, #2563eb, #6d28d9, #8c88ff, #1b1d22, #2563eb)',
+  metrics: [
+    {
+      value: 'AA',
+      label: 'Live contrast enforcement',
+    },
+    {
+      value: 'CSS',
+      label: 'Portable design-token exports',
+    },
+  ],
+  links: [
+    {
+      id: 'website',
+      label: 'Visit Website',
+      url: 'https://design-kernel.rachida.dev',
+    },
+  ],
+  path: '/projects/design-kernel',
 }
 
 export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
@@ -124,6 +171,105 @@ export const CRAZY_SUDOKU_PROJECT: PortfolioProject = {
   path: '/projects/crazy-sudoku',
 }
 
+export const EVERMATH_PROJECT: PortfolioProject = {
+  id: 'evermath',
+  title: 'Evermath',
+  category: 'Adaptive Math Learning Platform',
+  summary:
+    'An all-ages mathematics platform that turns placement, personal lessons, and daily practice into a learning path that grows with each learner.',
+  description:
+    'Evermath brings a Nuxt web experience, an offline-capable Expo mobile app, and a versioned Fastify API into one mathematics platform. Learners move through age-aware foundations, school mastery, and adult refreshers with adaptive lessons, daily check-ins, progress tracking, household profiles, competitions, and English, French, and Arabic support.',
+  stack: [
+    'Nuxt',
+    'Vue',
+    'TypeScript',
+    'Pinia',
+    'KaTeX',
+    'Expo',
+    'React Native',
+    'Fastify',
+    'Drizzle',
+    'Postgres',
+  ],
+  imageAlt: 'Evermath adaptive mathematics lesson and learning path preview.',
+  logo: '/images/projects/evermath/evermath-logo.svg',
+  logoAlt: 'Evermath sigma logo.',
+  images: [
+    '/images/projects/evermath/evermath-prev-1-lesson-hero.png',
+    '/images/projects/evermath/evermath-prev-2-learning-paths.png',
+    '/images/projects/evermath/evermath-prev-3-daily-practice.png',
+  ],
+  bgImg: '/images/projects/evermath/evermath-prev-1-lesson-hero.png',
+  background: 'linear-gradient(90deg, #5046e5, #d64b68, #d18b16, #078574, #5046e5)',
+  metrics: [
+    {
+      value: 'K–12+',
+      label: 'Learning paths for every age',
+    },
+    {
+      value: '3',
+      label: 'Supported learning languages',
+    },
+  ],
+  links: [
+    {
+      id: 'website',
+      label: 'Visit Website',
+      url: 'https://evermath.rachida.dev',
+    },
+  ],
+  path: '/projects/evermath',
+}
+
+export const VERSE_PROJECT: PortfolioProject = {
+  id: 'verse',
+  title: 'Verse',
+  category: 'Local-first Lyrics Rehearsal App',
+  summary:
+    'A private rehearsal studio for learning lyrics through synced entrances, focused loops, flexible recall modes, and honest memory tracking.',
+  description:
+    'Verse turns a browser into a private rehearsal room for singers. Musicians can import local audio or use the official YouTube player, synchronize every lyric entrance, isolate difficult sections with precise A/B loops, switch between full, hidden, first-letter, and cloze recall, and build memory through self-rated practice—all without an account or backend.',
+  stack: [
+    'Nuxt',
+    'Vue',
+    'TypeScript',
+    'Pinia',
+    'Vuestic UI',
+    'IndexedDB',
+    'Web Audio',
+    'YouTube IFrame API',
+  ],
+  imageAlt: 'Verse lyric rehearsal workspace with local audio, timing, and recall practice.',
+  logo: '/images/projects/verse/verse-logo.png',
+  logoAlt: 'Verse ribbon V logo.',
+  images: [
+    '/images/projects/verse/verse-prev-1-workspace.png',
+    '/images/projects/verse/verse-prev-2-lyric-sync.png',
+    '/images/projects/verse/verse-prev-3-recall-practice.png',
+    '/images/projects/verse/verse-prev-4-song-library.png',
+  ],
+  bgImg: '/images/projects/verse/verse-prev-1-workspace.png',
+  background: 'linear-gradient(90deg, #0b0a09, #8f5931, #e4a155, #f2eadf, #0b0a09)',
+  metrics: [
+    {
+      value: 'A/B',
+      label: 'Precision rehearsal loops',
+    },
+    {
+      value: 'Local',
+      label: 'Private, account-free library',
+    },
+  ],
+  links: [
+    {
+      id: 'website',
+      label: 'Visit Website',
+      url: 'https://verse.rachida.dev',
+    },
+  ],
+  path: '/projects/verse',
+}
+
 export const TRACKPAL_PROJECT = {
   id: 'trackpal',
   title: 'TrackPal',
@@ -132,101 +278,59 @@ export const TRACKPAL_PROJECT = {
     'A connected personal finance system for planning on the web and keeping up with money on the go.',
   description:
     'TrackPal brings a Nuxt web workspace and an Expo mobile app into one finance product. Both platforms share the same Fastify, Drizzle, and Postgres foundation for transactions, recurring schedules, forecasts, insights, receipts, and subscriptions, while each interface is shaped for its own context.',
-  path: '/projects/trackpal',
-  platforms: [
+  stack: [
+    'Nuxt',
+    'Vue',
+    'TypeScript',
+    'Pinia',
+    'Vuestic UI',
+    'Chart.js',
+    'Expo',
+    'React Native',
+    'Expo Router',
+    'MobX',
+    'React Native Paper',
+    'Fastify',
+    'Drizzle',
+    'Postgres',
+    'RevenueCat',
+    'AsyncStorage',
+  ],
+  imageAlt: 'TrackPal personal finance dashboard across web and mobile.',
+  logo: '/images/projects/trackpal-web/trackpal-web-logo.png',
+  logoAlt: 'TrackPal logo.',
+  images: [
+    '/images/projects/trackpal-web/trackpal-web-prev-1-dashboard-forecast.png',
+    '/images/projects/trackpal-mobile/trackpal-mobile-prev-1-dashboard-cash-flow.png',
+    '/images/projects/trackpal-web/trackpal-web-prev-2-dashboard-analytics.png',
+    '/images/projects/trackpal-mobile/trackpal-mobile-prev-2-dashboard-category-spend.png',
+    '/images/projects/trackpal-web/trackpal-web-prev-3-transactions.png',
+    '/images/projects/trackpal-mobile/trackpal-mobile-prev-3-transactions.png',
+    '/images/projects/trackpal-web/trackpal-web-prev-4-recurring-payments.png',
+    '/images/projects/trackpal-mobile/trackpal-mobile-prev-4-insights-overview.png',
+    '/images/projects/trackpal-web/trackpal-web-prev-5-forecast-patterns.png',
+    '/images/projects/trackpal-mobile/trackpal-mobile-prev-5-insights-highlights.png',
+    '/images/projects/trackpal-web/trackpal-web-prev-6-spending-history.png',
+  ],
+  bgImg: '/images/projects/trackpal-web/trackpal-web-bg.png',
+  background: 'linear-gradient(90deg, #00d4a6, #55b7ff, #7c5cff, #ffd166, #00d4a6)',
+  metrics: [
+    { value: 'Web + App', label: 'One connected finance system' },
+    { value: 'Sync', label: 'Forecasts, receipts, and insights' },
+  ],
+  links: [
     {
-      id: 'trackpal-web',
-      platform: 'Web',
-      title: 'TrackPal Web',
-      category: 'Web App',
-      summary:
-        'A personal finance dashboard for tracking cash flow, forecasting balances, and turning daily spending into a clearer plan.',
-      description:
-        'TrackPal Web is a Nuxt and Vue finance workspace with transaction management, recurring schedules, receipt uploads, forecast charts, insights, exports, and subscription-aware Pro areas. It connects to a Fastify API backed by Drizzle and Postgres, with Pinia for app state, Vuestic UI for the interface, Chart.js for analytics, and RevenueCat for subscriptions.',
-      path: '/projects/trackpal',
-      stack: [
-        'Nuxt',
-        'Vue',
-        'TypeScript',
-        'Pinia',
-        'Vuestic UI',
-        'Chart.js',
-        'Fastify',
-        'Drizzle',
-        'Postgres',
-        'RevenueCat',
-      ],
-      imageAlt: 'TrackPal Web finance dashboard themed background.',
-      logo: '/images/projects/trackpal-web/trackpal-web-logo.png',
-      logoAlt: 'TrackPal Web logo.',
-      images: [
-        '/images/projects/trackpal-web/trackpal-web-prev-1-dashboard-forecast.png',
-        '/images/projects/trackpal-web/trackpal-web-prev-2-dashboard-analytics.png',
-        '/images/projects/trackpal-web/trackpal-web-prev-3-transactions.png',
-        '/images/projects/trackpal-web/trackpal-web-prev-4-recurring-payments.png',
-        '/images/projects/trackpal-web/trackpal-web-prev-5-forecast-patterns.png',
-        '/images/projects/trackpal-web/trackpal-web-prev-6-spending-history.png',
-      ],
-      bgImg: '/images/projects/trackpal-web/trackpal-web-bg.png',
-      background: 'linear-gradient(90deg, #00d4a6, #55b7ff, #7c5cff, #00d4a6)',
-      metrics: [
-        { value: 'Nuxt', label: 'Responsive finance dashboard' },
-        { value: 'API', label: 'Forecasts, exports, receipts' },
-      ],
-      links: [
-        {
-          id: 'website',
-          label: 'Visit Website',
-          url: 'https://trackpal.rachida.dev',
-        },
-      ],
+      id: 'website',
+      label: 'Visit Website',
+      url: 'https://trackpal.rachida.dev',
     },
     {
-      id: 'trackpal-mobile',
-      platform: 'Mobile',
-      title: 'TrackPal Mobile',
-      category: 'Mobile App',
-      summary:
-        'A companion finance app built for quick transaction capture, planning, and spending awareness on the go.',
-      description:
-        'TrackPal Mobile is an Expo and React Native app for tracking transactions, reviewing forecasts, checking insights, planning recurring payments, and syncing receipt images with the TrackPal API. It uses Expo Router, MobX, React Native Paper, local storage, image picking, RevenueCat purchases, and the same finance data model as the web app.',
-      path: '/projects/trackpal',
-      stack: [
-        'Expo',
-        'React Native',
-        'TypeScript',
-        'Expo Router',
-        'MobX',
-        'React Native Paper',
-        'AsyncStorage',
-        'RevenueCat',
-      ],
-      imageAlt: 'TrackPal Mobile finance app themed background.',
-      logo: '/images/projects/trackpal-mobile/trackpal-mobile-logo.png',
-      logoAlt: 'TrackPal Mobile logo.',
-      images: [
-        '/images/projects/trackpal-mobile/trackpal-mobile-prev-1-dashboard-cash-flow.png',
-        '/images/projects/trackpal-mobile/trackpal-mobile-prev-2-dashboard-category-spend.png',
-        '/images/projects/trackpal-mobile/trackpal-mobile-prev-3-transactions.png',
-        '/images/projects/trackpal-mobile/trackpal-mobile-prev-4-insights-overview.png',
-        '/images/projects/trackpal-mobile/trackpal-mobile-prev-5-insights-highlights.png',
-      ],
-      bgImg: '/images/projects/trackpal-mobile/trackpal-mobile-bg.png',
-      background: 'linear-gradient(90deg, #55b7ff, #00d4a6, #ffd166, #55b7ff)',
-      metrics: [
-        { value: 'Expo', label: 'Native mobile experience' },
-        { value: 'Sync', label: 'Offline capture and receipts' },
-      ],
-      links: [
-        {
-          id: 'google-play',
-          label: 'View on Google Play',
-          url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
-        },
-      ],
+      id: 'google-play',
+      label: 'View on Google Play',
+      url: 'https://play.google.com/store/apps/details?id=dev.rachida.trackpal',
     },
   ],
-  separatePlatformsInCarousel: true,
+  path: '/projects/trackpal',
 } satisfies PortfolioProject
 
 export const NOTIFY_PROJECT: PortfolioProject = {
@@ -379,7 +483,10 @@ export const PLAYQUEST_PROJECT: PortfolioProject = {
 export const PROJECTS: PortfolioProject[] = [
   TRACKPAL_PROJECT,
   CRAZY_SUDOKU_PROJECT,
+  // EVERMATH_PROJECT,
+  VERSE_PROJECT,
   AURAFLOW_PROJECT,
+  DESIGN_KERNEL_PROJECT,
   NOTIFY_PROJECT,
   PLAYQUEST_PROJECT,
   // WHISPER_PROJECT,

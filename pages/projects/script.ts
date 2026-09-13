@@ -17,9 +17,9 @@ export default defineComponent({
     usePageSeo({
       title: 'Independent Web and Mobile Products',
       description:
-        'Explore independent web and mobile products by Rachida El Hady, including TrackPal, Crazy Sudoku, Nuxt, Vue, React Native, TypeScript, and WebGL work.',
+        'Explore independent products by Rachida El Hady, including TrackPal, Crazy Sudoku, Evermath, Verse, Design Kernel, and Auraflow.',
       path: '/projects',
-      image: PROJECTS[0]?.platforms?.[0]?.bgImg ?? PROJECTS[0]?.bgImg ?? '',
+      image: PROJECTS[0]?.bgImg ?? '',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -52,26 +52,14 @@ export default defineComponent({
     const activeProject = computed<PortfolioProject>(
       () => PROJECTS[activeProjectIndex.value] ?? PROJECTS[0]!,
     )
-    const activeProjectPreviews = computed(() => getProjectPreviews(activeProject.value))
     const activeProjectIndexLabel = computed(() => formatProjectIndex(activeProjectIndex.value))
     const activeProjectLinks = computed(() =>
-      activeProjectPreviews.value
-        .flatMap((project) => project.links ?? [])
-        .filter((link) => Boolean(link.url)),
+      (activeProject.value.links ?? []).filter((link) => Boolean(link.url)),
     )
-    const activeProjectStack = computed(() =>
-      [...new Set(activeProjectPreviews.value.flatMap((project) => project.stack ?? []))].slice(
-        0,
-        4,
-      ),
-    )
+    const activeProjectStack = computed(() => (activeProject.value.stack ?? []).slice(0, 4))
     const projectCountLabel = computed(() => String(PROJECTS.length).padStart(2, '0'))
 
     // -------------------- Methods --------------------
-    function getProjectPreviews(project: PortfolioProject): PortfolioProject[] {
-      return project.platforms ?? [project]
-    }
-
     function formatProjectIndex(index: number): string {
       return String(index + 1).padStart(2, '0')
     }
@@ -204,13 +192,11 @@ export default defineComponent({
       projectsPageRef,
       isDesktopViewport,
       activeProject,
-      activeProjectPreviews,
       activeProjectIndex,
       activeProjectIndexLabel,
       activeProjectLinks,
       activeProjectStack,
       projectCountLabel,
-      getProjectPreviews,
       formatProjectIndex,
       setActiveProject,
     }
