@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
+  <title id="title">Launchframe</title>
+  <desc id="description">A geometric letter L within a layered rounded frame.</desc>
+  <defs>
+    <linearGradient id="background" x1="18" y1="12" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8e8bff"/>
+      <stop offset="0.58" stop-color="#5a55e7"/>
+      <stop offset="1" stop-color="#1b9aaa"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="32" fill="#11182b"/>
+  <rect x="17" y="17" width="94" height="94" rx="25" fill="url(#background)"/>
+  <path d="M44 37h18v39h27v16H44V37Z" fill="#fff"/>
+  <path d="M34 27h60" stroke="#fff" stroke-opacity=".3" stroke-width="4" stroke-linecap="round"/>
+</svg>
