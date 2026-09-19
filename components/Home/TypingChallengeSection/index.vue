@@ -72,7 +72,7 @@
           <div class="controls">
             <button type="button" class="start-button" @click="startChallenge">
               <span>{{ buttonLabel }}</span>
-              <span aria-hidden="true">↗</span>
+              <span class="arrow" aria-hidden="true">↗</span>
             </button>
             <div
               class="live-clock"

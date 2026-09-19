@@ -1,6 +1,7 @@
 import { useState } from '#imports'
 import { defineComponent, nextTick, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
 import { APP_LINKS, APP_ROUTES } from '~/constants/routes'
+import { MOTION } from '~/constants/motion'
 import { DEFAULT_THEME_MODE, type ThemeMode } from '~/constants/theme'
 import { hexColorToNumber, resolveCssVarColor, themeColorVariables } from '~/lib/utils'
 
@@ -29,6 +30,8 @@ export default defineComponent({
     const vantaEffect = shallowRef<VantaEffect | null>(null)
     let vantaCreationId = 0
     let scrollMatchMedia: GsapMatchMedia | null = null
+    let motionPreference: MediaQueryList | null = null
+    let hasEntered = false
 
     // -------------------- Computed --------------------
     // -------------------- Methods --------------------
@@ -109,30 +112,47 @@ export default defineComponent({
 
       gsap.registerPlugin(ScrollTrigger)
       scrollMatchMedia = gsap.matchMedia()
-      scrollMatchMedia.add('(prefers-reduced-motion: no-preference)', () => {
+      scrollMatchMedia.add(MOTION.enabled, () => {
         const context = gsap.context(() => {
-          gsap.from(['.eyebrow', '.title span', '.subtitle', '.actions'], {
-            opacity: 0,
-            y: 28,
-            duration: 0.82,
-            stagger: 0.075,
-            ease: 'power3.out',
-            clearProps: 'opacity,transform',
-          })
+          if (!hasEntered) {
+            hasEntered = true
+            gsap
+              .timeline({ defaults: { ease: MOTION.ease, clearProps: 'opacity,transform' } })
+              .from('.eyebrow', { opacity: 0, y: '0.75rem', duration: MOTION.headline }, 0)
+              .from(
+                '.title .reveal',
+                {
+                  yPercent: 110,
+                  duration: MOTION.headline,
+                  stagger: MOTION.stagger,
+                },
+                MOTION.stagger,
+              )
+              .from(
+                ['.subtitle', '.actions'],
+                {
+                  opacity: 0,
+                  y: '0.75rem',
+                  duration: MOTION.headline,
+                  stagger: MOTION.stagger,
+                },
+                MOTION.headline,
+              )
 
-          gsap.from(sittingImageElement, {
-            opacity: 0,
-            duration: 1,
-            delay: 0.18,
-            ease: 'power2.out',
-          })
+            gsap.from(sittingImageElement, {
+              opacity: 0,
+              duration: 1,
+              delay: 0.18,
+              ease: 'power2.out',
+            })
 
-          gsap.from(scrollFlowerElement, {
-            opacity: 0,
-            duration: 0.9,
-            delay: 0.34,
-            ease: 'power2.out',
-          })
+            gsap.from(scrollFlowerElement, {
+              opacity: 0,
+              duration: 0.9,
+              delay: 0.34,
+              ease: 'power2.out',
+            })
+          }
 
           gsap
             .timeline({
@@ -156,6 +176,11 @@ export default defineComponent({
       scrollMatchMedia = null
     }
 
+    const syncMotionPreference = (): void => {
+      destroyVantaBackground()
+      void createVantaBackground()
+    }
+
     // -------------------- Watchers --------------------
     watch(themeMode, async () => {
       await nextTick()
@@ -165,11 +190,14 @@ export default defineComponent({
 
     // -------------------- Lifecycle --------------------
     onMounted(() => {
+      motionPreference = window.matchMedia(MOTION.reduced)
+      motionPreference.addEventListener('change', syncMotionPreference)
       void createVantaBackground()
       void createScrollAnimations()
     })
 
     onBeforeUnmount(() => {
+      motionPreference?.removeEventListener('change', syncMotionPreference)
       destroyVantaBackground()
       destroyScrollAnimations()
     })

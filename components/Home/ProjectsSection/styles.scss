@@ -1,4 +1,7 @@
+@use '~/assets/motion.scss' as motion;
+
 .projects {
+  @include motion.headline;
   & {
     --carousel-scale-active: 1;
     --carousel-scale-1: 0.75;
@@ -103,10 +106,10 @@
     transform: translateX(-50%) scale(1);
     transform-origin: center center;
     transition:
-      transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-      z-index 0s 0.6s;
+      transform var(--motion-carousel) var(--motion-ease),
+      opacity var(--motion-carousel) var(--motion-ease),
+      box-shadow var(--motion-carousel) var(--motion-ease),
+      z-index 0s var(--motion-carousel);
     will-change: transform, opacity;
     animation: gradientShift 7s linear infinite;
   }
@@ -115,7 +118,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity var(--motion-carousel) var(--motion-ease);
   }
 
   .carousel-card.is-active {
@@ -200,6 +203,7 @@
   }
 
   .nav-button {
+    @include motion.feedback;
     width: 3rem;
     height: 3rem;
     border: 0.0625rem solid var(--line-subtle);
@@ -208,24 +212,57 @@
     color: var(--primary-scale-400);
     font-size: 1.3rem;
     cursor: pointer;
-    transition:
-      color 180ms ease,
-      background-color 180ms ease,
-      transform 180ms ease;
   }
 
   .nav-button:hover {
     border-color: rgba(var(--primary-scale-400-rgb), 0.38);
     background: var(--surface-accent-soft);
-    transform: translateY(-0.08rem);
+  }
+
+  .panels {
+    display: grid;
+    // All panels contribute to intrinsic height, including before hydration.
+    // Hidden panels are inert and excluded from the accessibility tree.
+    overflow: clip;
+    padding-block: 0.5rem;
+
+    @media (prefers-reduced-motion: no-preference) {
+      &.is-changing .panel.is-active {
+        animation: panel-enter var(--motion-carousel) var(--motion-ease) both;
+      }
+    }
   }
 
   .panel {
+    grid-area: 1 / 1;
+    width: 100%;
     padding: 0 1.5rem;
     max-width: 40.5rem;
     margin-inline: auto;
     text-align: center;
-    animation: projects-panel-in 180ms ease-out both;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(var(--panel-offset));
+    transition:
+      opacity var(--motion-carousel) var(--motion-ease),
+      transform var(--motion-carousel) var(--motion-ease),
+      visibility 0s var(--motion-carousel);
+
+    &.is-leaving {
+      transform: translateX(calc(-1 * var(--panel-offset)));
+    }
+
+    &.is-active {
+      z-index: 1;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+
+    &:not(.is-active) .cta {
+      animation: none;
+    }
   }
 
   .panel-title {
@@ -280,9 +317,11 @@
   }
 
   .cta {
+    @include motion.feedback;
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    gap: 0.6rem;
     min-width: 11.5rem;
     padding: 0.9rem 1.4rem;
     border: 0.0625rem solid transparent;
@@ -300,15 +339,6 @@
     background-size: 200% auto;
     color: var(--static-white);
     animation: projects-gradient-loop 4.5s linear infinite alternate;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.05);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
   }
 
   .cta--secondary {
@@ -341,15 +371,28 @@
     }
   }
 
-  @keyframes projects-panel-in {
-    from {
-      opacity: 0;
-      transform: translateY(0.5rem);
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-card,
+    .carousel-image,
+    .panel,
+    .cta {
+      animation: none;
+      transition: none;
     }
 
+    .panel {
+      transform: none;
+    }
+  }
+
+  @keyframes panel-enter {
+    from {
+      opacity: 0;
+      transform: translateX(var(--panel-offset));
+    }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
     }
   }
 

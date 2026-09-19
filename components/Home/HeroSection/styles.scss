@@ -1,5 +1,8 @@
+@use '~/assets/motion.scss' as motion;
+
 /* Hero layout and its Vanta foreground treatment. */
 .hero {
+  @include motion.headline;
   & {
     position: relative;
     isolation: isolate;
@@ -85,7 +88,7 @@
     letter-spacing: -0.065em;
   }
 
-  .title span:last-child {
+  .title > .mask:last-child {
     color: var(--primary-scale-400);
   }
 
@@ -104,19 +107,12 @@
   }
 
   .cta {
+    @include motion.feedback;
     padding: 0.72rem 1.15rem;
     border: 0.0625rem solid transparent;
     border-radius: 999rem;
     font-weight: 650;
     text-decoration: none;
-    transition:
-      transform 180ms ease,
-      border-color 180ms ease,
-      background-color 180ms ease;
-  }
-
-  .cta:hover {
-    transform: translateY(-0.12rem);
   }
 
   .cta.primary {
@@ -283,7 +279,7 @@
       line-height: 0.86;
     }
 
-    .title span:last-child {
+    .title > .mask:last-child {
       margin-left: 0.5em;
     }
 

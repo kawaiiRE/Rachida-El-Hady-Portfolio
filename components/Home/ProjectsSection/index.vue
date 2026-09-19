@@ -1,10 +1,16 @@
 <template>
-  <section id="projects" class="projects">
+  <section id="projects" ref="sectionRef" class="projects">
     <div class="app-container section-content">
-      <div class="header" data-motion>
+      <div class="header">
         <div>
-          <p class="section-label">Independent products</p>
-          <h2 class="section-title">Ideas I took all the way to working software.</h2>
+          <p class="section-label" data-motion>Independent products</p>
+          <h2 class="section-title">
+            <template v-for="(word, index) in headingWords" :key="index"
+              ><span class="mask"
+                ><span class="reveal">{{ word }}</span></span
+              >{{ index < headingWords.length - 1 ? ' ' : '' }}</template
+            >
+          </h2>
         </div>
       </div>
     </div>
@@ -31,6 +37,8 @@
           @pointermove="trackDrag"
           @pointerup="finishDrag"
           @pointercancel="cancelDrag"
+          @click.capture="preventDragClick"
+          @dragstart.prevent
         >
           <button
             v-for="(carouselProject, index) in carouselProjects"
@@ -52,6 +60,7 @@
               :src="carouselProject.project.logo"
               :alt="carouselProject.project.logoAlt"
               class="carousel-image"
+              draggable="false"
             />
           </button>
         </div>
@@ -74,34 +83,39 @@
         </button>
       </div>
 
-      <div
-        v-if="currentProject"
-        :key="currentProject.id"
-        class="panel"
-        :style="{ '--project-background': currentProject.background }"
-      >
-        <div class="panel-copy">
-          <h3 class="panel-title">{{ currentProject.title }}</h3>
-          <p class="panel-summary">{{ currentProject.summary }}</p>
-        </div>
+      <div class="panels" :class="{ 'is-changing': previousIndex !== null }" :style="panelStyle">
+        <div
+          v-for="(project, index) in projects"
+          :key="project.id"
+          class="panel"
+          :class="{ 'is-active': index === currentIndex, 'is-leaving': index === previousIndex }"
+          :aria-hidden="index !== currentIndex"
+          :inert="index !== currentIndex"
+          :style="{ '--project-background': project.background }"
+        >
+          <div class="panel-copy">
+            <h3 class="panel-title">{{ project.title }}</h3>
+            <p class="panel-summary">{{ project.summary }}</p>
+          </div>
 
-        <div class="panel-tags" aria-label="Project overview">
-          <span class="panel-tag panel-tag--category">
-            {{ currentProject.category }}
-          </span>
-          <span
-            v-for="technology in getPreviewStack(currentProject)"
-            :key="technology"
-            class="panel-tag"
-          >
-            {{ technology }}
-          </span>
-        </div>
+          <div class="panel-tags" aria-label="Project overview">
+            <span class="panel-tag panel-tag--category">
+              {{ project.category }}
+            </span>
+            <span
+              v-for="technology in getPreviewStack(project)"
+              :key="technology"
+              class="panel-tag"
+            >
+              {{ technology }}
+            </span>
+          </div>
 
-        <div class="actions">
-          <NuxtLink :to="getProjectPath(currentProject)" class="cta cta--primary">
-            See Full Project
-          </NuxtLink>
+          <div class="actions">
+            <NuxtLink :to="getProjectPath(project)" class="cta cta--primary">
+              See Full Project <span class="arrow" aria-hidden="true">↗</span>
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>

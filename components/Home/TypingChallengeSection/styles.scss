@@ -1,3 +1,5 @@
+@use '~/assets/motion.scss' as motion;
+
 .typing-challenge {
   &,
   .header,
@@ -279,6 +281,7 @@
   }
 
   .start-button {
+    @include motion.feedback;
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -293,22 +296,10 @@
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease;
-  }
-
-  .start-button span:last-child {
-    transition: transform 180ms ease;
   }
 
   .start-button:hover {
     box-shadow: 0 0.7rem 1.8rem rgba(var(--primary-scale-400-rgb), 0.22);
-    transform: translateY(-0.12rem);
-  }
-
-  .start-button:hover span:last-child {
-    transform: translate(0.15rem, -0.15rem);
   }
 
   .start-button:focus-visible,

@@ -1,5 +1,6 @@
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { PROJECTS } from '~/constants/projects'
+import { MOTION, MOTION_STYLE } from '~/constants/motion'
 
 type RevertibleMatchMedia = {
   revert: () => void
@@ -72,10 +73,15 @@ export default defineComponent({
 
     // -------------------- State --------------------
     const homePageRef = ref<HTMLElement | null>(null)
+    const isMotionEnabled = ref(false)
+    let motionPreference: MediaQueryList | null = null
     let motionMatchMedia: RevertibleMatchMedia | null = null
 
     // -------------------- Computed --------------------
     // -------------------- Methods --------------------
+    const syncMotionPreference = (): void => {
+      isMotionEnabled.value = motionPreference?.matches ?? false
+    }
     const createSectionMotion = async (): Promise<void> => {
       if (!homePageRef.value) {
         return
@@ -131,14 +137,20 @@ export default defineComponent({
 
     // -------------------- Lifecycle --------------------
     onMounted(() => {
+      motionPreference = window.matchMedia(MOTION.enabled)
+      syncMotionPreference()
+      motionPreference.addEventListener('change', syncMotionPreference)
       void createSectionMotion()
     })
 
     onBeforeUnmount(() => {
+      motionPreference?.removeEventListener('change', syncMotionPreference)
       destroySectionMotion()
     })
 
     return {
+      MOTION_STYLE,
+      isMotionEnabled,
       homePageRef,
     }
   },

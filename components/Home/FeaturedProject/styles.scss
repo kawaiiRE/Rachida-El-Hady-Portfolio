@@ -1,4 +1,7 @@
+@use '~/assets/motion.scss' as motion;
+
 .featured-project {
+  @include motion.headline;
   & {
     position: relative;
     overflow: hidden;
@@ -24,29 +27,29 @@
     align-items: end;
     margin-top: 3rem;
     min-height: 30rem;
-    padding: 0;
-    overflow: hidden;
+    padding: 2rem 0.5rem;
+    overflow: visible;
     border: 0;
     border-radius: 0;
     background: transparent;
   }
-  .visual img {
+  .media {
     position: relative;
     z-index: 1;
-    width: 100%;
-    border-radius: 0.9rem;
-    box-shadow: var(--shadow-image);
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .visual img:last-of-type {
-    max-height: 25rem;
-    object-fit: contain;
-  }
-  .visual:hover img:first-of-type {
-    transform: translateY(-0.5rem) rotate(-0.5deg);
-  }
-  .visual:hover img:last-of-type {
-    transform: translateY(-1rem) rotate(1.2deg);
+    min-width: 0;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0.9rem;
+      box-shadow: var(--shadow-image);
+    }
+
+    &.mobile {
+      width: min(100%, 12.207rem);
+      justify-self: center;
+    }
   }
   .field {
     position: absolute;
@@ -59,13 +62,13 @@
     animation: featured-field-breathe 9s ease-in-out infinite alternate;
   }
 
-  .field--primary {
+  .field.primary {
     top: 1.5rem;
     right: 5%;
     background: rgba(var(--primary-scale-400-rgb), 0.22);
   }
 
-  .field--secondary {
+  .field.secondary {
     bottom: 0.5rem;
     left: 17%;
     width: 24rem;
@@ -104,6 +107,7 @@
     font-size: 0.7rem;
   }
   .link {
+    @include motion.feedback;
     display: flex;
     gap: 2rem;
     padding-bottom: 0.4rem;

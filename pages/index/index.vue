@@ -1,7 +1,7 @@
 <template>
-  <div ref="homePageRef" class="home-page">
+  <div ref="homePageRef" class="home-page" :style="MOTION_STYLE">
     <ClientOnly>
-      <LazyHomeSectionField />
+      <LazyHomeSectionField v-if="isMotionEnabled" />
     </ClientOnly>
     <HomeHeroSection />
     <HomeAboutSection />

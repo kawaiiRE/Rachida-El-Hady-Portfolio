@@ -1,3 +1,5 @@
+@use '~/assets/motion.scss' as motion;
+
 .contact {
   .wrapper {
     position: relative;
@@ -199,6 +201,7 @@
   }
 
   .form-button {
+    @include motion.feedback;
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -214,22 +217,10 @@
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease;
-  }
-
-  .form-button span:last-child {
-    transition: transform 180ms ease;
   }
 
   .form-button:hover:not(:disabled) {
     box-shadow: 0 0.7rem 1.8rem rgba(var(--primary-scale-400-rgb), 0.22);
-    transform: translateY(-0.12rem);
-  }
-
-  .form-button:hover:not(:disabled) span:last-child {
-    transform: translate(0.15rem, -0.15rem);
   }
 
   .form-button:focus-visible {

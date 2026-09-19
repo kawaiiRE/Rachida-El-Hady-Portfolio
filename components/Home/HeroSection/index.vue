@@ -10,8 +10,9 @@
         </p>
 
         <h1 class="title">
-          <span>Rachida</span>
-          <span>El Hady</span>
+          <span class="mask"><span class="reveal">Rachida</span></span
+          >{{ ' ' }}
+          <span class="mask"><span class="reveal">El Hady</span></span>
         </h1>
 
         <p class="subtitle">

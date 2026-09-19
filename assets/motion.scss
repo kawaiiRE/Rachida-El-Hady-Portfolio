@@ -1,0 +1,59 @@
+// Local heading wrappers preserve ordinary whitespace and responsive wrapping.
+@mixin headline {
+  .mask {
+    display: inline-block;
+    overflow: clip;
+    vertical-align: bottom;
+    padding-block: 0.12em;
+    margin-block: -0.12em;
+  }
+
+  .reveal {
+    display: inline-block;
+  }
+}
+
+@mixin feedback {
+  transition:
+    transform var(--motion-feedback, 0.18s) ease,
+    background-color var(--motion-feedback, 0.18s) ease,
+    border-color var(--motion-feedback, 0.18s) ease,
+    box-shadow var(--motion-feedback, 0.18s) ease;
+
+  .arrow {
+    display: inline-block;
+    transition: transform var(--motion-feedback, 0.18s) ease;
+  }
+
+  &:focus-visible {
+    outline: 0.125rem solid var(--primary-scale-400);
+    outline-offset: 0.25rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        transform: translateY(-0.125rem);
+      }
+
+      &:hover:not(:disabled) .arrow {
+        transform: translate(0.15rem, -0.15rem);
+      }
+    }
+
+    &:focus-visible .arrow {
+      transform: translate(0.15rem, -0.15rem);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    .arrow {
+      transition: none;
+    }
+  }
+}

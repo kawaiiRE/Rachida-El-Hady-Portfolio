@@ -111,7 +111,7 @@
         <!-- Submit button -->
         <button type="submit" class="form-button" :disabled="isLoading">
           <span>{{ isLoading ? 'Sending...' : 'Send Message' }}</span>
-          <span aria-hidden="true">↗</span>
+          <span class="arrow" aria-hidden="true">↗</span>
         </button>
       </form>
     </div>

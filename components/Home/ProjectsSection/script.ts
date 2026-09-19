@@ -1,4 +1,4 @@
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref, shallowRef } from 'vue'
 import { PROJECTS, type PortfolioProject } from '~/constants/projects'
 
 type ProjectCardState =
@@ -35,11 +35,17 @@ export default defineComponent({
   emits: [],
   setup() {
     // -------------------- Composables --------------------
+    const sectionRef = shallowRef<HTMLElement | null>(null)
+    useHeadlineMotion(sectionRef)
     // -------------------- State --------------------
     const projects = PROJECTS
+    const headingWords = 'Ideas I took all the way to working software.'.split(' ')
     const currentIndex = ref(0)
+    const previousIndex = ref<number | null>(null)
+    const travelDirection = ref(1)
     const carouselRef = ref<HTMLElement | null>(null)
     const dragStartX = ref<number | null>(null)
+    let suppressClick = false
     const totalProjects = computed(() => projects.length)
 
     // -------------------- Computed --------------------
@@ -47,6 +53,7 @@ export default defineComponent({
       return projects[currentIndex.value] ?? null
     })
     const currentPosition = computed(() => String(currentIndex.value + 1).padStart(2, '0'))
+    const panelStyle = computed(() => ({ '--panel-offset': `${travelDirection.value}rem` }))
 
     // -------------------- Methods --------------------
     const normalizeIndex = (index: number): number => {
@@ -80,6 +87,23 @@ export default defineComponent({
       }))
     })
 
+    const updateProject = (index: number, direction: number): void => {
+      const nextIndex = normalizeIndex(index)
+      if (nextIndex === currentIndex.value) return
+      // Keep focus on a stable control before hiding the current card or panel.
+      const focused = document.activeElement
+      if (
+        focused instanceof HTMLElement &&
+        (focused.closest('.carousel-card') || focused.closest('.panel')) &&
+        sectionRef.value?.contains(focused)
+      ) {
+        carouselRef.value?.focus({ preventScroll: true })
+      }
+      previousIndex.value = currentIndex.value
+      travelDirection.value = direction < 0 ? -1 : 1
+      currentIndex.value = nextIndex
+    }
+
     const selectProject = (index: number): void => {
       const normalizedIndex = normalizeIndex(index)
 
@@ -93,7 +117,7 @@ export default defineComponent({
         return
       }
 
-      currentIndex.value = normalizedIndex
+      updateProject(normalizedIndex, getRelativeIndex(normalizedIndex))
     }
 
     const shiftProject = (direction: number): void => {
@@ -101,10 +125,12 @@ export default defineComponent({
         return
       }
 
-      currentIndex.value = normalizeIndex(currentIndex.value + direction)
+      updateProject(currentIndex.value + direction, direction)
     }
 
     const startDrag = (event: PointerEvent): void => {
+      if (!event.isPrimary || event.button !== 0) return
+      suppressClick = false
       dragStartX.value = event.clientX
     }
 
@@ -119,10 +145,12 @@ export default defineComponent({
       if (!carouselRef.value?.hasPointerCapture(event.pointerId)) {
         carouselRef.value?.setPointerCapture(event.pointerId)
       }
+      suppressClick = true
     }
 
     const cancelDrag = (): void => {
       dragStartX.value = null
+      suppressClick = false
     }
 
     const finishDrag = (event: PointerEvent): void => {
@@ -131,6 +159,13 @@ export default defineComponent({
       dragStartX.value = null
       if (Math.abs(distance) < 42) return
       shiftProject(distance > 0 ? -1 : 1)
+    }
+
+    const preventDragClick = (event: MouseEvent): void => {
+      if (!suppressClick || event.detail === 0) return
+      event.preventDefault()
+      event.stopPropagation()
+      suppressClick = false
     }
 
     const getPreviewStack = (project: PortfolioProject): string[] => {
@@ -142,6 +177,13 @@ export default defineComponent({
     // -------------------- Lifecycle --------------------
 
     return {
+      sectionRef,
+      projects,
+      headingWords,
+      currentIndex,
+      previousIndex,
+      panelStyle,
+      preventDragClick,
       carouselProjects,
       carouselRef,
       currentProject,
