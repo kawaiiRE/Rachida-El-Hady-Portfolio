@@ -97,7 +97,7 @@ export const LAUNCHFRAME_PROJECT: PortfolioProject = {
     {
       id: 'website',
       label: 'Visit Live Demo',
-      url: 'https://launchframe.152.53.158.194.sslip.io',
+      url: 'https://next-template.rachida.dev',
     },
   ],
   path: '/projects/launchframe',
