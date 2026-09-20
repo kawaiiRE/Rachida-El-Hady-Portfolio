@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
-  <title id="title">Launchframe</title>
-  <desc id="description">A geometric letter L within a layered rounded frame.</desc>
+  <title id="title">Next Template</title>
+  <desc id="description">A geometric letter N within a layered rounded frame.</desc>
   <defs>
     <linearGradient id="background" x1="18" y1="12" x2="112" y2="118" gradientUnits="userSpaceOnUse">
       <stop stop-color="#8e8bff"/>
@@ -10,6 +10,6 @@
   </defs>
   <rect width="128" height="128" rx="32" fill="#11182b"/>
   <rect x="17" y="17" width="94" height="94" rx="25" fill="url(#background)"/>
-  <path d="M44 37h18v39h27v16H44V37Z" fill="#fff"/>
+  <path d="M38 92V36h16l22 32V36h16v56H76L54 60v32H38Z" fill="#fff"/>
   <path d="M34 27h60" stroke="#fff" stroke-opacity=".3" stroke-width="4" stroke-linecap="round"/>
 </svg>

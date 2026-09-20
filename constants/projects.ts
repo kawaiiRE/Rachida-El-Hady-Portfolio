@@ -58,14 +58,14 @@ export const AURAFLOW_PROJECT: PortfolioProject = {
   path: '/projects/auraflow',
 }
 
-export const LAUNCHFRAME_PROJECT: PortfolioProject = {
-  id: 'launchframe',
-  title: 'Launchframe',
+export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
+  id: 'next-template',
+  title: 'Next Template',
   category: 'Next.js + PocketBase Starter',
   summary:
     'A polished, production-minded full-stack foundation with independent frontend and backend repositories, typed boundaries, and recovery-ready deployment.',
   description:
-    'Launchframe pairs a responsive Next.js and React dashboard shell with a private PocketBase backend through a small versioned HTTP contract. The two templates keep separate histories, dependencies, tests, and deployment rules while working together through same-origin server routes. The reference release includes strict TypeScript, Zod validation, SCSS Modules, accessible desktop and mobile navigation, container isolation, health checks, forward migrations, and verified backup tooling.',
+    'Next Template pairs a responsive Next.js and React dashboard shell with a private PocketBase backend through a small versioned HTTP contract. The two templates keep separate histories, dependencies, tests, and deployment rules while working together through same-origin server routes. The reference release includes strict TypeScript, Zod validation, SCSS Modules, accessible desktop and mobile navigation, container isolation, health checks, forward migrations, and verified backup tooling.',
   stack: [
     'Next.js',
     'React',
@@ -77,11 +77,11 @@ export const LAUNCHFRAME_PROJECT: PortfolioProject = {
     'Docker',
     'Yarn',
   ],
-  imageAlt: 'Launchframe responsive Next.js dashboard and PocketBase architecture preview.',
-  logo: '/images/projects/launchframe/launchframe-logo.svg',
-  logoAlt: 'Launchframe letter L logo.',
-  images: ['/images/projects/launchframe/launchframe-dashboard.png'],
-  bgImg: '/images/projects/launchframe/launchframe-dashboard.png',
+  imageAlt: 'Next Template responsive Next.js dashboard and PocketBase architecture preview.',
+  logo: '/images/projects/next-template/next-template-logo.svg',
+  logoAlt: 'Next Template letter N logo.',
+  images: ['/images/projects/next-template/next-template-dashboard.png'],
+  bgImg: '/images/projects/next-template/next-template-dashboard.png',
   background: 'linear-gradient(90deg, #11182b, #5a55e7, #1b9aaa, #11182b)',
   metrics: [
     {
@@ -100,7 +100,7 @@ export const LAUNCHFRAME_PROJECT: PortfolioProject = {
       url: 'https://next-template.rachida.dev',
     },
   ],
-  path: '/projects/launchframe',
+  path: '/projects/next-template',
 }
 
 export const DESIGN_KERNEL_PROJECT: PortfolioProject = {
@@ -531,7 +531,7 @@ export const PROJECTS: PortfolioProject[] = [
   // EVERMATH_PROJECT,
   VERSE_PROJECT,
   AURAFLOW_PROJECT,
-  LAUNCHFRAME_PROJECT,
+  NEXT_TEMPLATE_PROJECT,
   DESIGN_KERNEL_PROJECT,
   NOTIFY_PROJECT,
   PLAYQUEST_PROJECT,
