@@ -1,6 +1,5 @@
-export interface LeadershipMetric {
+export interface LeadershipHighlight {
   id: string
-  value: string
   label: string
   description: string
 }
@@ -19,17 +18,15 @@ export interface ProfessionalRole {
   technologies: string[]
 }
 
-export const LEADERSHIP_METRICS: LeadershipMetric[] = [
+export const LEADERSHIP_HIGHLIGHTS: LeadershipHighlight[] = [
   {
     id: 'delivery-team',
-    value: '3+',
     label: 'Delivery team coordinated',
     description:
       'Coordinated two frontend developers and one intern while following features through release.',
   },
   {
     id: 'developers-trained',
-    value: '6+',
     label: 'Developers trained and onboarded',
     description:
       'Trained developers and interns on project structure, implementation standards, and independent delivery.',

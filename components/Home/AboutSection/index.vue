@@ -9,17 +9,19 @@
         unblocking developers, and keeping product, design, and backend decisions connected.
       </p>
 
-      <div class="highlights">
-        <article
-          v-for="highlight in leadershipHighlights"
-          :key="highlight.id"
-          class="card"
-          data-motion
-        >
-          <strong class="card-value">{{ highlight.value }}</strong>
-          <h3 class="card-title">{{ highlight.label }}</h3>
-          <p class="card-description">{{ highlight.description }}</p>
-        </article>
+      <div class="highlights" data-motion>
+        <p class="highlights-label">Leadership in practice</p>
+
+        <div class="list">
+          <article v-for="highlight in leadershipHighlights" :key="highlight.id" class="card">
+            <span class="marker" aria-hidden="true"></span>
+
+            <div class="card-content">
+              <h3 class="card-title">{{ highlight.label }}</h3>
+              <p class="card-description">{{ highlight.description }}</p>
+            </div>
+          </article>
+        </div>
       </div>
 
       <div id="skills" class="skills">

@@ -1,47 +1,49 @@
 <template>
   <div class="project-detail" :style="{ '--project-background': project.background }">
     <div class="app-container container">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <NuxtLink :to="APP_ROUTES.HOME">Home</NuxtLink><span aria-hidden="true">/</span>
-        <NuxtLink :to="APP_ROUTES.PROJECTS">Projects</NuxtLink><span aria-hidden="true">/</span>
-        <span aria-current="page">{{ project.title }}</span>
-      </nav>
+      <div class="opening">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <NuxtLink :to="APP_ROUTES.HOME">Home</NuxtLink><span aria-hidden="true">/</span>
+          <NuxtLink :to="APP_ROUTES.PROJECTS">Projects</NuxtLink><span aria-hidden="true">/</span>
+          <span aria-current="page">{{ project.title }}</span>
+        </nav>
 
-      <header class="header">
-        <div class="meta">
-          <span>{{ project.category }}</span>
-          <span>Project {{ projectNumber }} / {{ projectCount }}</span>
-        </div>
+        <header class="header">
+          <div class="meta">
+            <span>{{ project.category }}</span>
+            <span>Project {{ projectNumber }} / {{ projectCount }}</span>
+          </div>
 
-        <div class="intro">
-          <h1>{{ project.title }}</h1>
+          <div class="intro">
+            <h1>{{ project.title }}</h1>
 
-          <div class="introduction">
-            <p>{{ project.summary }}</p>
-            <div v-if="hasProjectLinks" class="actions">
-              <a
-                v-for="projectLink in project.links"
-                :key="projectLink.id"
-                :href="projectLink.url"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{ projectLink.label }} <span aria-hidden="true">&#8599;</span>
-              </a>
+            <div class="introduction">
+              <p>{{ project.summary }}</p>
+              <div v-if="hasProjectLinks" class="actions">
+                <a
+                  v-for="projectLink in project.links"
+                  :key="projectLink.id"
+                  :href="projectLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ projectLink.label }} <span aria-hidden="true">&#8599;</span>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <figure class="hero">
-        <div class="hero-media">
-          <img :src="project.bgImg" :alt="project.imageAlt" />
-        </div>
-        <figcaption>
-          <span>{{ project.title }} / Platform previews</span>
-          <span>{{ project.category }}</span>
-        </figcaption>
-      </figure>
+        <figure class="hero">
+          <div class="hero-media">
+            <img :src="project.bgImg" :alt="project.imageAlt" />
+          </div>
+          <figcaption>
+            <span>{{ project.title }} / Platform previews</span>
+            <span>{{ project.category }}</span>
+          </figcaption>
+        </figure>
+      </div>
 
       <section class="overview" aria-labelledby="project-overview-title">
         <div class="overview-copy">

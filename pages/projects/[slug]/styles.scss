@@ -1,6 +1,7 @@
 .project-detail {
   &,
   .container,
+  .opening,
   .header,
   .intro,
   .introduction,
@@ -19,7 +20,7 @@
 
   & {
     min-height: 100vh;
-    padding: 6rem 0 7rem;
+    padding: 3.5rem 0 7rem;
     color: var(--gray-scale-50);
     background: var(--surface-page);
   }
@@ -28,6 +29,12 @@
     display: flex;
     flex-direction: column;
     gap: 5.5rem;
+  }
+
+  .opening {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
   }
 
   .breadcrumb {
@@ -85,29 +92,29 @@
   .intro {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.55fr);
-    gap: clamp(3rem, 7vw, 7rem);
-    align-items: end;
-    padding-top: 3.5rem;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+    padding-top: 2.25rem;
   }
 
   .intro h1 {
     max-width: 10ch;
-    font-size: clamp(3.5rem, 9vw, 8.5rem);
-    line-height: 0.87;
-    letter-spacing: -0.075em;
+    font-size: clamp(3.5rem, 7vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.065em;
   }
 
   .introduction {
     display: grid;
-    gap: 1.75rem;
-    padding: 0 0 0.5rem 1.5rem;
+    gap: 1.25rem;
+    padding: 0 0 0.25rem 1.5rem;
     border-left: 0.0625rem solid var(--line-subtle);
   }
 
   .introduction > p {
     color: rgba(var(--gray-scale-50-rgb), 0.72);
-    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-    line-height: 1.7;
+    font-size: clamp(1rem, 1.35vw, 1.125rem);
+    line-height: 1.6;
   }
 
   .actions {
@@ -478,7 +485,7 @@
 
   @media (max-width: breakpoint('tablet')) {
     & {
-      padding: 5.5rem 0 5rem;
+      padding: 3.5rem 0 5rem;
     }
 
     .container {
@@ -491,6 +498,10 @@
     }
 
     .intro {
+      gap: 2rem;
+    }
+
+    .opening {
       gap: 2rem;
     }
 
@@ -511,7 +522,7 @@
 
   @media (max-width: breakpoint('phone-wide')) {
     & {
-      padding: 3.5rem 0 4rem;
+      padding: 2.5rem 0 4rem;
     }
 
     .container {
@@ -540,7 +551,7 @@
 
     .intro {
       gap: 1.5rem;
-      padding-top: 2rem;
+      padding-top: 1.5rem;
     }
 
     .intro h1 {

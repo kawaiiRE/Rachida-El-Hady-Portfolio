@@ -7,52 +7,73 @@
   }
 
   .highlights {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.28fr) 1fr;
+    gap: clamp(1.75rem, 5vw, 5rem);
+    align-items: start;
+    margin-top: 2rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 0.0625rem solid rgba(var(--primary-scale-400-rgb), 0.2);
+    border-radius: 1rem;
+    background:
+      linear-gradient(135deg, var(--surface-accent-soft), transparent 48%), var(--surface-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .highlights::after {
+    position: absolute;
+    z-index: -1;
+    top: -7rem;
+    right: -4rem;
+    width: 15rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(var(--secondary-scale-400-rgb), 0.08);
+    filter: blur(2.5rem);
+    content: '';
+    pointer-events: none;
+  }
+
+  .highlights-label {
+    color: var(--primary-scale-400);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    margin-top: 1.5rem;
-    border-block: 0.0625rem solid var(--line-subtle);
+    gap: clamp(1.5rem, 4vw, 4rem);
   }
 
   .card {
-    position: relative;
-    min-height: 12rem;
-    padding: 1.5rem 2rem;
-    border-right: 0.0625rem solid var(--line-subtle);
-    background: transparent;
-    transition:
-      background-color 240ms ease,
-      color 240ms ease;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: start;
   }
 
-  .card:first-child {
-    padding-left: 0;
-  }
-
-  .card:last-child {
-    padding-right: 0;
-    border-right: 0;
-  }
-
-  .card:hover {
-    background: var(--surface-accent-soft);
+  .marker {
+    width: 0.6rem;
+    aspect-ratio: 1;
+    margin-top: 0.38rem;
+    border-radius: 50%;
+    background: var(--primary-scale-400);
+    box-shadow: 0 0 0 0.28rem rgba(var(--primary-scale-400-rgb), 0.13);
   }
 
   .card-title {
-    margin: 1.4rem 0 0.75rem;
+    margin-bottom: 0.65rem;
     color: var(--gray-scale-50);
     font-size: 1.08rem;
-    line-height: 1.25;
-  }
-
-  .card-value {
-    display: block;
-    color: var(--primary-scale-400);
-    font-family: var(--font-display);
-    font-size: clamp(2.7rem, 6vw, 5.25rem);
-    font-weight: 700;
-    line-height: 0.82;
-    letter-spacing: -0.075em;
+    line-height: 1.3;
   }
 
   .card-description {
@@ -109,6 +130,11 @@
   }
 
   @media (max-width: breakpoint('tablet')) {
+    .highlights {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
     .skills {
       gap: 1.5rem;
     }
@@ -129,21 +155,17 @@
       margin-top: 5rem;
     }
 
+    .highlights {
+      padding: 1.35rem;
+    }
+
+    .list {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
     .card {
-      min-height: auto;
-      padding: 1.25rem 0.75rem;
-    }
-
-    .card:nth-child(odd) {
-      padding-left: 0;
-    }
-
-    .card:nth-child(even) {
-      padding-right: 0;
-    }
-
-    .card-value {
-      font-size: clamp(2.35rem, 12vw, 3.25rem);
+      gap: 0.8rem;
     }
 
     .card-title {

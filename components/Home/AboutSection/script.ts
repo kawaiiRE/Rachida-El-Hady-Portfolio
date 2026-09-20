@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue'
-import { LEADERSHIP_METRICS } from '~/constants/experience'
+import { LEADERSHIP_HIGHLIGHTS } from '~/constants/experience'
 
 type SkillGroup = {
   id: string
@@ -14,7 +14,7 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     // -------------------- State --------------------
-    const leadershipHighlights = LEADERSHIP_METRICS
+    const leadershipHighlights = LEADERSHIP_HIGHLIGHTS
 
     const skillGroups: SkillGroup[] = [
       {
