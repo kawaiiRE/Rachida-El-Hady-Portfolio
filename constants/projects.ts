@@ -61,16 +61,19 @@ export const AURAFLOW_PROJECT: PortfolioProject = {
 export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
   id: 'next-template',
   title: 'Next Template',
-  category: 'Next.js + PocketBase Starter',
+  category: 'Next.js + PocketBase + Expo Starter',
   summary:
-    'A polished, production-minded full-stack foundation with independent frontend and backend repositories, typed boundaries, and recovery-ready deployment.',
+    'A production-minded web, backend, and mobile foundation with three independent repositories, typed boundaries, and recovery-ready deployment.',
   description:
-    'Next Template pairs a responsive Next.js and React dashboard shell with a private PocketBase backend through a small versioned HTTP contract. The two templates keep separate histories, dependencies, tests, and deployment rules while working together through same-origin server routes. The reference release includes strict TypeScript, Zod validation, SCSS Modules, accessible desktop and mobile navigation, container isolation, health checks, forward migrations, and verified backup tooling.',
+    'Next Template connects a responsive Next.js and React gateway, a private PocketBase backend, and an Expo mobile client through a small versioned HTTP contract. All three public templates keep separate histories, dependencies, tests, CI, and deployment rules. The reference release includes strict TypeScript, Zod validation, SCSS Modules, React Native Paper, focused MobX state, accessible navigation, container isolation, health checks, forward migrations, and verified backup tooling.',
   stack: [
     'Next.js',
     'React',
     'TypeScript',
     'PocketBase',
+    'Expo',
+    'React Native',
+    'MobX',
     'Zod',
     'SCSS Modules',
     'Vitest',
@@ -85,7 +88,7 @@ export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
   background: 'linear-gradient(90deg, #11182b, #5a55e7, #1b9aaa, #11182b)',
   metrics: [
     {
-      value: '2 repos',
+      value: '3 repos',
       label: 'Independent clean codebases',
     },
     {
@@ -98,6 +101,21 @@ export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
       id: 'website',
       label: 'Visit Live Demo',
       url: 'https://next-template.rachida.dev',
+    },
+    {
+      id: 'frontend-source',
+      label: 'Frontend Template',
+      url: 'https://github.com/kawaiiRE/next-pocketbase-frontend-template',
+    },
+    {
+      id: 'backend-source',
+      label: 'Backend Template',
+      url: 'https://github.com/kawaiiRE/pocketbase-next-backend-template',
+    },
+    {
+      id: 'mobile-source',
+      label: 'Mobile Template',
+      url: 'https://github.com/kawaiiRE/react-native-expo-template',
     },
   ],
   path: '/projects/next-template',
