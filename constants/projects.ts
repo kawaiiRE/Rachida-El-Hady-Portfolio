@@ -80,8 +80,8 @@ export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
   imageAlt: 'Next Template responsive Next.js dashboard and PocketBase architecture preview.',
   logo: '/images/projects/next-template/next-template-logo.svg',
   logoAlt: 'Next Template letter N logo.',
-  images: ['/images/projects/next-template/next-template-dashboard.png'],
-  bgImg: '/images/projects/next-template/next-template-dashboard.png',
+  images: ['/images/projects/next-template/next-template-dashboard-e1f6b640.png'],
+  bgImg: '/images/projects/next-template/next-template-dashboard-e1f6b640.png',
   background: 'linear-gradient(90deg, #11182b, #5a55e7, #1b9aaa, #11182b)',
   metrics: [
     {
