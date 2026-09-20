@@ -105,12 +105,12 @@ export const NEXT_TEMPLATE_PROJECT: PortfolioProject = {
     {
       id: 'frontend-source',
       label: 'Frontend Template',
-      url: 'https://github.com/kawaiiRE/next-pocketbase-frontend-template',
+      url: 'https://github.com/kawaiiRE/next-frontend-template',
     },
     {
       id: 'backend-source',
       label: 'Backend Template',
-      url: 'https://github.com/kawaiiRE/pocketbase-next-backend-template',
+      url: 'https://github.com/kawaiiRE/pocketbase-backend-template',
     },
     {
       id: 'mobile-source',
