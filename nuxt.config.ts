@@ -25,6 +25,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   nitro: {
     prerender: {
+      autoSubfolderIndex: false,
       routes: [
         APP_ROUTES.HOME,
         APP_ROUTES.PROJECTS,

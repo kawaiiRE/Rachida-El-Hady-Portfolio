@@ -36,6 +36,8 @@ generates the sitemap from the published `PROJECTS` list, including project imag
 The home, collection, experience, typing, and published project pages are prerendered
 at build time; a failed page render fails the build. The home page also provides a
 visible directory of ordinary project links independently of the carousel.
+Prerendered pages use flat `.html` files so Cloudflare serves the canonical
+extensionless URLs without redirecting them to trailing-slash variants.
 Disabled projects stay out of the sitemap. Profile names and public social links
 are defined in `constants/site.ts`.
 
