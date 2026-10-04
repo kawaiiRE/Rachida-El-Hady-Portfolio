@@ -119,6 +119,14 @@
         </div>
       </div>
     </div>
+    <nav class="app-container directory" aria-label="Browse all projects by Rachida">
+      <p class="section-label">Browse all projects</p>
+      <ul>
+        <li v-for="project in projects" :key="project.id">
+          <NuxtLink :to="getProjectPath(project)">{{ project.title }}</NuxtLink>
+        </li>
+      </ul>
+    </nav>
   </section>
 </template>
 <script lang="ts" src="./script.ts" />

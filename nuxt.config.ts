@@ -1,6 +1,9 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-const siteUrl = process.env.NUXT_PUBLIC_SITE_URL!
-const siteName = 'Rachida El Hady'
+import { SITE_IDENTITY } from './constants/site'
+import { PROJECTS } from './constants/projects'
+import { APP_ROUTES } from './constants/routes'
+
+const siteUrl = (process.env.NUXT_PUBLIC_SITE_URL || SITE_IDENTITY.url).replace(/\/$/, '')
+const siteName = SITE_IDENTITY.name
 const siteDescription =
   'Software engineer Rachida El Hady builds production web and mobile products, APIs, and data workflows with React, Vue, Nuxt, TypeScript, React Native, Node.js, and Fastify with scalable architecture, polished interfaces, and reliable delivery.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
@@ -8,15 +11,31 @@ const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
 const websiteStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
+  '@id': `${siteUrl}/#website`,
   name: siteName,
-  alternateName: 'Rachida El Hady',
-  url: siteUrl,
+  alternateName: [SITE_IDENTITY.shortName, new URL(siteUrl).hostname],
+  url: `${siteUrl}/`,
+  inLanguage: 'en',
+  publisher: { '@id': `${siteUrl}/#person` },
 }
 
 export default defineNuxtConfig({
   ssr: true,
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  nitro: {
+    prerender: {
+      routes: [
+        APP_ROUTES.HOME,
+        APP_ROUTES.PROJECTS,
+        APP_ROUTES.EXPERIENCE,
+        APP_ROUTES.TYPING,
+        ...PROJECTS.map((project) => project.path),
+        '/sitemap.xml',
+      ],
+      failOnError: true,
+    },
+  },
 
   hooks: {
     'pages:extend'(pages) {

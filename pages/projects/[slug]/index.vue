@@ -18,6 +18,7 @@
             <h1>{{ project.title }}</h1>
 
             <div class="introduction">
+              <p>A project by <NuxtLink :to="APP_ROUTES.HOME">Rachida El Hady</NuxtLink>.</p>
               <p>{{ project.summary }}</p>
               <div v-if="hasProjectLinks" class="actions">
                 <a

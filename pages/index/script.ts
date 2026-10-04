@@ -1,6 +1,7 @@
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { PROJECTS } from '~/constants/projects'
 import { MOTION, MOTION_STYLE } from '~/constants/motion'
+import { SITE_IDENTITY } from '~/constants/site'
 
 type RevertibleMatchMedia = {
   revert: () => void
@@ -28,10 +29,15 @@ export default defineComponent({
           '@type': 'ProfilePage',
           url: siteUrl,
           name: 'Rachida El Hady — Software Engineer',
+          isPartOf: { '@id': `${siteUrl}/#website` },
           mainEntity: {
             '@type': 'Person',
             '@id': personId,
             name: 'Rachida El Hady',
+            alternateName: SITE_IDENTITY.shortName,
+            givenName: 'Rachida',
+            familyName: 'El Hady',
+            sameAs: [...SITE_IDENTITY.profiles],
             url: siteUrl,
             jobTitle: 'Software Engineer',
             description:

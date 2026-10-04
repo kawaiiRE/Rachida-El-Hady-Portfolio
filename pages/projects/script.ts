@@ -1,5 +1,6 @@
 import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { PROJECTS, type PortfolioProject } from '~/constants/projects'
+import { SITE_IDENTITY } from '~/constants/site'
 
 type RevertibleMatchMedia = {
   revert: () => void
@@ -12,19 +13,21 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     const runtimeConfig = useRuntimeConfig()
-    const siteUrl = String(runtimeConfig.public.siteUrl)
+    const siteUrl = String(runtimeConfig.public.siteUrl || SITE_IDENTITY.url).replace(/\/$/, '')
 
     usePageSeo({
       title: 'Independent Web and Mobile Products',
-      description:
-        'Explore independent products by Rachida El Hady, including TrackPal, Crazy Sudoku, Evermath, Verse, Design Kernel, and Auraflow.',
+      description: `Explore software projects by Rachida El Hady: ${PROJECTS.map((project) => project.title).join(', ')}.`,
       path: '/projects',
       image: PROJECTS[0]?.bgImg ?? '',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
+        '@id': `${siteUrl}/projects#webpage`,
         name: 'Independent Web and Mobile Products',
         url: `${siteUrl}/projects`,
+        isPartOf: { '@id': `${siteUrl}/#website` },
+        about: { '@id': `${siteUrl}/#person` },
         description:
           'Selected independent web and mobile products designed and engineered by Rachida El Hady.',
         mainEntity: {

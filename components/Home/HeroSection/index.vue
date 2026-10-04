@@ -16,8 +16,9 @@
         </h1>
 
         <p class="subtitle">
-          I build production web and mobile products, APIs, and data workflows—then shape the
-          architecture, delivery rhythm, and team clarity that help them scale.
+          I'm Rachida, a software engineer. I build web and mobile products, APIs, and data
+          workflows—then shape the architecture, delivery rhythm, and team clarity that help them
+          scale.
         </p>
 
         <div class="actions">

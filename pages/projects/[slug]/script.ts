@@ -1,13 +1,17 @@
 import { defineComponent, ref } from 'vue'
 import { PROJECTS } from '~/constants/projects'
 import { APP_ROUTES } from '~/constants/routes'
+import { SITE_IDENTITY } from '~/constants/site'
 
 export default defineComponent({
   name: 'ProjectDetailPage',
   setup() {
     // -------------------- Composables --------------------
     const route = useRoute()
-    const siteUrl = useRuntimeConfig().public.siteUrl
+    const siteUrl = String(useRuntimeConfig().public.siteUrl || SITE_IDENTITY.url).replace(
+      /\/$/,
+      '',
+    )
 
     // -------------------- State --------------------
     const slug = String(route.params.slug || '')
@@ -41,21 +45,40 @@ export default defineComponent({
       structuredData: [
         {
           '@context': 'https://schema.org',
+          '@type': 'WebPage',
+          '@id': `${canonicalUrl}#webpage`,
+          name: `${project.title} — A project by ${SITE_IDENTITY.name}`,
+          url: canonicalUrl,
+          description: project.summary,
+          inLanguage: 'en',
+          isPartOf: { '@id': `${siteUrl}/#website` },
+          about: { '@id': `${siteUrl}/#person` },
+          mainEntity: { '@id': `${canonicalUrl}#application` },
+          breadcrumb: { '@id': `${canonicalUrl}#breadcrumb` },
+        },
+        {
+          '@context': 'https://schema.org',
           '@type': 'SoftwareApplication',
+          '@id': `${canonicalUrl}#application`,
           name: project.title,
           url: canonicalUrl,
           description: project.description,
           applicationCategory: project.category,
+          image: (project.images ?? []).map((image) => new URL(image, siteUrl).href),
+          mainEntityOfPage: { '@id': `${canonicalUrl}#webpage` },
           author: {
             '@type': 'Person',
             '@id': `${siteUrl}/#person`,
             name: 'Rachida El Hady',
+            alternateName: SITE_IDENTITY.shortName,
+            sameAs: [...SITE_IDENTITY.profiles],
             url: siteUrl,
           },
         },
         {
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
+          '@id': `${canonicalUrl}#breadcrumb`,
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
             { '@type': 'ListItem', position: 2, name: 'Projects', item: `${siteUrl}/projects` },
