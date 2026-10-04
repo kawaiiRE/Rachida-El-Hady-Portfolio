@@ -16,12 +16,19 @@ My personal portfolio showcasing frontend, mobile, and creative development proj
 Copy `.env.example` to `.env`, then run:
 
 ```bash
-npm install
-npm run dev
+yarn install --frozen-lockfile
+yarn dev
 ```
 
 Create a production build with:
 
 ```bash
-npm run build
+yarn build
 ```
+
+## Public discovery
+
+Pages render their content on the server; optional WebGL effects do not gate reading.
+`public/llms.txt` provides a concise public profile and links for automated readers.
+Keep it aligned with the experience, project, and contact content when those change.
+Crawler access is covered by `public/robots.txt` and `public/sitemap.xml`.

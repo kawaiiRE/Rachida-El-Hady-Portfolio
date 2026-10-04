@@ -1,0 +1,46 @@
+# Rachida El Hady
+
+> Frontend engineer building production web and mobile products with React,
+> Vue, Nuxt, React Native, and TypeScript, with a focus on scalable architecture,
+> polished interfaces, and reliable delivery.
+
+## Portfolio
+
+- [Home](https://rachida.dev/): About, selected projects, engineering approach, and contact.
+- [Projects](https://rachida.dev/projects): Project descriptions, technologies, and public links.
+- [Experience](https://rachida.dev/experience): Professional roles and delivery leadership.
+- [Typing challenge](https://rachida.dev/typing): Interactive typing practice.
+- [Sitemap](https://rachida.dev/sitemap.xml): Public portfolio pages and project details.
+
+## Professional experience
+
+- Sowlutions — Front-End Developer, January 2025–August 2026. Hands-on frontend
+  delivery across SaaS, AI, analytics, creator-economy, and client platforms.
+  Responsibilities included implementation, pull-request reviews, release
+  coordination, API planning, reusable Nuxt foundations, and developer onboarding.
+- Axentech GIB — Front-End Developer, December 2023–September 2024. Production
+  React features for an insurance-brokerage ERP, including clients, invoices,
+  receipts, installment tracking, complex forms, data tables, and REST APIs.
+
+## Selected projects
+
+- [Auraflow](https://rachida.dev/projects/auraflow): Interactive WebGL wallpaper
+  studio with six creative modes, local presets, and PNG exports.
+- [Next Template](https://rachida.dev/projects/next-template): Independent Next.js,
+  PocketBase, and Expo foundations with typed contracts and recovery-ready deployment.
+- [All projects](https://rachida.dev/projects): The current project collection.
+
+## Engineering approach
+
+Clear architecture, reusable interface patterns, accessible controls, responsive
+layouts, reliable states, and graceful fallbacks. Animation supports hierarchy
+and context. The portfolio serves readable HTML independently of its optional
+WebGL effects; structured profile data is included on the home page.
+
+## Public contact
+
+- [Email](mailto:elhadyrachida71@gmail.com)
+- [GitHub](https://github.com/kawaiiRE)
+- [LinkedIn](https://www.linkedin.com/in/rachida-el-hady-8a5251223/)
+
+The linked portfolio pages are the source of truth for current details.
