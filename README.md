@@ -1,6 +1,6 @@
 # Rachida El Hady Portfolio
 
-My personal portfolio showcasing frontend, mobile, and creative development projects.
+My personal portfolio showcasing web, mobile, backend, and creative development projects.
 
 ## Built With
 

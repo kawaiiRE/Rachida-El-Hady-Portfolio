@@ -32,7 +32,8 @@
           </div>
           <p class="description">
             My strongest recent depth is Vue and Nuxt, backed by production React experience and
-            cross-platform React Native work. The constant is scalable frontend architecture.
+            cross-platform React Native work. I also build backend APIs and data workflows with
+            Node.js, Fastify, and SQL.
           </p>
         </div>
 

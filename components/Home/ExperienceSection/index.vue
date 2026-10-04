@@ -7,8 +7,8 @@
           <h2 class="section-title">Production work, with ownership attached.</h2>
         </div>
         <p>
-          The through-line is hands-on frontend engineering: build the system, clarify the work,
-          help the team ship it, and stay close enough to production to know what actually works.
+          The through-line is hands-on engineering: build the system, clarify the work, help the
+          team ship it, and stay close enough to production to know what actually works.
         </p>
       </header>
 

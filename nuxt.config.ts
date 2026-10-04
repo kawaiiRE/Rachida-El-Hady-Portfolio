@@ -2,7 +2,7 @@
 const siteUrl = process.env.NUXT_PUBLIC_SITE_URL!
 const siteName = 'Rachida El Hady'
 const siteDescription =
-  'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products with scalable architecture, polished interfaces, and reliable delivery.'
+  'Software engineer Rachida El Hady builds production web and mobile products, APIs, and data workflows with React, Vue, Nuxt, TypeScript, React Native, Node.js, and Fastify with scalable architecture, polished interfaces, and reliable delivery.'
 const socialImage = `${siteUrl}/images/char-sitting-with-laptop.avif`
 const googleAnalyticsId = process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
 const websiteStructuredData = {

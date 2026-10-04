@@ -19,7 +19,7 @@ export const TYPING_DIFFICULTIES: Array<{
 export const TYPING_PROMPTS: Record<TypingDifficulty, readonly string[]> = {
   easy: [
     'i build production web and mobile products with clean architecture and a sharp eye for details',
-    'my strongest frontend work connects thoughtful interfaces with systems that stay clear as products grow',
+    'my strongest engineering work connects thoughtful interfaces with systems that stay clear as products grow',
     'i lead delivery while staying hands on with the code from planning and reviews through release',
     'i turn complex forms and data heavy screens into interfaces that feel calm and direct',
     'good motion explains hierarchy and rewards intent without slowing anyone down',
@@ -30,7 +30,7 @@ export const TYPING_PROMPTS: Record<TypingDifficulty, readonly string[]> = {
   hard: [
     'I build production interfaces in Vue, Nuxt, React, and TypeScript - then help teams ship them clearly.',
     'From PR review to release: I stay close to the code, the team, and the product.',
-    '"Clarity before complexity" is how I shape scalable frontend systems; it is not just a phrase.',
+    '"Clarity before complexity" is how I shape scalable product systems; it is not just a phrase.',
     'My work spans SaaS, AI, analytics, React Native, and data-heavy tools - without losing the details.',
     'A reliable UI handles edge cases, respects accessibility, and still feels sharp at 2:00 a.m.',
     'When a product grows, I ask: is the architecture still clear, reusable, and easy to change?',

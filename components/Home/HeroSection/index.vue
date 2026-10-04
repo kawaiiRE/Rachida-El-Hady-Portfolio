@@ -5,7 +5,7 @@
     <div class="app-container section-content">
       <div class="content">
         <p class="eyebrow">
-          <span>Frontend engineer</span>
+          <span>Software engineer</span>
           <span>Web &amp; mobile products</span>
         </p>
 
@@ -16,8 +16,8 @@
         </h1>
 
         <p class="subtitle">
-          I build production React, Vue, Nuxt, and mobile products—then shape the architecture,
-          delivery rhythm, and team clarity that help them scale.
+          I build production web and mobile products, APIs, and data workflows—then shape the
+          architecture, delivery rhythm, and team clarity that help them scale.
         </p>
 
         <div class="actions">

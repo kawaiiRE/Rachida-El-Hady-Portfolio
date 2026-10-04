@@ -8,9 +8,9 @@ export default defineComponent({
   setup() {
     // -------------------- Composables --------------------
     usePageSeo({
-      title: 'Professional Frontend Experience',
+      title: 'Professional Experience',
       description:
-        'Explore Rachida El Hady’s professional frontend experience across production SaaS, React, Vue, Nuxt, TypeScript, delivery leadership, code reviews, and team mentorship.',
+        'Explore Rachida El Hady’s professional engineering experience across production SaaS, React, Vue, Nuxt, TypeScript, delivery leadership, code reviews, and team mentorship.',
       path: APP_ROUTES.EXPERIENCE,
       type: 'profile',
     })

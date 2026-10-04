@@ -38,9 +38,9 @@ export default defineComponent({
         id: 'engineering',
         title: 'Engineering',
         skills: [
-          'Frontend Architecture',
+          'Application Architecture',
           'Reusable Components',
-          'REST API Integration',
+          'REST API Design & Integration',
           'Responsive Design',
           'SSR',
           'SEO',

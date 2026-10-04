@@ -1,8 +1,8 @@
 # Rachida El Hady
 
-> Frontend engineer building production web and mobile products with React,
-> Vue, Nuxt, React Native, and TypeScript, with a focus on scalable architecture,
-> polished interfaces, and reliable delivery.
+> Software engineer building production web and mobile products, APIs, and data
+> workflows with React, Vue, Nuxt, React Native, TypeScript, Node.js, Fastify, and
+> SQL. Scalable architecture, polished interfaces, and reliable delivery.
 
 ## Portfolio
 

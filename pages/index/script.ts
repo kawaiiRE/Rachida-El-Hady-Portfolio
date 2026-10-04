@@ -17,9 +17,9 @@ export default defineComponent({
     const personId = `${siteUrl}/#person`
 
     usePageSeo({
-      title: 'Rachida El Hady | Frontend Engineer',
+      title: 'Rachida El Hady | Software Engineer',
       description:
-        'Frontend engineer Rachida El Hady builds production React, Vue, Nuxt, TypeScript, and React Native products with scalable architecture, polished interfaces, and reliable delivery.',
+        'Software engineer Rachida El Hady builds production web and mobile products with React, Vue, Nuxt, TypeScript, React Native, Node.js, and Fastify, from interfaces to APIs and data.',
       path: '/',
       type: 'profile',
       structuredData: [
@@ -27,16 +27,21 @@ export default defineComponent({
           '@context': 'https://schema.org',
           '@type': 'ProfilePage',
           url: siteUrl,
-          name: 'Rachida El Hady — Frontend Engineer',
+          name: 'Rachida El Hady — Software Engineer',
           mainEntity: {
             '@type': 'Person',
             '@id': personId,
             name: 'Rachida El Hady',
             url: siteUrl,
-            jobTitle: 'Front-End Developer',
+            jobTitle: 'Software Engineer',
             description:
-              'Frontend engineer building production web and mobile products with React, Vue, Nuxt, React Native, and TypeScript.',
+              'Software engineer building production web and mobile products, APIs, and data workflows with React, Vue, Nuxt, React Native, TypeScript, Node.js, and Fastify.',
             knowsAbout: [
+              'Software engineering',
+              'Backend engineering',
+              'Node.js',
+              'Fastify',
+              'SQL',
               'Frontend engineering',
               'React.js',
               'Next.js',
