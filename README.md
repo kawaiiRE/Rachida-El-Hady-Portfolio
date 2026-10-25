@@ -26,6 +26,32 @@ Create a production build with:
 yarn build
 ```
 
+Run the checks with:
+
+```bash
+yarn typecheck
+yarn test
+yarn format:check
+```
+
+## Contact form
+
+The contact form posts to the `api.rachida.dev` backend; nothing is sent from the browser
+to a third-party mail service. The endpoint is a two-step flow: the form fetches a signed,
+single-use challenge token when it is shown, then sends it back with the message, which is
+what lets the server enforce a minimum time-to-submit. The hidden `website` field is a
+honeypot and is always submitted empty.
+
+`lib/contact-api.ts` owns the requests and maps each documented refusal — rate limited,
+submitted too fast, expired challenge, invalid details, delivery failure — to a specific
+message. The backend does not store submissions, so anything other than a `202` is
+reported to the visitor as not sent.
+
+Point the form at another instance with `NUXT_PUBLIC_CONTACT_API_BASE_URL`; it defaults to
+`https://api.rachida.dev`. That API pins its CORS allowlist to `https://rachida.dev` and
+`https://www.rachida.dev`, so a browser on `localhost` cannot call the production endpoint
+— run the backend locally and override the base URL for local work on the form.
+
 ## Public discovery
 
 Pages render their content on the server; optional WebGL effects do not gate reading.

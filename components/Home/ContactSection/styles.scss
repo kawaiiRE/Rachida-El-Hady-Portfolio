@@ -143,12 +143,37 @@
     gap: 0.35rem;
   }
 
+  .field-error {
+    margin: 0;
+    color: var(--error-color);
+    font-size: 0.8rem;
+  }
+
+  /*
+   * The honeypot. Kept out of the layout and out of view for every real visitor; the
+   * markup already removes it from the accessibility tree and the tab order.
+   */
+  .honeypot {
+    position: absolute;
+    left: -100vw;
+    width: 0.0625rem;
+    height: 0.0625rem;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .form-label {
     color: rgba(var(--gray-scale-50-rgb), 0.62);
     font-family: var(--font-space-mono);
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  .form-label .optional {
+    opacity: 0.68;
+    text-transform: none;
   }
 
   .form-input,

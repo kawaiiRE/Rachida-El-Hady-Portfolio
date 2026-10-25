@@ -1,8 +1,12 @@
 import { SITE_IDENTITY } from './constants/site'
 import { PROJECTS } from './constants/projects'
 import { APP_ROUTES } from './constants/routes'
+import { CONTACT_API } from './constants/contact'
 
 const siteUrl = (process.env.NUXT_PUBLIC_SITE_URL || SITE_IDENTITY.url).replace(/\/$/, '')
+const contactApiBaseUrl = (
+  process.env.NUXT_PUBLIC_CONTACT_API_BASE_URL || CONTACT_API.defaultBaseUrl
+).replace(/\/+$/, '')
 const siteName = SITE_IDENTITY.name
 const siteDescription =
   'Software engineer Rachida El Hady builds production web and mobile products, APIs, and data workflows with React, Vue, Nuxt, TypeScript, React Native, Node.js, and Fastify with scalable architecture, polished interfaces, and reliable delivery.'
@@ -61,9 +65,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl,
       ...(googleAnalyticsId ? { googleAnalyticsId } : {}),
-      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
-      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID!,
-      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+      contactApiBaseUrl,
     },
   },
 
