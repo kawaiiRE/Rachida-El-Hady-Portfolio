@@ -44,13 +44,12 @@ honeypot and is always submitted empty.
 
 `lib/contact-api.ts` owns the requests and maps each documented refusal — rate limited,
 submitted too fast, expired challenge, invalid details, delivery failure — to a specific
-message. The backend does not store submissions, so anything other than a `202` is
-reported to the visitor as not sent.
+message. The backend does not store submissions. A response lost in transit is
+reported as unconfirmed delivery because the SMTP handoff may already have happened.
 
-Point the form at another instance with `NUXT_PUBLIC_CONTACT_API_BASE_URL`; it defaults to
-`https://api.rachida.dev`. That API pins its CORS allowlist to `https://rachida.dev` and
-`https://www.rachida.dev`, so a browser on `localhost` cannot call the production endpoint
-— run the backend locally and override the base URL for local work on the form.
+Set server-only `NUXT_CONTACT_API_ORIGIN` for local work and provide a matching
+`NUXT_CONTACT_GATEWAY_TOKEN` / backend `CONTACT_GATEWAY_TOKEN`. Browser requests
+remain same-origin. See [the reviewed release order](docs/contact-release.md).
 
 ## Public discovery
 

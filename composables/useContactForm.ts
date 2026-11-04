@@ -1,5 +1,4 @@
 import { onMounted, ref } from 'vue'
-import { useRuntimeConfig } from '#imports'
 import { CONTACT_LIMITS, CONTACT_MESSAGES } from '~/constants/contact'
 import {
   contactChallengeWaitSeconds,
@@ -35,11 +34,10 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
  * shown and sent back with the message, which is what makes the server's minimum
  * time-to-submit check trustworthy. A token is spent by an accepted submission and by a
  * delivery failure, so a fresh one is fetched whenever the previous one can no longer be
- * used. Nothing is stored server-side, so a refusal is always reported as "not sent".
+ * used. Connection failures report unconfirmed delivery; a lost response may follow a send.
  */
 export const useContactForm = () => {
-  const runtimeConfig = useRuntimeConfig()
-  const baseUrl = String(runtimeConfig.public.contactApiBaseUrl || '').replace(/\/+$/, '')
+  const baseUrl = '' // Same-origin /api; upstream settings stay server-side.
 
   const fields = ref<ContactFormFields>(emptyFields())
   const fieldErrors = ref<Record<string, string>>({})
@@ -58,8 +56,6 @@ export const useContactForm = () => {
   }
 
   const loadChallenge = async (): Promise<boolean> => {
-    if (!baseUrl) return false
-
     isPreparing.value = true
     try {
       const result = await requestContactChallenge({ baseUrl })

@@ -1,11 +1,11 @@
 /**
  * Mirrors the published `api.rachida.dev` contract (`api-contract.json`, revision
- * `2026-10-24.1`). The server is the authority; these values exist so the form can refuse
+ * `2026-11-04.1`). The server is the authority; these values exist so the form can refuse
  * obviously invalid input before spending a single-use challenge token on it.
  */
 export const CONTACT_API = {
-  /** Overridden with `NUXT_PUBLIC_CONTACT_API_BASE_URL` when pointing at another instance. */
-  defaultBaseUrl: 'https://api.rachida.dev',
+  /** Browsers always use this portfolio's own server gateway. */
+  defaultBaseUrl: '',
   challengePath: '/api/v1/contact/challenge',
   submitPath: '/api/v1/contact',
   /** Hidden field a person never fills in. Any value means a script filled it in. */
@@ -57,11 +57,11 @@ export const CONTACT_MESSAGES = {
   challengeUnavailable:
     'The form could not be prepared, so nothing was sent. Check your connection and reload the page.',
   networkError:
-    'Your message could not be sent because the connection failed. Nothing was delivered — please try again.',
+    'The connection failed before delivery could be confirmed. Please check before sending the same message again, or email Rachida directly.',
   rateLimited:
     'You have reached the limit of 5 messages an hour from this connection. Nothing was sent this time; please try again later or email Rachida directly.',
   mailUnavailable:
-    'The mail service did not accept the message, so it was not delivered and it is not saved. Please try again in a few minutes, or email Rachida directly.',
+    'Delivery could not be confirmed. Please try again in a few minutes, or email Rachida directly.',
   tooFast: 'That was submitted a little too quickly. Please take a moment and send it again.',
   challengeInvalid:
     'Your form session expired before the message was sent. The form has been refreshed — please send it again.',
