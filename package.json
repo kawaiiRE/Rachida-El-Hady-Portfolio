@@ -10,11 +10,12 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
+    "test": "vitest run",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "format:files": "prettier --write"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/plugin-polygon-mask": "^3.9.1",
     "@tsparticles/vue3": "^3.0.1",

@@ -58,12 +58,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    contactApiOrigin: 'https://api.rachida.dev',
+    contactGatewayToken: '',
     public: {
       siteUrl,
       ...(googleAnalyticsId ? { googleAnalyticsId } : {}),
-      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
-      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID!,
-      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
     },
   },
 

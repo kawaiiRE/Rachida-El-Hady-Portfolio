@@ -50,46 +50,102 @@
       </div>
 
       <!-- Contact form -->
-      <form class="form" @submit.prevent="sendMessage">
+      <form class="form" novalidate @submit.prevent="sendMessage" @focusin="onFormFocus">
         <p class="form-intro">Start with the essentials.</p>
         <div class="form-group">
           <label class="form-label" for="contact-name">Name</label>
           <input
             id="contact-name"
-            v-model="formData.name"
+            v-model="fields.name"
             type="text"
             name="name"
             autocomplete="name"
             placeholder="Your name"
             class="form-input"
+            :maxlength="limits.nameMax"
+            :aria-invalid="Boolean(fieldErrors.name)"
+            :aria-describedby="fieldErrors.name ? 'contact-name-error' : undefined"
             required
           />
+          <p v-if="fieldErrors.name" id="contact-name-error" class="field-error">
+            {{ fieldErrors.name }}
+          </p>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="contact-email">Email</label>
           <input
             id="contact-email"
-            v-model="formData.email"
+            v-model="fields.email"
             type="email"
             name="email"
             autocomplete="email"
             placeholder="you@example.com"
             class="form-input"
+            :maxlength="limits.emailMax"
+            :aria-invalid="Boolean(fieldErrors.email)"
+            :aria-describedby="fieldErrors.email ? 'contact-email-error' : undefined"
             required
           />
+          <p v-if="fieldErrors.email" id="contact-email-error" class="field-error">
+            {{ fieldErrors.email }}
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-subject">
+            Subject <span class="optional">(optional)</span>
+          </label>
+          <input
+            id="contact-subject"
+            v-model="fields.subject"
+            type="text"
+            name="subject"
+            autocomplete="off"
+            placeholder="What it is about"
+            class="form-input"
+            :maxlength="limits.subjectMax"
+            :aria-invalid="Boolean(fieldErrors.subject)"
+            :aria-describedby="fieldErrors.subject ? 'contact-subject-error' : undefined"
+          />
+          <p v-if="fieldErrors.subject" id="contact-subject-error" class="field-error">
+            {{ fieldErrors.subject }}
+          </p>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="contact-message">Message</label>
           <textarea
             id="contact-message"
-            v-model="formData.message"
+            v-model="fields.message"
             name="message"
             placeholder="What are you working on?"
             class="form-textarea"
             rows="6"
+            :maxlength="limits.messageMax"
+            :aria-invalid="Boolean(fieldErrors.message)"
+            :aria-describedby="fieldErrors.message ? 'contact-message-error' : undefined"
             required
+          />
+          <p v-if="fieldErrors.message" id="contact-message-error" class="field-error">
+            {{ fieldErrors.message }}
+          </p>
+        </div>
+
+        <!--
+          Honeypot. Removed from the accessibility tree and the tab order, and never
+          visible, so only a script fills it in. The server discards any submission that
+          carries a value here.
+        -->
+        <div class="honeypot" aria-hidden="true">
+          <label :for="`contact-${honeypotField}`">Website</label>
+          <input
+            :id="`contact-${honeypotField}`"
+            v-model="fields.website"
+            :name="honeypotField"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
           />
         </div>
 
@@ -109,8 +165,8 @@
         </div>
 
         <!-- Submit button -->
-        <button type="submit" class="form-button" :disabled="isLoading">
-          <span>{{ isLoading ? 'Sending...' : 'Send Message' }}</span>
+        <button type="submit" class="form-button" :disabled="isSubmitting">
+          <span>{{ isSubmitting ? 'Sending...' : 'Send Message' }}</span>
           <span class="arrow" aria-hidden="true">↗</span>
         </button>
       </form>

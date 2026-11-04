@@ -1,7 +1,7 @@
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent } from 'vue'
 import { APP_LINKS } from '~/constants/routes'
-
-type EmailJsClient = typeof import('@emailjs/browser').default
+import { CONTACT_API, CONTACT_LIMITS } from '~/constants/contact'
+import { useContactForm } from '~/composables/useContactForm'
 
 interface HomeContactItem {
   id: string
@@ -52,124 +52,36 @@ export const homeContactItems: HomeContactItem[] = [
   },
 ]
 
-interface FormData {
-  name: string
-  email: string
-  message: string
-}
-
 export default defineComponent({
   name: 'ContactSection',
   props: {},
   emits: [],
   setup() {
     // -------------------- Composables --------------------
-    const config = useRuntimeConfig()
+    const { fields, fieldErrors, isSubmitting, successMessage, errorMessage, prepare, submit } =
+      useContactForm()
 
     // -------------------- State --------------------
     const contactItems = homeContactItems
-    const formData = ref<FormData>({
-      name: '',
-      email: '',
-      message: '',
-    })
 
-    const isLoading = ref(false)
-    const successMessage = ref('')
-    const errorMessage = ref('')
-    let emailClient: EmailJsClient | null = null
-
-    // -------------------- Computed --------------------
     // -------------------- Methods --------------------
-    const getEmailJSConfig = () => ({
-      publicKey: config.public.emailjsPublicKey,
-      serviceId: config.public.emailjsServiceId,
-      templateId: config.public.emailjsTemplateId,
-    })
-
-    const initializeEmailJS = async (): Promise<EmailJsClient | null> => {
-      const { publicKey } = getEmailJSConfig()
-
-      if (!publicKey) {
-        console.error(
-          'EmailJS public key is missing. Check NUXT_PUBLIC_EMAILJS_PUBLIC_KEY in the deployment environment.',
-        )
-        return null
-      }
-
-      if (!emailClient) {
-        const emailModule = await import('@emailjs/browser')
-        emailClient = emailModule.default
-        emailClient.init({ publicKey })
-      }
-
-      return emailClient
+    // Covers the visitor whose token request failed while the page was still loading.
+    const onFormFocus = () => {
+      void prepare()
     }
-
-    const sendMessage = async () => {
-      if (!formData.value.name || !formData.value.email || !formData.value.message) {
-        errorMessage.value = 'Please fill in all fields'
-        return
-      }
-
-      isLoading.value = true
-      errorMessage.value = ''
-      successMessage.value = ''
-
-      try {
-        const { publicKey, serviceId, templateId } = getEmailJSConfig()
-
-        if (!publicKey || !serviceId || !templateId) {
-          throw new Error('EmailJS configuration is missing')
-        }
-
-        const client = await initializeEmailJS()
-
-        if (!client) {
-          throw new Error('EmailJS client could not be initialized')
-        }
-
-        await client.send(
-          serviceId,
-          templateId,
-          {
-            from_name: formData.value.name,
-            to_name: 'Rachida',
-            email: formData.value.email,
-            from_email: formData.value.email,
-            to_email: 'elhadyrachida71@gmail.com',
-            message: formData.value.message,
-          },
-          { publicKey },
-        )
-
-        successMessage.value = 'Message sent successfully!'
-        formData.value = { name: '', email: '', message: '' }
-
-        setTimeout(() => {
-          successMessage.value = ''
-        }, 5000)
-      } catch (error) {
-        console.error('EmailJS error:', error)
-        errorMessage.value = 'Failed to send the message. Please try again.'
-      } finally {
-        isLoading.value = false
-      }
-    }
-
-    // -------------------- Lifecycle --------------------
-    onMounted(() => {
-      void initializeEmailJS()
-    })
 
     return {
       contactItems,
-      formData,
-      isLoading,
+      fields,
+      fieldErrors,
+      isSubmitting,
       successMessage,
       errorMessage,
+      honeypotField: CONTACT_API.honeypotField,
+      limits: CONTACT_LIMITS,
       APP_LINKS,
-      sendMessage,
+      onFormFocus,
+      sendMessage: submit,
     }
   },
 })
