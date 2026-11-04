@@ -25,7 +25,7 @@ describe('same-origin contact gateway', () => {
       'x-rachida-client-ip': '192.0.2.1',
       'x-rachida-gateway-token': input.token,
     })
-    expect(captured?.redirect).toBe('error')
+    expect(captured?.redirect).toBe('manual')
     expect(JSON.stringify(result)).not.toContain(input.token)
   })
   it('refuses missing credentials, invalid addresses and insecure production origins', async () => {
@@ -35,6 +35,17 @@ describe('same-origin contact gateway', () => {
       { origin: 'http://api.rachida.dev' },
     ])
       await expect(forwardContact({ ...input, ...patch })).rejects.toMatchObject({ status: 503 })
+  })
+  it('refuses upstream redirects without following them or exposing their destination', async () => {
+    for (const status of [301, 302, 307, 308]) {
+      let calls = 0
+      await expect(forwardContact(input, (async (_url, init) => {
+        calls++
+        expect(init?.redirect).toBe('manual')
+        return new Response(null, { status, headers: { location: 'https://foreign.test/private' } })
+      }) as typeof fetch)).rejects.toMatchObject({ status: 502, code: 'MAIL_UNAVAILABLE' })
+      expect(calls).toBe(1)
+    }
   })
   it('does not expose upstream errors or retry submissions', async () => {
     let calls = 0

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { CONTACT_API, CONTACT_MESSAGES } from '~/constants/contact'
 import {
   contactChallengeWaitSeconds,
@@ -34,6 +34,21 @@ const message = {
 }
 
 describe('requestContactChallenge', () => {
+  it('cancels stalled challenge and submission requests without claiming delivery', async () => {
+    const controller = new AbortController()
+    const deadline = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(controller.signal)
+    const stalled = (async (_url, init) => new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(new Error('Deadline')), { once: true })
+    })) as typeof fetch
+    try {
+      const challenge = requestContactChallenge({ baseUrl: BASE_URL, fetchImpl: stalled })
+      const submission = submitContactMessage(message, 'synthetic-token', { baseUrl: BASE_URL, fetchImpl: stalled })
+      controller.abort()
+      await expect(challenge).resolves.toMatchObject({ ok: false, code: 'CHALLENGE_UNAVAILABLE' })
+      await expect(submission).resolves.toMatchObject({ ok: false, code: 'NETWORK_ERROR' })
+      expect(deadline).toHaveBeenCalledWith(15_000)
+    } finally { deadline.mockRestore() }
+  })
   it('reads the token, expiry, and minimum submit delay', async () => {
     const capture: Capture[] = []
     const result = await requestContactChallenge({

@@ -95,11 +95,13 @@ export const forwardContact = async (
           'x-rachida-client-ip': input.clientIp,
         },
         ...(input.method === 'POST' ? { body: input.body } : {}),
-        redirect: 'error',
+        // Workers supports manual/follow only. Reject redirects without forwarding secrets.
+        redirect: 'manual',
         signal: AbortSignal.timeout(10_000),
       },
     )
     upstreamStatus = response.status
+    if (response.status >= 300 && response.status < 400) throw new Error('Redirect refused')
     stage = 'read-json'
     if (!response.ok && ![400, 413, 429, 502, 503].includes(response.status)) {
       console.error('contact_gateway_upstream_failure', { status: response.status })
