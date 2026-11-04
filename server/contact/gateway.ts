@@ -81,6 +81,8 @@ export const forwardContact = async (
   if (input.body && new TextEncoder().encode(input.body).byteLength > CONTACT_API.bodyLimitBytes) {
     throw new ContactGatewayError(413, 'PAYLOAD_TOO_LARGE', 'The message is too large.')
   }
+  let stage = 'fetch'
+  let upstreamStatus: number | undefined
   try {
     const response = await request(
       new URL(input.method === 'GET' ? CONTACT_API.challengePath : CONTACT_API.submitPath, origin),
@@ -97,7 +99,13 @@ export const forwardContact = async (
         signal: AbortSignal.timeout(10_000),
       },
     )
+    upstreamStatus = response.status
+    stage = 'read-json'
+    if (!response.ok && ![400, 413, 429, 502, 503].includes(response.status)) {
+      console.error('contact_gateway_upstream_failure', { status: response.status })
+    }
     const value: unknown = JSON.parse(await readLimitedBody(response.body, 16 * 1024))
+    stage = 'validate-response'
     if (!value || typeof value !== 'object' || Array.isArray(value))
       throw new Error('Invalid response')
     const data = value as Record<string, unknown>
@@ -152,7 +160,13 @@ export const forwardContact = async (
       body: { code, message: messages[code] },
       ...(retryAfter && /^\d{1,5}$/.test(retryAfter) ? { retryAfter } : {}),
     }
-  } catch {
+  } catch (error) {
+    // Never log request headers, body, URL or error messages containing upstream data.
+    console.error('contact_gateway_request_failed', {
+      kind: error instanceof Error ? error.name : 'UnknownError',
+      stage,
+      status: upstreamStatus,
+    })
     throw new ContactGatewayError(
       502,
       'MAIL_UNAVAILABLE',

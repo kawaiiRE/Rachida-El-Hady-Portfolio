@@ -176,6 +176,7 @@ export const requestContactChallenge = async (
     response = await request(resolveUrl(options.baseUrl, CONTACT_API.challengePath), {
       method: 'GET',
       headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(15_000),
     })
   } catch {
     return {
@@ -245,6 +246,7 @@ export const submitContactMessage = async (
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body,
+      signal: AbortSignal.timeout(15_000),
     })
   } catch {
     return failure('NETWORK_ERROR')
